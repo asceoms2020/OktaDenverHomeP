@@ -12,19 +12,19 @@ const Home = () => {
                     url(${heroBg}) no-repeat center center`
       }}>
         <div className="hero-content">
-          <h1 className="hero-title">Welcome to Our Shop</h1>
+          <h1 className="hero-title">Welcome to Okta Denver</h1>
           <p className="hero-subtitle">
-            최고의 품질, 최상의 서비스를 제공합니다
+            OKTA DENVER 홈페이지 입니다.
           </p>
-          <Link to="/products" className="shop-button">쇼핑하기</Link>
+          <Link to="/products" className="shop-button">탐색하기</Link>
         </div>
       </section>
       
       <section className="featured-section">
         <div className="grid-container">
           <div className="card">
-            <h2>신상품</h2>
-            <p>최신 트렌드의 새로운 상품을 만나보세요</p>
+            <h2>OKTA DENVER 소개</h2>
+            <p>OKTA DENVER 홈페이지 입니다.</p>
           </div>
           <div className="card">
             <h2>베스트셀러</h2>
