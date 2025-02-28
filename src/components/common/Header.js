@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import logoImage from '../../assets/images/logo.png';
 
 const HeaderContainer = styled.header`
   background-color: #fff;
@@ -30,7 +31,9 @@ const Header = () => {
   return (
     <HeaderContainer>
       <Nav>
-        <StyledLink to="/">쇼핑몰 로고</StyledLink>
+        <StyledLink to="/">
+          <img src={logoImage} alt="OKTA DENVER" style={{ height: '40px', width: 'auto' }} />
+        </StyledLink>
         <div>
           <StyledLink to="/products">상품</StyledLink>
           <StyledLink to="/cart" style={{ marginLeft: '20px' }}>장바구니</StyledLink>
