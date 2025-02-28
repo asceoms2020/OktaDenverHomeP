@@ -35,8 +35,9 @@ const Header = () => {
           <img src={logoImage} alt="OKTA DENVER" style={{ height: '40px', width: 'auto' }} />
         </StyledLink>
         <div>
-          <StyledLink to="/products">상품</StyledLink>
-          <StyledLink to="/cart" style={{ marginLeft: '20px' }}>장바구니</StyledLink>
+          <StyledLink to="/home">Home</StyledLink>
+          <StyledLink to="/about"style={{ marginLeft: '20px' }}>About</StyledLink>
+          <StyledLink to="/news" style={{ marginLeft: '20px' }}>News</StyledLink>
         </div>
       </Nav>
     </HeaderContainer>

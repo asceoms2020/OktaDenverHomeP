@@ -16,7 +16,7 @@ const Home = () => {
           <p className="hero-subtitle">
             OKTA DENVER 홈페이지 입니다.
           </p>
-          <Link to="/products" className="shop-button">탐색하기</Link>
+          <Link to="/about" className="shop-button">탐색하기</Link>
         </div>
       </section>
       

@@ -28,3 +28,9 @@ yarn-error.log*
 # 시스템 파일
 .DS_Store
 Thumbs.db
+
+# NPM 캐시
+.npm-cache/
+.npm/
+.npm-cache/_logs/2025-02-27T23_38_08_000Z-debug-0.log
+.gitignore
