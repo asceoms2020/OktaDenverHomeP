@@ -2,8 +2,9 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/common/Header';
 import Home from './pages/Home';
-import Products from './pages/Products';
-import Cart from './pages/Cart';
+import About from './pages/about';
+import Events from './pages/Events';
+import News from './pages/News';
 import './styles/global.css';
 
 function App() {
@@ -12,8 +13,9 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/products" element={<Products />} />
-        <Route path="/cart" element={<Cart />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/events" element={<Events />} />
+        <Route path="/news" element={<News />} />
       </Routes>
     </div>
   );

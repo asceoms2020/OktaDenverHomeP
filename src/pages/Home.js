@@ -16,7 +16,7 @@ const Home = () => {
           <p className="hero-subtitle">
             하는 일?
           </p>
-          <Link to="/volunteer" className="cta-button">더 알아보기</Link>
+          <Link to="/about" className="shop-button">탐색하기</Link>
         </div>
       </section>
       
