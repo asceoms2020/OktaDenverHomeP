@@ -11,7 +11,7 @@ const Products = () => {
   return (
     <ProductsContainer>
       <h1>상품 목록</h1>
-      <p>준비중입니다...</p>
+      <p>준비중이 아닙니다...</p>
     </ProductsContainer>
   );
 };
