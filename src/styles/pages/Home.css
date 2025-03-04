@@ -13,6 +13,27 @@
   padding: 0 1rem;
 }
 
+.shop-button {
+  background-color: #2ecc71;
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  padding: 1rem 2.5rem;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  display: inline-block;
+  margin: 1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.shop-button:hover {
+  background-color: #27ae60;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+
 .hero-content {
   max-width: 800px;
 }

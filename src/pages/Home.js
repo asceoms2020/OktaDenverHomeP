@@ -3,8 +3,13 @@ import { Link } from 'react-router-dom';
 import '../styles/pages/Home.css';
 // 배경 이미지 import
 import heroBg from '../assets/images/hero-bg.jpg';
+import { useLanguage } from '../context/LanguageContext';
+import { translations } from '../translations/translations';
 
 const Home = () => {
+  const { language } = useLanguage();
+  const t = translations[language].home;
+
   return (
     <div className="home-container">
       <section className="hero-section" style={{
@@ -12,43 +17,43 @@ const Home = () => {
                     url(${heroBg}) no-repeat center center`
       }}>
         <div className="hero-content">
-          <h1 className="hero-title">Okta Denver란?</h1>
+          <h1 className="hero-title">{t.title}</h1>
           <p className="hero-subtitle">
-            하는 일?
+            {t.subtitle}
           </p>
-          <Link to="/about" className="shop-button">탐색하기</Link>
+          <Link to="/volunteer" className="cta-button">{t.ctaButton}</Link>
         </div>
       </section>
       
       <section className="about-section">
-        <h2>우리는 누구인가요?</h2>
+        <h2>{t.aboutTitle}</h2>
         <div className="about-content">
-          <p>단체입니다.</p>
+          <p>{t.aboutContent}</p>
         </div>
       </section>
 
       <section className="projects-section">
-        <h2>진행 중인 프로젝트</h2>
+        <h2>{t.projectsTitle}</h2>
         <div className="project-grid">
           <div className="project-card">
-            <img src="/images/project1.jpg" alt="해양 보호" />
-            <h3>사업 소개</h3>
-            <p>사업 위한 활동</p>
+            <img src="/images/project1.jpg" alt={t.projects.project1.title} />
+            <h3>{t.projects.project1.title}</h3>
+            <p>{t.projects.project1.description}</p>
           </div>
           <div className="project-card">
-          <img src="/images/project2.jpg" alt="숲 보호" />
-            <h3>사업 소개</h3>
-            <p>두번째 사업 프로젝트</p>
+            <img src="/images/project2.jpg" alt={t.projects.project2.title} />
+            <h3>{t.projects.project2.title}</h3>
+            <p>{t.projects.project2.description}</p>
           </div>
           <div className="project-card">
-          <img src="/images/project2.jpg" alt="숲 보호" />
-            <h3>협력업체</h3>
-            <p>협력업체 소개</p>
+            <img src="/images/project2.jpg" alt={t.projects.project3.title} />
+            <h3>{t.projects.project3.title}</h3>
+            <p>{t.projects.project3.description}</p>
           </div>
           <div className="project-card">
-          <img src="/images/project2.jpg" alt="숲 보호" />
-            <h3>사업 소개</h3>
-            <p>사업 위한 활동</p>
+            <img src="/images/project2.jpg" alt={t.projects.project4.title} />
+            <h3>{t.projects.project4.title}</h3>
+            <p>{t.projects.project4.description}</p>
           </div>
         </div>
       </section>
