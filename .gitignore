@@ -4,7 +4,6 @@
 .pnp.js
 
 # 빌드 산출물
-/build
 /dist
 
 # 환경 변수

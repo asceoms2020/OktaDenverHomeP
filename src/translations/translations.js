@@ -6,8 +6,8 @@ export const translations = {
       news: "뉴스"
     },
     home: {
-      title: "Okta Denver란?",
-      subtitle: "하는 일?",
+      title: "창업에 도약을 더하세요",
+      subtitle: "시작에서 성장까지, 그리고 그 성공 너머까지. 1983년부터 젊은 창업가의 열정을 성공으로 이끌어왔습니다.",
       ctaButton: "더 알아보기",
       aboutTitle: "우리는 누구인가요?",
       aboutContent: "단체입니다.",
@@ -43,8 +43,8 @@ export const translations = {
       news: "News"
     },
     home: {
-      title: "What is Okta Denver?",
-      subtitle: "What we do?",
+      title: "Elevate your entrepreneurial journey",
+      subtitle: "Start, grow, and thrive. Transforming ambition into successful businesses for young entrepreneurs since 1983.",
       ctaButton: "Learn More",
       aboutTitle: "Who are we?",
       aboutContent: "We are an organization.",
