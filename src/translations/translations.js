@@ -2,8 +2,11 @@ export const translations = {
   ko: {
     navigation: {
       home: "홈",
-      about: "소개",
-      news: "뉴스"
+      events: "이벤트",
+      resources: "자료",
+      newsletter: "뉴스레터",
+      sponsors: "후원사",
+      about: "소개"
     },
     home: {
       title: "창업에 도약을 더하세요",
@@ -39,8 +42,11 @@ export const translations = {
   en: {
     navigation: {
       home: "Home",
+      events: "Events",
+      resources: "Resources",
+      newsletter: "Newsletter",
       about: "About",
-      news: "News"
+      sponsors: "Sponsors"
     },
     home: {
       title: "Elevate your entrepreneurial journey",

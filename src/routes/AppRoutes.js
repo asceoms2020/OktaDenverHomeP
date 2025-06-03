@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Home from '../pages/Home';
-import About from '../pages/about';
+import About from '../pages/About';
 import Events from '../pages/Events';
 import News from '../pages/News';
 

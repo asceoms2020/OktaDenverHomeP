@@ -45,8 +45,11 @@ const Header = () => {
   const { language } = useLanguage();
   const t = translations[language].navigation || {
     home: "Home",
+    events: "Events",
+    resources: "Resources",
+    newsletter: "Newsletter",
     about: "About",
-    news: "News"
+    sponsors: "Sponsors"
   };
 
   return (
@@ -57,8 +60,11 @@ const Header = () => {
         </StyledLink>
         <NavLinks>
           <StyledLink to="/">{t.home}</StyledLink>
+          <StyledLink to="/events">{t.events}</StyledLink>
+          <StyledLink to="/resources">{t.resources}</StyledLink>
+          <StyledLink to="/newsletter">{t.newsletter}</StyledLink>
           <StyledLink to="/about">{t.about}</StyledLink>
-          <StyledLink to="/news">{t.news}</StyledLink>
+          <StyledLink to="/sponsors">{t.sponsors}</StyledLink>
           <LanguageSwitch />
         </NavLinks>
       </Nav>
