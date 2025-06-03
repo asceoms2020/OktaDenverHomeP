@@ -106,7 +106,7 @@ const About = () => {
         <SectionTitle>조직도</SectionTitle>
         <OrgChart>
           <OrgLevel>
-            <OrgBox>회장<br/>최준겸</OrgBox>
+            <OrgBox>회장<br/>최준경</OrgBox>
           </OrgLevel>
           <OrgLevel>
             <OrgBox>기획운영위원회<br/>박수정,박수영</OrgBox>
