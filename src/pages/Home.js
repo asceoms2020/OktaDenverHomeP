@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/pages/Home.css';
 // 배경 이미지 import
-import heroBg from '../assets/images/hero-bg.png';
+import heroBg from '../assets/images/hero-bg.jpeg';
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../translations/translations';
 
