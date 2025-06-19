@@ -58,4 +58,9 @@ module.exports = {
   cache: {
     type: 'filesystem',
   },
+  performance: {
+    maxEntrypointSize: 300000, // 300 KiB (기본값: 250000)
+    maxAssetSize: 300000, // 300 KiB (기본값: 250000)
+    hints: 'warning', // 'error', 'warning', false 중 선택
+  },
 }; 
