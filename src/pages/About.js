@@ -32,7 +32,7 @@ import {
   TimelineContent
 } from '../styles/About.styles';
 
-import ceoPhoto from '../assets/images/ceo-photo-optimized.jpg';
+import ceoPhoto from '../assets/images/ceo-photo.jpg';
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../translations/translations';
 
