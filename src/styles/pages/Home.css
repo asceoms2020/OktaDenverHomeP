@@ -13,6 +13,29 @@
   padding: 0 1rem;
 }
 
+/* 배경 이미지와 오버레이를 위한 클래스 */
+.hero-section-background {
+  background-size: 100% auto !important;
+}
+
+/* hero content 내부의 박스 스타일 */
+.hero-content-box {
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 18px;
+  padding: 2.5rem 2rem;
+  display: inline-block;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+/* hero 제목과 부제목 색상 */
+.hero-title-white {
+  color: #fff !important;
+}
+
+.hero-subtitle-white {
+  color: #fff !important;
+}
+
 .shop-button {
   background-color: #2ecc71;
   color: white;

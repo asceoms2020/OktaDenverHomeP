@@ -9,8 +9,8 @@ export const translations = {
       about: "소개"
     },
     home: {
-      title: "창업에 도약을 더하세요",
-      subtitle: "시작에서 성장까지, 그리고 그 성공 너머까지. 1983년부터 젊은 창업가의 열정을 성공으로 이끌어왔습니다.",
+      title: "우리는 누구인가요?",
+      subtitle: "미국 콜로라도에 자리한 덴버 OKTA는 한인 비즈니스의 성장을 지원하는 비영리 단체입니다. 세계한인무역협회(월드옥타)의 덴버 지회로서, 콜로라도 지역의 한인 경제인들이 함께 모여 한인 비즈니스의 활성화와 차세대 경제인 육성에 힘쓰고 있습니다.",
       ctaButton: "더 알아보기",
       aboutTitle: "우리는 누구인가요?",
       aboutContent: "단체입니다.",
@@ -133,8 +133,8 @@ export const translations = {
       sponsors: "Sponsors"
     },
     home: {
-      title: "Elevate your entrepreneurial journey",
-      subtitle: "Start, grow, and thrive. Transforming ambition into successful businesses for young entrepreneurs since 1983.",
+      title: "Who are we?",
+      subtitle: "Located in Colorado, USA, Okta Denver is a non-profit organization supporting the growth of Korean businesses. As the Denver branch of the World-OKTA (World Federation of Overseas Korean Traders Associations), Korean business people in Colorado gather to promote Korean business vitality and foster the next generation of entrepreneurs.",
       ctaButton: "Learn More",
       aboutTitle: "Who are we?",
       aboutContent: "We are an organization.",
