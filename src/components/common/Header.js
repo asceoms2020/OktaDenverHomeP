@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import logoImage from '../../assets/images/logo.png';
+import logoImage from '../../assets/images/World-Okta.png';
 import LanguageSwitch from '../LanguageSwitch';
 import { useLanguage } from '../../context/LanguageContext';
 import { translations } from '../../translations/translations';
@@ -39,9 +39,39 @@ const NavLinks = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
+
+  @media (max-width: 768px) {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transform: ${props => props.isOpen ? 'translateY(0)' : 'translateY(-100%)'};
+    opacity: ${props => props.isOpen ? '1' : '0'};
+    visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
+    transition: all 0.3s ease;
+    z-index: 999;
+  }
+`;
+
+const MobileMenuButton = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
 `;
 
 const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { language } = useLanguage();
   const t = translations[language].navigation || {
     home: "Home",
@@ -52,19 +82,30 @@ const Header = () => {
     sponsors: "Sponsors"
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <HeaderContainer>
       <Nav>
-        <StyledLink to="/">
+        <StyledLink to="/" onClick={closeMenu}>
           <img src={logoImage} alt="OKTA DENVER" style={{ height: '40px', width: 'auto' }} />
         </StyledLink>
-        <NavLinks>
-          <StyledLink to="/">{t.home}</StyledLink>
-          <StyledLink to="/events">{t.events}</StyledLink>
-          <StyledLink to="/resources">{t.resources}</StyledLink>
-          <StyledLink to="/newsletter">{t.newsletter}</StyledLink>
-          <StyledLink to="/about">{t.about}</StyledLink>
-          <StyledLink to="/sponsors">{t.sponsors}</StyledLink>
+        <MobileMenuButton onClick={toggleMenu}>
+          {isMenuOpen ? '✕' : '☰'}
+        </MobileMenuButton>
+        <NavLinks isOpen={isMenuOpen}>
+          <StyledLink to="/" onClick={closeMenu}>{t.home}</StyledLink>
+          <StyledLink to="/events" onClick={closeMenu}>{t.events}</StyledLink>
+          <StyledLink to="/resources" onClick={closeMenu}>{t.resources}</StyledLink>
+          <StyledLink to="/newsletter" onClick={closeMenu}>{t.newsletter}</StyledLink>
+          <StyledLink to="/about" onClick={closeMenu}>{t.about}</StyledLink>
+          <StyledLink to="/sponsors" onClick={closeMenu}>{t.sponsors}</StyledLink>
           <LanguageSwitch />
         </NavLinks>
       </Nav>

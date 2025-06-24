@@ -221,4 +221,61 @@ export const EventGrid = styled.div`
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
+`;
+
+// 더보기 버튼 섹션
+export const ViewMoreSection = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 3rem 0;
+  padding: 2rem 0;
+`;
+
+// 더 많은 웹진 보기 버튼
+export const ViewMoreWebzineBtn = styled.button`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1.2rem 3rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s ease;
+  }
+  
+  &:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4c93 100%);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.6);
+  }
+  
+  &:hover::before {
+    left: 100%;
+  }
+  
+  &:active {
+    transform: translateY(-2px) scale(1.02);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+  }
 `; 

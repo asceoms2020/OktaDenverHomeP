@@ -38,40 +38,56 @@ import {
   EventInfo,
   EventTitle,
   EventDate,
-  ReadMoreBtn
+  ReadMoreBtn,
+  ViewMoreSection,
+  ViewMoreWebzineBtn
 } from '../styles/Newsletter.styles';
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../translations/translations';
+import webzine1 from '../assets/images/newletter/webzine/17th-webzine.jpg';
+import webzine2 from '../assets/images/newletter/webzine/16th-webzine.jpg';
+import webzine3 from '../assets/images/newletter/webzine/15th-webzine.jpg';
+
 
 const Newsletter = () => {
   const { language } = useLanguage();
   // 임시로 한국어 사용 (나중에 translations에 추가)
   
+  // 웹진 클릭 핸들러
+  const handleWebzineClick = (url) => {
+    if (url) {
+      window.open(url, '_blank');
+    }
+  };
+
   // 예시 데이터
   const webzineData = [
     {
       id: 1,
-      title: "2024년 보안 트렌드 리포트",
-      excerpt: "최신 사이버 보안 위협과 대응 방안에 대한 종합적인 분석을 담은 특별 웹진입니다.",
-      date: "2024.03.15",
-      image: "/images/webzine1.jpg",
-      category: "보안 트렌드"
+      title: "월드옥타 웹진 17호",
+      excerpt: "",
+      date: "05.25.2025",
+      image: webzine1,
+      url: "https://book.litchi.biz/books/pggb/mobile/index.html", // 
+      category: ""
     },
     {
       id: 2,
-      title: "클라우드 보안 완벽 가이드",
-      excerpt: "기업의 클라우드 전환 시 필수적으로 고려해야 할 보안 요소들을 상세히 정리했습니다.",
-      date: "2024.02.28",
-      image: "/images/webzine2.jpg",
-      category: "클라우드"
+      title: "월드옥타 웹진 16호",
+      excerpt: "",
+      date: "04.25.2025",
+      image: webzine2,
+      url: "https://book.yunzhan365.com/bavku/howc/mobile/index.html", // 실제 URL로 변경 필요
+      category: ""
     },
     {
       id: 3,
-      title: "제로 트러스트 보안 모델",
-      excerpt: "차세대 보안 패러다임인 제로 트러스트 모델의 개념과 구현 방법을 소개합니다.",
-      date: "2024.02.10",
-      image: "/images/webzine3.jpg",
-      category: "보안 모델"
+      title: "월드옥타 웹진 15호",
+      excerpt: "",
+      date: "03.25.2025",
+      image: webzine3,
+      url: "https://book.litchi.biz/books/galf/mobile/index.html", // 실제 URL로 변경 필요
+      category: ""
     }
   ];
 
@@ -142,17 +158,37 @@ const Newsletter = () => {
         <SectionTitle>웹진</SectionTitle>
         <ServiceGrid>
           {webzineData.map((webzine) => (
-            <WebzineCard key={webzine.id}>
+            <WebzineCard 
+              key={webzine.id}
+              onClick={() => handleWebzineClick(webzine.url)}
+              style={{ cursor: webzine.url ? 'pointer' : 'default' }}
+            >
               <WebzineImage src={webzine.image} alt={webzine.title} />
               <WebzineContent>
                 <WebzineDate>{webzine.date}</WebzineDate>
                 <WebzineTitle>{webzine.title}</WebzineTitle>
                 <WebzineExcerpt>{webzine.excerpt}</WebzineExcerpt>
-                <ReadMoreBtn>자세히 보기</ReadMoreBtn>
+                <ReadMoreBtn 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleWebzineClick(webzine.url);
+                  }}
+                >
+                  자세히 보기
+                </ReadMoreBtn>
               </WebzineContent>
             </WebzineCard>
           ))}
         </ServiceGrid>
+        
+        {/* 더 많은 웹진 보기 버튼 */}
+        <ViewMoreSection>
+          <ViewMoreWebzineBtn 
+            onClick={() => handleWebzineClick('https://www.okta.net/site/okta/page/activity/promotion/webzine/')}
+          >
+            📚 더 많은 웹진 보기
+          </ViewMoreWebzineBtn>
+        </ViewMoreSection>
       </Section>
 
       {/* 뉴스 섹션 */}
@@ -171,24 +207,6 @@ const Newsletter = () => {
             </NewsCard>
           ))}
         </NewsletterContainer>
-      </Section>
-
-      {/* 과거 이벤트 섹션 */}
-      <Section>
-        <SectionTitle>Past Events</SectionTitle>
-        <ImageGrid>
-          {eventData.map((event) => (
-            <ImageContainer key={event.id}>
-              <Image src={event.image} alt={event.title} />
-              <ImageCaption>
-                <EventInfo>
-                  <EventTitle>{event.title}</EventTitle>
-                  <EventDate>{event.date}</EventDate>
-                </EventInfo>
-              </ImageCaption>
-            </ImageContainer>
-          ))}
-        </ImageGrid>
       </Section>
     </AboutContainer>
   );
