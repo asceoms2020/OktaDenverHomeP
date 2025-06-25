@@ -3,10 +3,11 @@ export const translations = {
     navigation: {
       home: "홈",
       events: "이벤트",
-      resources: "자료",
+      resources: "자료실",
       newsletter: "뉴스레터",
-      sponsors: "후원사",
-      about: "소개"
+      about: "소개",
+      sponsors: "스폰서",
+      donation: "후원하기"
     },
     home: {
       title: "우리는 누구인가요?",
@@ -50,11 +51,11 @@ export const translations = {
       boardMembers: {
         title: "보드멤버",
         members: [
-          { name: "박수정", position: "부회장" },
-          { name: "신윤주", position: "부회장" },
-          { name: "이승우", position: "이사장" },
-          { name: "신동윤", position: "감사이사" },
-          { name: "김소연", position: "재무이사" }
+          { name: "박수정", position: "부회장", image: "sjp.jpg" },
+          { name: "신윤주", position: "부회장", image: "syk.png" },
+          { name: "이승우", position: "이사장", image: "swl.png" },
+          { name: "신동윤", position: "감사이사", image: "dys.png" },
+          { name: "김소연", position: "재무이사", image: "yjs.png" }
         ]
       },
       organization: {
@@ -71,11 +72,11 @@ export const translations = {
         title: "하는 일",
         items: [
           {
-            title: "신원 관리",
-            description: "통합된 신원 관리 솔루션으로 사용자 인증과 권한 관리를 간편하고 안전하게 제공합니다."
+            title: "멘토링",
+            description: "차세대 글로벌창업무역스쿨: 젊은 세대에게 체계적인 교육과 멘토링을 제공해 미래 비즈니스 리더로 성장하도록 돕습니다."
           },
           {
-            title: "보안 솔루션",
+            title: "창업기회",
             description: "다중 인증과 위험 기반 인증을 통해 기업의 디지털 자산을 보호하는 강력한 보안 서비스를 제공합니다."
           },
           {
@@ -120,6 +121,76 @@ export const translations = {
           "열정적인 Okta 덴버 팀",
           "혁신적인 기업 문화"
         ]
+      },
+      footer: {
+        organizationName: "OKTA 덴버지회",
+        address: {
+          street: "1234 Main Street",
+          city: "Denver, Colorado 80203"
+        },
+        contact: {
+          phone: "303.555.0123",
+          email: "info@oktadenver.org"
+        },
+        ein: "EIN: 12-3456789",
+        newsletter: {
+          title: "연락하기",
+          description: "OKTA 덴버지회의 월간 뉴스레터를 구독하시고 최신 소식, 행사 정보, 회원 혜택을 받아보세요.",
+          placeholders: {
+            firstName: "이름",
+            lastName: "성",
+            email: "이메일"
+          },
+          signUpButton: "구독하기"
+        },
+        social: {
+          linkedin: "LinkedIn",
+          facebook: "Facebook",
+          youtube: "YouTube",
+          instagram: "Instagram"
+        },
+        copyright: "© 2024 OKTA 덴버지회. All rights reserved."
+      },
+      events: {
+        title: "이벤트",
+        upcomingEvents: "다가오는 이벤트",
+        pastEvents: "지난 이벤트",
+        clickToView: "클릭하여 자세히 보기 →",
+        eventRegistration: {
+          title: "이벤트 등록하기",
+          description: "OKTA 덴버지회의 다양한 이벤트에 참여하세요!",
+          buttonText: "Zeffy에서 이벤트 등록하기"
+        },
+        upcomingEventsList: [
+          {
+            title: "Discover Korea at Dragon Boat Festival",
+            description: "콜로라도 드래곤 보트 페스티벌에서 한국 문화를 소개하는 특별한 기회입니다.",
+            badge: "참가 모집중"
+          },
+          {
+            title: "제 4회 OKTA 비즈니스 세미나",
+            description: "최신 금융 트렌드와 투자 전략에 대한 전문가 세미나입니다.",
+            badge: "곧 개최"
+          }
+        ],
+        pastEventsList: [
+          {
+            title: "제 3회 월드옥타 덴버 차세대 세미나",
+            description: "차세대 리더십과 성장 전략에 대한 세미나"
+          },
+          {
+            title: "제 2회 월드옥타 덴버 차세대 세미나",
+            description: "젊은 전문가들을 위한 네트워킹과 교육"
+          },
+          {
+            title: "디스커버 코리아(Discover Korea)",
+            description: "글로벌 경제 전망과 투자 기회"
+          },
+          {
+            title: "골프 토너먼트 (Golf Tournament)",
+            description: "연례 골프 토너먼트 및 네트워킹 이벤트"
+          }
+        ]
       }
     }
   },
@@ -130,7 +201,8 @@ export const translations = {
       resources: "Resources",
       newsletter: "Newsletter",
       about: "About",
-      sponsors: "Sponsors"
+      sponsors: "Sponsors",
+      donation: "Donation"
     },
     home: {
       title: "Who are we?",
@@ -172,11 +244,11 @@ export const translations = {
       boardMembers: {
         title: "Board Members",
         members: [
-          { name: "Soojung Park", position: "Vice President" },
-          { name: "Yunju Shin", position: "Vice President" },
-          { name: "Seun gwoo Lee", position: "Board Chairman" },
-          { name: "Dong Shin", position: "Audit Director" },
-          { name: "Soyeon Kim", position: "Finance Director" }
+          { name: "Soojung Park", position: "Vice President", image: "sjp.jpg" },
+          { name: "Yunju Shin", position: "Vice President", image: "syk.png" },
+          { name: "Seun gwoo Lee", position: "Board Chairman", image: "swl.png" },
+          { name: "Dong Shin", position: "Audit Director", image: "dys.png" },
+          { name: "Soyeon Kim", position: "Finance Director", image: "yjs.png" }
         ]
       },
       organization: {
@@ -241,6 +313,76 @@ export const translations = {
           "Modern Okta Denver Office",
           "Passionate Okta Denver Team",
           "Innovative Corporate Culture"
+        ]
+      },
+      footer: {
+        organizationName: "OKTA Denver",
+        address: {
+          street: "1234 Main Street",
+          city: "Denver, Colorado 80203"
+        },
+        contact: {
+          phone: "303.555.0123",
+          email: "info@oktadenver.org"
+        },
+        ein: "EIN: 12-3456789",
+        newsletter: {
+          title: "Stay in Touch",
+          description: "Sign up for our monthly newsletter for updates on funding, career, and volunteer opportunities at OKTA Denver, as well as highlights of our work in the community.",
+          placeholders: {
+            firstName: "First Name",
+            lastName: "Last Name",
+            email: "Email"
+          },
+          signUpButton: "SIGN UP"
+        },
+        social: {
+          linkedin: "LinkedIn",
+          facebook: "Facebook",
+          youtube: "YouTube",
+          instagram: "Instagram"
+        },
+        copyright: "© 2024 OKTA Denver. All rights reserved."
+      },
+      events: {
+        title: "Events",
+        upcomingEvents: "Upcoming Events",
+        pastEvents: "Past Events",
+        clickToView: "Click to view details →",
+        eventRegistration: {
+          title: "Register for Event",
+          description: "Join our various events and get involved!",
+          buttonText: "Register for Event on Zeffy"
+        },
+        upcomingEventsList: [
+          {
+            title: "Discover Korea at Dragon Boat Festival",
+            description: "Special opportunity to introduce Korean culture at the Colorado Dragon Boat Festival.",
+            badge: "Registration Open"
+          },
+          {
+            title: "4th OKTA Business Seminar",
+            description: "Seminar with experts on latest financial trends and investment strategies.",
+            badge: "Coming Soon"
+          }
+        ],
+        pastEventsList: [
+          {
+            title: "3rd World-OKTA Denver Next Generation Seminar",
+            description: "Seminar on leadership and growth strategies for the next generation"
+          },
+          {
+            title: "2nd World-OKTA Denver Next Generation Seminar",
+            description: "Networking and education for young professionals"
+          },
+          {
+            title: "Discover Korea (Global Economic Outlook and Investment Opportunities)",
+            description: "Global economic outlook and investment opportunities"
+          },
+          {
+            title: "Golf Tournament",
+            description: "Annual golf tournament and networking event"
+          }
         ]
       }
     }

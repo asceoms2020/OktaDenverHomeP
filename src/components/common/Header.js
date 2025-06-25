@@ -35,6 +35,30 @@ const StyledLink = styled(Link)`
   }
 `;
 
+const DonationButton = styled.a`
+  background: transparent;
+  color: #3498db;
+  padding: 8px 16px;
+  border: 2px solid #3498db;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    background: #3498db;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
 const NavLinks = styled.div`
   display: flex;
   align-items: center;
@@ -79,7 +103,8 @@ const Header = () => {
     resources: "Resources",
     newsletter: "Newsletter",
     about: "About",
-    sponsors: "Sponsors"
+    sponsors: "Sponsors",
+    donation: "Donation"
   };
 
   const toggleMenu = () => {
@@ -106,6 +131,14 @@ const Header = () => {
           <StyledLink to="/newsletter" onClick={closeMenu}>{t.newsletter}</StyledLink>
           <StyledLink to="/about" onClick={closeMenu}>{t.about}</StyledLink>
           <StyledLink to="/sponsors" onClick={closeMenu}>{t.sponsors}</StyledLink>
+          <DonationButton 
+            href="https://www.zeffy.com/donation-form/donate-to-change-lives-1296"
+            target="_blank" 
+            rel="noopener noreferrer"
+            onClick={closeMenu}
+          >
+            {t.donation}
+          </DonationButton>
           <LanguageSwitch />
         </NavLinks>
       </Nav>
@@ -113,4 +146,4 @@ const Header = () => {
   );
 };
 
-export default Header; 
+export default Header;

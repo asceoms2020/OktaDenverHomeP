@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from '../components/common/Header';
+import Footer from '../components/common/Footer';
 import Home from '../pages/Home';
 import About from '../pages/About';
 import Events from '../pages/Events';
@@ -23,6 +24,7 @@ const AppRoutes = () => {
           <Route path="/sponsors" element={<Sponsors />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 };

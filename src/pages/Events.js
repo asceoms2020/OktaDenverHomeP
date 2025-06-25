@@ -34,62 +34,105 @@ import pastEvent2Poster from '../assets/images/event/pastevent2.png';
 import pastEvent3Poster from '../assets/images/event/pastevent3.png';
 import pastEvent4Poster from '../assets/images/event/pastevent4.png';
 
-export const upcomingEvents = [
-  {
-    id: 1,
-    title: "Discover Korea at Dragon Boat Festival",
-    date: "09.27.2025",
-    description: "콜로라도 드래곤 보트 페스티벌에서 한국 문화를 소개하는 특별한 기회입니다.",
-    poster: upcomingEvent1Poster,
-    url: "https://www.cdbf.org",
-    badge: "참가 모집중"
-  },
-  {
-    id: 2,
-    title: "제 4회 OKTA 비즈니스 세미나",
-    date: "06.28.2025",
-    description: "최신 금융 트렌드와 투자 전략에 대한 전문가 세미나입니다.",
-    poster: upcomingEvent2Poster,
-    url: "https://www.zeffy.com/ticketing/3",
-    badge: "곧 개최"
-  }
-];
-
 const Events = () => {
   const { language } = useLanguage();
-  // 임시로 한국어 사용 (나중에 translations에 추가)
+  const t = translations[language]?.events || translations.ko.events;
+  
+  // 디버깅: 현재 언어와 번역 데이터 확인
+  console.log('Current language:', language);
+  console.log('Events translations:', t);
+  
+  // 언어별 기본값 설정
+  const defaultTexts = {
+    ko: {
+      title: "이벤트",
+      upcomingEvents: "다가오는 이벤트", 
+      pastEvents: "지난 이벤트",
+      clickToView: "클릭하여 자세히 보기 →",
+      upcomingEvent1: {
+        title: "Discover Korea at Dragon Boat Festival",
+        description: "콜로라도 드래곤 보트 페스티벌에서 한국 문화를 소개하는 특별한 기회입니다.",
+        badge: "참가 모집중"
+      },
+      upcomingEvent2: {
+        title: "제 4회 OKTA 비즈니스 세미나", 
+        description: "최신 금융 트렌드와 투자 전략에 대한 전문가 세미나입니다.",
+        badge: "곧 개최"
+      }
+    },
+    en: {
+      title: "Events",
+      upcomingEvents: "Upcoming Events",
+      pastEvents: "Past Events", 
+      clickToView: "Click to view details →",
+      upcomingEvent1: {
+        title: "Discover Korea at Dragon Boat Festival",
+        description: "Special opportunity to introduce Korean culture at the Colorado Dragon Boat Festival.",
+        badge: "Registration Open"
+      },
+      upcomingEvent2: {
+        title: "4th OKTA Business Seminar",
+        description: "Seminar with experts on latest financial trends and investment strategies.",
+        badge: "Coming Soon"
+      }
+    }
+  };
+  
+  const defaults = defaultTexts[language] || defaultTexts.ko;
 
-  // 과거 이벤트 데이터
-  const pastEvents = [
+  // 다가오는 이벤트 데이터 (번역 적용)
+  const upcomingEvents = [
     {
       id: 1,
-      title: "제 3회 월드옥타 덴버 차세대 세미나",
-      date: "11.23.2023",
-      description: "차세대 리더십과 성장 전략에 대한 세미나",
-      poster: pastEvent1Poster,
-      url: null // URL이 없는 경우
+      title: t?.upcomingEventsList?.[0]?.title || defaults.upcomingEvent1.title,
+      date: "09.27.2025",
+      description: t?.upcomingEventsList?.[0]?.description || defaults.upcomingEvent1.description,
+      poster: upcomingEvent1Poster,
+      url: "https://www.cdbf.org",
+      badge: t?.upcomingEventsList?.[0]?.badge || defaults.upcomingEvent1.badge
     },
     {
       id: 2,
-      title: "제 2회 월드옥타 덴버 차세대 세미나",
+      title: t?.upcomingEventsList?.[1]?.title || defaults.upcomingEvent2.title,
+      date: "06.28.2025",
+      description: t?.upcomingEventsList?.[1]?.description || defaults.upcomingEvent2.description,
+      poster: upcomingEvent2Poster,
+      url: "https://www.zeffy.com/ticketing/3",
+      badge: t?.upcomingEventsList?.[1]?.badge || defaults.upcomingEvent2.badge
+    }
+  ];
+
+  // 과거 이벤트 데이터 (번역 적용)
+  const pastEvents = [
+    {
+      id: 1,
+      title: t?.pastEventsList?.[0]?.title || "제 3회 월드옥타 덴버 차세대 세미나",
+      date: "11.23.2023",
+      description: t?.pastEventsList?.[0]?.description || "차세대 리더십과 성장 전략에 대한 세미나",
+      poster: pastEvent1Poster,
+      url: null
+    },
+    {
+      id: 2,
+      title: t?.pastEventsList?.[1]?.title || "제 2회 월드옥타 덴버 차세대 세미나",
       date: "02.18.2023",
-      description: "젊은 전문가들을 위한 네트워킹과 교육",
+      description: t?.pastEventsList?.[1]?.description || "젊은 전문가들을 위한 네트워킹과 교육",
       poster: pastEvent2Poster,
-      url: null // URL이 없는 경우
+      url: null
     },
     {
       id: 3,
-      title: "디스커버 코리아(Discover Korea)",
+      title: t?.pastEventsList?.[2]?.title || "디스커버 코리아(Discover Korea)",
       date: "06.29.2024 ~ 06.30.2024",
-      description: "글로벌 경제 전망과 투자 기회",
+      description: t?.pastEventsList?.[2]?.description || "글로벌 경제 전망과 투자 기회",
       poster: pastEvent3Poster,
-      url: null // URL이 없는 경우
+      url: null
     },
     {
       id: 4,
-      title: "골프 토너먼트 (Golf Tournament)",
+      title: t?.pastEventsList?.[3]?.title || "골프 토너먼트 (Golf Tournament)",
       date: "07.16.2024",
-      description: "연례 골프 토너먼트 및 네트워킹 이벤트",
+      description: t?.pastEventsList?.[3]?.description || "연례 골프 토너먼트 및 네트워킹 이벤트",
       poster: pastEvent4Poster,
       url: "https://www.zeffy.com/en-US/ticketing/526bb733-8248-4987-be28-edd572e750c6"
     }
@@ -107,11 +150,11 @@ const Events = () => {
 
   return (
     <AboutContainer>
-      <Title>이벤트</Title>
+      <Title>{t?.title || defaults.title}</Title>
       
       {/* 다가오는 이벤트 섹션 */}
       <UpcomingSection>
-        <SectionTitle>다가오는 이벤트</SectionTitle>
+        <SectionTitle>{t?.upcomingEvents || defaults.upcomingEvents}</SectionTitle>
         <EventsGrid>
           {upcomingEvents.map((event) => (
             <EventCard 
@@ -127,7 +170,7 @@ const Events = () => {
                   <EventDate>{event.date}</EventDate>
                   <EventDescription>{event.description}</EventDescription>
                   {event.url && (
-                    <ClickIndicator>클릭하여 자세히 보기 →</ClickIndicator>
+                    <ClickIndicator>{t?.clickToView || defaults.clickToView}</ClickIndicator>
                   )}
                 </EventOverlay>
               </PosterContainer>
@@ -138,16 +181,16 @@ const Events = () => {
 
       {/* Zeffy 등록 섹션 */}
       {/* <ZeffySection>
-        <h3>이벤트 등록하기</h3>
-        <p>OKTA 덴버지회의 다양한 이벤트에 참여하세요!</p>
+        <h3>{t.eventRegistration.title}</h3>
+        <p>{t.eventRegistration.description}</p>
         <ZeffyButton onClick={handleZeffyClick}>
-          Zeffy에서 이벤트 등록하기
+          {t.eventRegistration.buttonText}
         </ZeffyButton>
       </ZeffySection> */}
 
       {/* 과거 이벤트 섹션 */}
       <PastSection>
-        <SectionTitle>지난 이벤트</SectionTitle>
+        <SectionTitle>{t?.pastEvents || defaults.pastEvents}</SectionTitle>
         <EventsGrid>
           {pastEvents.map((event) => (
             <EventCard 
@@ -162,7 +205,7 @@ const Events = () => {
                   <EventDate>{event.date}</EventDate>
                   <EventDescription>{event.description}</EventDescription>
                   {event.url && (
-                    <ClickIndicator>클릭하여 자세히 보기 →</ClickIndicator>
+                    <ClickIndicator>{t?.clickToView || defaults.clickToView}</ClickIndicator>
                   )}
                 </EventOverlay>
               </PosterContainer>
