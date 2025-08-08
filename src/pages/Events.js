@@ -28,11 +28,11 @@ import { translations } from '../translations/translations';
 
 // 다가오는 이벤트 데이터 (export)
 import upcomingEvent1Poster from '../assets/images/event/upcomingevent1.png';
-import upcomingEvent2Poster from '../assets/images/event/upcomingevent2.png';
 import pastEvent1Poster from '../assets/images/event/pastevent1.png';
 import pastEvent2Poster from '../assets/images/event/pastevent2.png'; 
 import pastEvent3Poster from '../assets/images/event/pastevent3.png';
 import pastEvent4Poster from '../assets/images/event/pastevent4.png';
+import pastEvent5Poster from '../assets/images/event/pastevent5.png';
 
 const Events = () => {
   const { language } = useLanguage();
@@ -53,11 +53,6 @@ const Events = () => {
         title: "Discover Korea at Dragon Boat Festival",
         description: "콜로라도 드래곤 보트 페스티벌에서 한국 문화를 소개하는 특별한 기회입니다.",
         badge: "참가 모집중"
-      },
-      upcomingEvent2: {
-        title: "제 4회 OKTA 비즈니스 세미나", 
-        description: "최신 금융 트렌드와 투자 전략에 대한 전문가 세미나입니다.",
-        badge: "곧 개최"
       }
     },
     en: {
@@ -69,11 +64,6 @@ const Events = () => {
         title: "Discover Korea at Dragon Boat Festival",
         description: "Special opportunity to introduce Korean culture at the Colorado Dragon Boat Festival.",
         badge: "Registration Open"
-      },
-      upcomingEvent2: {
-        title: "4th OKTA Business Seminar",
-        description: "Seminar with experts on latest financial trends and investment strategies.",
-        badge: "Coming Soon"
       }
     }
   };
@@ -90,15 +80,6 @@ const Events = () => {
       poster: upcomingEvent1Poster,
       url: "https://www.cdbf.org",
       badge: t?.upcomingEventsList?.[0]?.badge || defaults.upcomingEvent1.badge
-    },
-    {
-      id: 2,
-      title: t?.upcomingEventsList?.[1]?.title || defaults.upcomingEvent2.title,
-      date: "06.28.2025",
-      description: t?.upcomingEventsList?.[1]?.description || defaults.upcomingEvent2.description,
-      poster: upcomingEvent2Poster,
-      url: "https://www.zeffy.com/ticketing/3",
-      badge: t?.upcomingEventsList?.[1]?.badge || defaults.upcomingEvent2.badge
     }
   ];
 
@@ -106,33 +87,41 @@ const Events = () => {
   const pastEvents = [
     {
       id: 1,
-      title: t?.pastEventsList?.[0]?.title || "제 3회 월드옥타 덴버 차세대 세미나",
+      title: t?.pastEventsList?.[0]?.title || "제 4회 OKTA 비즈니스 세미나",
+      date: "06.28.2025",
+      description: t?.pastEventsList?.[0]?.description || "최신 금융 트렌드와 투자 전략에 대한 전문가 세미나",
+      poster: pastEvent5Poster,
+      url: "https://www.zeffy.com/ticketing/3"
+    },
+    {
+      id: 2,
+      title: t?.pastEventsList?.[1]?.title || "제 3회 월드옥타 덴버 차세대 세미나",
       date: "11.23.2023",
-      description: t?.pastEventsList?.[0]?.description || "차세대 리더십과 성장 전략에 대한 세미나",
+      description: t?.pastEventsList?.[1]?.description || "차세대 리더십과 성장 전략에 대한 세미나",
       poster: pastEvent1Poster,
       url: null
     },
     {
-      id: 2,
-      title: t?.pastEventsList?.[1]?.title || "제 2회 월드옥타 덴버 차세대 세미나",
+      id: 3,
+      title: t?.pastEventsList?.[2]?.title || "제 2회 월드옥타 덴버 차세대 세미나",
       date: "02.18.2023",
-      description: t?.pastEventsList?.[1]?.description || "젊은 전문가들을 위한 네트워킹과 교육",
+      description: t?.pastEventsList?.[2]?.description || "젊은 전문가들을 위한 네트워킹과 교육",
       poster: pastEvent2Poster,
       url: null
     },
     {
-      id: 3,
-      title: t?.pastEventsList?.[2]?.title || "디스커버 코리아(Discover Korea)",
+      id: 4,
+      title: t?.pastEventsList?.[3]?.title || "디스커버 코리아(Discover Korea)",
       date: "06.29.2024 ~ 06.30.2024",
-      description: t?.pastEventsList?.[2]?.description || "글로벌 경제 전망과 투자 기회",
+      description: t?.pastEventsList?.[3]?.description || "글로벌 경제 전망과 투자 기회",
       poster: pastEvent3Poster,
       url: null
     },
     {
-      id: 4,
-      title: t?.pastEventsList?.[3]?.title || "골프 토너먼트 (Golf Tournament)",
+      id: 5,
+      title: t?.pastEventsList?.[4]?.title || "골프 토너먼트 (Golf Tournament)",
       date: "07.16.2024",
-      description: t?.pastEventsList?.[3]?.description || "연례 골프 토너먼트 및 네트워킹 이벤트",
+      description: t?.pastEventsList?.[4]?.description || "연례 골프 토너먼트 및 네트워킹 이벤트",
       poster: pastEvent4Poster,
       url: "https://www.zeffy.com/en-US/ticketing/526bb733-8248-4987-be28-edd572e750c6"
     }

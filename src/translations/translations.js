@@ -15,7 +15,32 @@ export const translations = {
       ctaButton: "더 알아보기",
       aboutTitle: "우리는 누구인가요?",
       aboutContent: "단체입니다.",
-      projectsTitle: "진행 중인 프로젝트",
+      projectsTitle: "주요행사",
+      projectMain: {
+        subtitle: "콜로라도에서 한국을 만나보세요!",
+        description: [
+          "콜로라도 덴버에서 한국의 매력을 발견할 수 있는 특별한 기회를 놓치지 마세요! 옥타 덴버가 주관하는 Discover Korea 행사가 올해도 여러분을 찾아갑니다.",
+          "특히 올해는 콜로라도 드래곤 보트 페스티벌에서 Discover Korea 행사를 만나보실 수 있습니다. 최근 미국 전역에서 뜨거운 관심을 받고 있는 K-제품과 한류 문화를 콜로라도 현지 미국인들과 다양한 문화권의 이민자들에게 소개하기 위해 마련된 이번 행사는, 한국 상품의 미국 시장 진출 기회를 확대하고 한류 콘테츠 홍보 및 문화 교류 활성화를 목표로 합니다.",
+          "참여해 찾아서보면 덴버 옥타에 연락 주세요!"
+        ]
+      },
+      pastEventsSection: {
+        title: "지난 주요 행사",
+        events: [
+          {
+            category: "OKTA SEMINAR",
+            title: "제 4회 OKTA 비즈니스 세미나",
+            date: "2025년 4차",
+            description: "한인 사회의 경제 발전과 성공적인 창업을 돕기 위해 정기적으로 유치원 세미나를 개최합니다. 그리고 비즈니스 세계에서 성공적인 창업을 돕기 위한 E-commerce (전자상거래), 온라인 비즈니스 사업 개념, 스타트업 노하우 등 주제를 다룰 예정입니다."
+          },
+          {
+            category: "GOLF TOURNAMENT",
+            title: "자연 거버너먼트 컵대회의 결대회",
+            date: "2024년 3차",
+            description: "덴버 멤버는 그룹이 자연 거버너먼트 컵대회를 위해 정기적으로 골프대회를 개최했습니다. 자연은 기후대대 속력과 같군데 지역에서 아름다운 골프장에서 계절감있게 즐길 수 있었습니다."
+          }
+        ]
+      },
       projects: {
         project1: {
           title: "사업 소개",
@@ -210,7 +235,32 @@ export const translations = {
       ctaButton: "Learn More",
       aboutTitle: "Who are we?",
       aboutContent: "We are an organization.",
-      projectsTitle: "Current Projects",
+      projectsTitle: "Main Events",
+      projectMain: {
+        subtitle: "Experience Korea in Colorado!",
+        description: [
+          "Don't miss this special opportunity to discover the charm of Korea in Denver, Colorado! The Discover Korea event hosted by OKTA Denver is coming to you again this year.",
+          "This year, you can experience the Discover Korea event at the Colorado Dragon Boat Festival. This special event is designed to introduce K-products and Korean Wave culture, which are receiving hot attention across the United States, to local Americans in Colorado and immigrants from various cultural backgrounds. The event aims to expand opportunities for Korean products to enter the US market and promote Korean Wave content and cultural exchange.",
+          "To participate, please contact Denver OKTA!"
+        ]
+      },
+      pastEventsSection: {
+        title: "Past Main Events",
+        events: [
+          {
+            category: "OKTA SEMINAR",
+            title: "4th OKTA Business Seminar",
+            date: "2025 Q4",
+            description: "We regularly hold kindergarten seminars to help promote economic development and successful entrepreneurship in the Korean community. And we will discuss topics such as E-commerce (electronic commerce), online business concepts, startup know-how, etc. to help entrepreneurs succeed in the business world."
+          },
+          {
+            category: "GOLF TOURNAMENT",
+            title: "Natural Golf Tournament Cup Final",
+            date: "2024 Q3",
+            description: "Denver members regularly hosted golf tournaments for the Natural Golf Tournament Cup. The natural environment provided a beautiful golf course in the same region as the climate, allowing for a pleasant season."
+          }
+        ]
+      },
       projects: {
         project1: {
           title: "Business Introduction",

@@ -50,21 +50,21 @@
   position: relative;
   background: #fff;
   border-radius: 15px;
-  padding: 1rem; /* 패딩 줄이기 */
+  padding: 1rem;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  margin: 2rem -2rem; /* 좌우 마진을 음수로 해서 더 넓게 */
+  margin: 2rem 0;
   overflow: hidden;
-  max-width: none; /* 최대 너비 제한 해제 */
+  width: 100%;
 }
 
 .world-map-image {
   width: 100%;
-  max-width: 1200px; /* 최대 너비 더 증가 */
-  height: 600px; /* 높이 더 증가 */
+  height: auto;
+  min-height: 500px;
   object-fit: contain;
   border-radius: 10px;
   opacity: 0.9;
-  margin: 0 auto; /* 중앙 정렬 */
+  margin: 0 auto;
   display: block;
 }
 
@@ -157,12 +157,11 @@
 @media (max-width: 1024px) {
   .world-map-container {
     padding: 1rem;
-    margin: 2rem -1rem; /* 태블릿에서 좀 더 보수적으로 */
+    margin: 2rem 0;
   }
   
   .world-map-image {
-    height: 500px; /* 태블릿에서도 크게 */
-    max-width: 1000px;
+    min-height: 400px;
   }
 }
 
@@ -186,12 +185,11 @@
   
   .world-map-container {
     padding: 0.5rem;
-    margin: 2rem -1rem; /* 모바일에서도 넓게 */
+    margin: 2rem 0;
   }
   
   .world-map-image {
-    height: 400px; /* 모바일에서도 크게 */
-    max-width: 800px;
+    min-height: 300px;
   }
   
   .benefits-grid {
@@ -223,7 +221,11 @@
   
   .world-map-container {
     padding: 0.5rem;
-    margin: 2rem -0.5rem; /* 아주 작은 화면에서도 넓게 */
+    margin: 2rem 0;
+  }
+  
+  .world-map-image {
+    min-height: 250px;
   }
   
   .mou-benefits {

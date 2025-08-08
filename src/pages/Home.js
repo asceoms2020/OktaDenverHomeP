@@ -22,7 +22,8 @@ import {
 } from '../styles/Events.styles';
 // Events 데이터 import
 import upcomingEvent1Poster from '../assets/images/event/upcomingevent1.png';
-import upcomingEvent2Poster from '../assets/images/event/upcomingevent2.png';
+import pastEvent4Poster from '../assets/images/event/pastevent4.png';
+import pastEvent5Poster from '../assets/images/event/pastevent5.png';
 
 const Home = () => {
   const { language } = useLanguage();
@@ -52,15 +53,28 @@ const Home = () => {
       poster: upcomingEvent1Poster,
       url: "https://www.cdbf.org",
       badge: eventT?.upcomingEventsList?.[0]?.badge || "참가 모집중"
+    }
+  ];
+
+  // 지난 이벤트 데이터 (Home에서 사용)
+  const pastEvents = [
+    {
+      id: 1,
+      category: t.pastEventsSection?.events?.[0]?.category || "OKTA SEMINAR",
+      title: t.pastEventsSection?.events?.[0]?.title || "제 4회 OKTA 비즈니스 세미나",
+      date: t.pastEventsSection?.events?.[0]?.date || "2025년 4차",
+      description: t.pastEventsSection?.events?.[0]?.description || "한인 사회의 경제 발전과 성공적인 창업을 돕기 위해 정기적으로 세미나를 개최합니다.",
+      poster: pastEvent5Poster,
+      url: "https://www.zeffy.com/ticketing/3"
     },
     {
       id: 2,
-      title: eventT?.upcomingEventsList?.[1]?.title || "제 4회 OKTA 비즈니스 세미나",
-      date: "06.28.2025",
-      description: eventT?.upcomingEventsList?.[1]?.description || "최신 금융 트렌드와 투자 전략에 대한 전문가 세미나입니다.",
-      poster: upcomingEvent2Poster,
-      url: "https://www.zeffy.com/ticketing/3",
-      badge: eventT?.upcomingEventsList?.[1]?.badge || "곧 개최"
+      category: t.pastEventsSection?.events?.[1]?.category || "GOLF TOURNAMENT",
+      title: t.pastEventsSection?.events?.[1]?.title || "골프 토너먼트",
+      date: t.pastEventsSection?.events?.[1]?.date || "2024년 3차",
+      description: t.pastEventsSection?.events?.[1]?.description || "덴버 멤버들이 정기적으로 골프대회를 개최했습니다.",
+      poster: pastEvent4Poster,
+      url: "https://www.zeffy.com/en-US/ticketing/526bb733-8248-4987-be28-edd572e750c6"
     }
   ];
 
@@ -103,28 +117,80 @@ const Home = () => {
       
       <section className="projects-section">
         <h2>{t.projectsTitle}</h2>
-        <EventsGrid>
-          {upcomingEvents.map((event) => (
-            <EventCard 
-              key={event.id}
-              onClick={() => handleProjectClick(event.url)}
-              clickable={!!event.url}
+        <div className="project-main-content">
+          <div className="project-poster-section">
+            <div 
+              className="project-poster-container"
+              onClick={() => handleProjectClick(upcomingEvents[0]?.url)}
             >
-              {event.badge && <EventBadge>{event.badge}</EventBadge>}
-              <PosterContainer>
-                <EventPoster src={event.poster} alt={event.title} />
-                <EventOverlay>
-                  <EventTitle>{event.title}</EventTitle>
-                  <EventDate>{event.date}</EventDate>
-                  <EventDescription>{event.description}</EventDescription>
-                  {event.url && (
-                    <ClickIndicator>{eventT?.clickToView || "클릭하여 자세히 보기 →"}</ClickIndicator>
-                  )}
-                </EventOverlay>
-              </PosterContainer>
-            </EventCard>
+              {upcomingEvents[0]?.badge && (
+                <div className="project-badge">{upcomingEvents[0].badge}</div>
+              )}
+              <img 
+                src={upcomingEvents[0]?.poster} 
+                alt={upcomingEvents[0]?.title}
+                className="project-poster"
+              />
+            </div>
+          </div>
+          
+          <div className="project-info-section">
+            <h3 className="project-main-title">{upcomingEvents[0]?.title}</h3>
+            <p className="project-subtitle">{t.projectMain?.subtitle}</p>
+            <div className="project-date">{upcomingEvents[0]?.date}</div>
+            
+            <ul className="project-description-list">
+              {t.projectMain?.description?.map((item, index) => (
+                <li key={index} className="project-description-item">
+                  <span className="project-bullet">●</span>
+                  <span className="project-description-text">{item}</span>
+                </li>
+              ))}
+            </ul>
+            
+            {upcomingEvents[0]?.url && (
+              <a 
+                href={upcomingEvents[0].url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="project-cta-button"
+              >
+                {eventT?.clickToView || "클릭하여 자세히 보기 →"}
+              </a>
+            )}
+          </div>
+        </div>
+      </section>
+      
+      {/* 지난 이벤트 섹션 */}
+      <section className="past-events-section">
+        <h2>{t.pastEventsSection?.title || "지난 주요 행사"}</h2>
+        <div className="past-events-grid">
+          {pastEvents.map((event) => (
+            <div 
+              key={event.id}
+              className="past-event-item"
+              onClick={() => handleProjectClick(event.url)}
+            >
+              <div className="past-event-poster-section">
+                <div className="past-event-poster-container">
+                  <img 
+                    src={event.poster} 
+                    alt={event.title}
+                    className="past-event-poster"
+                  />
+                </div>
+              </div>
+              
+              <div className="past-event-info-section">
+                <div className="past-event-category">{event.category}</div>
+                <h3 className="past-event-title">{event.title}</h3>
+                <div className="past-event-date">{event.date}</div>
+                <p className="past-event-description">{event.description}</p>
+              </div>
+            </div>
           ))}
-        </EventsGrid>
+        </div>
       </section>
     </div>
   );
