@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/pages/Home.css';
-import styled from 'styled-components';
-// 배경 이미지 import
-import mainBg from '../assets/images/home/golf.jpg';
+// 배경 이미지들 import
+import main1 from '../assets/images/main/main_1.jpg';
+import main2 from '../assets/images/main/main_2.jpg';
+import main3 from '../assets/images/main/main_3.jpg';
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../translations/translations';
 // Events 스타일 컴포넌트들 import
@@ -23,22 +24,30 @@ import {
 import upcomingEvent1Poster from '../assets/images/event/upcomingevent1.png';
 import upcomingEvent2Poster from '../assets/images/event/upcomingevent2.png';
 
-const HomeContainer = styled.div`
-  min-height: 100vh;
-  padding: 2rem 1rem;
-`;
-
 const Home = () => {
   const { language } = useLanguage();
   const t = translations[language].home;
   const eventT = translations[language]?.events || translations.ko.events;
+
+  // 슬라이더 상태 관리
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const backgroundImages = [main1, main2, main3];
+
+  // 자동 슬라이딩 효과
+  useEffect(() => {
+    const slideInterval = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % backgroundImages.length);
+    }, 5000);
+
+    return () => clearInterval(slideInterval);
+  }, [backgroundImages.length]);
 
   // 다가오는 이벤트 데이터 (Home에서 사용)
   const upcomingEvents = [
     {
       id: 1,
       title: eventT?.upcomingEventsList?.[0]?.title || "Discover Korea at Dragon Boat Festival",
-      date: "09.27.2025",
+      date: "09.07.2025~09.08.2025",
       description: eventT?.upcomingEventsList?.[0]?.description || "콜로라도 드래곤 보트 페스티벌에서 한국 문화를 소개하는 특별한 기회입니다.",
       poster: upcomingEvent1Poster,
       url: "https://www.cdbf.org",
@@ -65,14 +74,22 @@ const Home = () => {
   };
 
   return (
-    <HomeContainer>
-      <section 
-        className="hero-section hero-section-background" 
-        style={{
-          background: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-                      url(${mainBg}) no-repeat center center`
-        }}
-      >
+    <div className="home-container">
+      <section className="hero-section hero-section-background">
+        <div className="hero-slider">
+          <div 
+            className="slide-container" 
+            style={{ transform: `translateX(-${currentSlide * 33.333}%)` }}
+          >
+            {backgroundImages.map((image, index) => (
+              <div 
+                key={index} 
+                className="slide"
+                style={{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${image})` }}
+              />
+            ))}
+          </div>
+        </div>
         <div className="hero-content">
           <div className="hero-content-box">
             <h1 className="hero-title hero-title-white">{t.title}</h1>
@@ -109,7 +126,7 @@ const Home = () => {
           ))}
         </EventsGrid>
       </section>
-    </HomeContainer>
+    </div>
   );
 };
 

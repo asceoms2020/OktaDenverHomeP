@@ -1,51 +1,226 @@
+/* Header 컨테이너 */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   z-index: 1000;
+  padding: 1rem;
 }
 
-.header-container {
+/* 네비게이션 컨테이너 */
+.nav {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #2ecc71;
+/* 로고 링크 */
+.logo-link {
   text-decoration: none;
+  color: inherit;
 }
 
-.nav-menu {
+.logo-link:hover {
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+/* 로고 컨테이너 */
+.logo-container {
   display: flex;
-  gap: 2rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
 }
 
+/* 로고 이미지 */
+.logo-image {
+  height: 40px;
+  width: auto;
+}
+
+/* 조직 정보 컨테이너 */
+.organization-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+/* 회사명 */
+.corp-name {
+  font-size: 0.75rem;
+  color: #2c3e50;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* DBA 명 */
+.dba-name {
+  font-size: 0.7rem;
+  color: #7f8c8d;
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* 모바일 메뉴 버튼 */
+.mobile-menu-button {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+  color: #2c3e50;
+}
+
+.mobile-menu-button:hover {
+  color: #2ecc71;
+  transition: color 0.3s ease;
+}
+
+/* 네비게이션 링크들 */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 네비게이션 링크 */
 .nav-link {
   color: #333;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
+  position: relative;
 }
 
 .nav-link:hover {
   color: #2ecc71;
 }
 
-@media (max-width: 768px) {
-  .header-container {
-    padding: 1rem;
-  }
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -5px;
+  left: 50%;
+  background-color: #2ecc71;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
 
-  .nav-menu {
-    display: none;
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* 후원 버튼 */
+.donation-button {
+  background: transparent;
+  color: #3498db;
+  padding: 8px 16px;
+  border: 2px solid #3498db;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.donation-button:hover {
+  background: #3498db;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25);
+}
+
+.donation-button:active {
+  transform: translateY(0);
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .header {
+    padding: 0.8rem 1rem;
+  }
+  
+  .mobile-menu-button {
+    display: block;
+  }
+  
+  .nav-links {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 999;
+    gap: 15px;
+  }
+  
+  .nav-links-open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .nav-link {
+    padding: 10px 0;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .nav-link:last-child {
+    border-bottom: none;
+  }
+  
+  .donation-button {
+    margin-top: 10px;
+  }
+  
+  /* 모바일에서 조직 정보 크기 조정 */
+  .corp-name {
+    font-size: 0.7rem;
+  }
+  
+  .dba-name {
+    font-size: 0.65rem;
+  }
+  
+  .logo-image {
+    height: 35px;
+  }
+}
+
+/* 태블릿 사이즈 */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .nav {
+    padding: 0 1rem;
+  }
+  
+  .nav-links {
+    gap: 15px;
+  }
+  
+  .corp-name {
+    font-size: 0.72rem;
+  }
+  
+  .dba-name {
+    font-size: 0.68rem;
   }
 } 

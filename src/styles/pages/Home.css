@@ -1,21 +1,50 @@
 .home-container {
   width: 100%;
+  min-height: 100vh;
+  padding: 2rem 1rem;
 }
 
 .hero-section {
   height: 100vh;
-  background-size: cover;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   color: white;
   padding: 0 1rem;
+  overflow: hidden;
 }
 
 /* 배경 이미지와 오버레이를 위한 클래스 */
 .hero-section-background {
-  background-size: 100% auto !important;
+  position: relative;
+}
+
+/* 슬라이더 관련 스타일 */
+.hero-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.slide-container {
+  display: flex;
+  width: 300%;
+  height: 100%;
+  transition: transform 0.8s ease-in-out;
+}
+
+.slide {
+  width: 33.333%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
 }
 
 /* hero content 내부의 박스 스타일 */
@@ -59,6 +88,8 @@
 
 .hero-content {
   max-width: 800px;
+  position: relative;
+  z-index: 10;
 }
 
 .hero-title {

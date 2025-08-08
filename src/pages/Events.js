@@ -85,7 +85,7 @@ const Events = () => {
     {
       id: 1,
       title: t?.upcomingEventsList?.[0]?.title || defaults.upcomingEvent1.title,
-      date: "09.27.2025",
+      date: "09.07.2025~09.08.2025",
       description: t?.upcomingEventsList?.[0]?.description || defaults.upcomingEvent1.description,
       poster: upcomingEvent1Poster,
       url: "https://www.cdbf.org",
