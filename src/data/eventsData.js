@@ -10,16 +10,16 @@ export const eventsData = {
       url: "",
       date: "12.20.2025 PM 5:00",
       badge: {
-        ko: "K-BBQ",
-        en: ""
+        ko: "Mr. Kim Korean BBQ",
+        en: "Mr. Kim Korean BBQ"
       },
       title: {
         ko: "연말 송년회",
         en: "New Year's Eve"
       },
       description: {
-        ko: "장소 : K-BBQ",
-        en: "New Year's Eve"
+        ko: "장소 : Mr. Kim Korean BBQ",
+        en: "Location: Mr. Kim Korean BBQ"
       }
     }
   ],

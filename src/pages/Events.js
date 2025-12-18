@@ -51,7 +51,7 @@ const Events = () => {
       clickToView: "클릭하여 자세히 보기 →",
       upcomingEvent1: {
         title: "2026년 맞이 연말 송년회",
-        description: "K-BBQ에서 연말 송년회를 개최합니다.",
+        description: "Mr. Kim Korean BBQ 에서 연말 송년회를 개최합니다.",
         badge: "참가 모집중"
       }
     },
@@ -62,7 +62,7 @@ const Events = () => {
       clickToView: "Click to view details →",
       upcomingEvent1: {
         title: "2026 New Year's Eve",
-        description: "",
+        description: "Mr. Kim Korean BBQ",
         badge: "Registration Open"
       }
     }
