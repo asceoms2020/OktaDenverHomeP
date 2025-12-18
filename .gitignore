@@ -60,3 +60,6 @@ bower_components/
 
 # 웹팩 캐시
 .webpack/
+
+# Node Local Storage
+.localstorage
