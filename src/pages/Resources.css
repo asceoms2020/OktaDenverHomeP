@@ -2,233 +2,190 @@
 .resources-container {
   display: flex;
   flex-direction: column;
-  gap: 4rem;
-  padding-top: 100px; /* Header 높이만큼 상단 패딩 추가 */
+  gap: 6rem;
+  padding-top: 120px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 5rem;
 }
 
 /* MOU 섹션 스타일 */
 .mou-section {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  padding: 3rem;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  background: #ffffff;
+  padding: 4rem;
+  border-radius: 30px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mou-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.08);
 }
 
 .mou-content {
-  margin-bottom: 3rem;
+  flex: 1;
+  margin-bottom: 0;
 }
 
 .mou-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
-  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1a202c;
+  margin-bottom: 2rem;
+  text-align: left;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .mou-text {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   line-height: 1.8;
-  color: #555;
-  margin-bottom: 1.5rem;
-  text-align: justify;
+  color: #4a5568;
+  margin-bottom: 2rem;
+  text-align: left;
   word-break: keep-all;
 }
 
 .mou-benefits {
-  margin-left: 2rem;
-  line-height: 1.8;
-  color: #555;
+  margin-left: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.2rem;
+  padding: 0;
 }
 
 .mou-benefits li {
-  margin-bottom: 0.5rem;
+  position: relative;
+  padding-left: 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+}
+
+/* Custom Checkmark Icon */
+.mou-benefits li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #3498db, #2ecc71);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
 }
 
 /* 세계지도 컨테이너 */
 .world-map-container {
+  flex: 1.2;
   position: relative;
-  background: #fff;
-  border-radius: 15px;
-  padding: 1rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  margin: 2rem 0;
+  background: linear-gradient(145deg, #ffffff, #f0f7ff);
+  border-radius: 25px;
+  padding: 2rem;
+  box-shadow: inset 0 0 30px rgba(52, 152, 219, 0.05);
+  margin: 0;
   overflow: hidden;
-  width: 100%;
+  border: 1px solid rgba(52, 152, 219, 0.1);
 }
 
 .world-map-image {
   width: 100%;
   height: auto;
-  min-height: 500px;
+  min-height: 400px;
   object-fit: contain;
-  border-radius: 10px;
-  opacity: 0.9;
-  margin: 0 auto;
-  display: block;
+  transition: transform 0.5s ease;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
 }
 
-
-
-/* 회원혜택 그리드 */
-.benefits-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+.world-map-container:hover .world-map-image {
+  transform: scale(1.03);
 }
 
-/* 혜택 카드 */
-.benefit-card {
-  position: relative;
-  background: #fff;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  height: 300px;
-}
-
-.benefit-card:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.benefit-card:hover .click-indicator {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.benefit-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.benefit-card:hover .benefit-image {
-  transform: scale(1.1);
-}
-
-.benefit-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.3) 0%,
-    rgba(0, 0, 0, 0.5) 70%,
-    rgba(0, 0, 0, 0.8) 100%
-  );
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 2rem;
-  color: white;
-}
-
-.benefit-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: white;
-}
-
-.benefit-description {
-  font-size: 1rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.9);
-  margin: 0;
-}
-
-.click-indicator {
-  font-size: 0.9rem;
-  color: #3498db;
-  font-weight: 600;
-  margin-top: 1rem;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.3s ease;
-}
 
 /* 반응형 디자인 */
 @media (max-width: 1024px) {
-  .world-map-container {
-    padding: 1rem;
-    margin: 2rem 0;
+  .mou-section {
+    flex-direction: column;
+    padding: 3rem;
+    gap: 3rem;
   }
-  
+
+  .mou-content {
+    width: 100%;
+    text-align: center;
+  }
+
+  .mou-title,
+  .mou-text {
+    text-align: center;
+  }
+
+  .mou-benefits {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    margin: 0 auto;
+  }
+
+  .world-map-container {
+    width: 100%;
+    min-height: auto;
+  }
+
   .world-map-image {
-    min-height: 400px;
+    min-height: auto;
   }
 }
 
 @media (max-width: 768px) {
   .resources-container {
+    padding-top: 100px;
     gap: 3rem;
-    padding-top: 120px; /* 모바일에서 헤더가 더 높을 수 있으므로 조정 */
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
-  
+
   .mou-section {
     padding: 2rem;
+    border-radius: 20px;
   }
-  
+
   .mou-title {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
   }
-  
+
   .mou-text {
     font-size: 1rem;
+    text-align: justify;
   }
-  
-  .world-map-container {
-    padding: 0.5rem;
-    margin: 2rem 0;
+
+  .mou-benefits li {
+    font-size: 1rem;
+    padding-left: 2rem;
   }
-  
-  .world-map-image {
-    min-height: 300px;
-  }
-  
-  .benefits-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  
-  .benefit-card {
-    height: 250px;
-  }
-  
-  .benefit-overlay {
-    padding: 1.5rem;
-  }
-  
-  .benefit-title {
-    font-size: 1.3rem;
-  }
-  
-  .benefit-description {
-    font-size: 0.9rem;
+
+  .mou-benefits li::before {
+    width: 24px;
+    height: 24px;
+    font-size: 0.8rem;
   }
 }
-
-@media (max-width: 480px) {
-  .mou-section {
-    padding: 1.5rem;
-  }
-  
-  .world-map-container {
-    padding: 0.5rem;
-    margin: 2rem 0;
-  }
-  
-  .world-map-image {
-    min-height: 250px;
-  }
-  
-  .mou-benefits {
-    margin-left: 1rem;
-  }
-} 

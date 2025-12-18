@@ -216,8 +216,47 @@ export const translations = {
             description: "연례 골프 토너먼트 및 네트워킹 이벤트"
           }
         ]
+      },
+    },
+      sponsors: {
+        title: "후원사",
+        premiumTitle: "Premium Partners",
+        memberTitle: "Member Companies",
+        premiumPartner: "Premium Partner",
+        memberCompany: "Member Company",
+        availableSpot: "Available Spot",
+        recruitment: {
+          title: "후원사가 되어주세요!",
+          description: "OKTA 덴버지회와 함께 한인 커뮤니티의 발전에 기여하고,<br/>비즈니스 네트워킹의 기회를 넓혀보세요.",
+          button: "후원사 문의하기"
+        }
+      },
+      resources: {
+        title: "자료실",
+        mouTitle: "MOU란 무엇인가요?",
+        mouContent: {
+          title: "MOU (Memorandum of Understanding)",
+          description: "MOU(양해각서)는 서로 협력하기로 한 약속입니다.<br/><br/>OKTA 덴버 지회는 전 세계 다양한 지회들과 협력하여 비즈니스 기회를 넓히고 정보를 공유하며 함께 성장하고 있습니다. 이를 통해 회원님들께 더 넓은 글로벌 무대를 연결해 드립니다.",
+          benefits: [
+            "더 많은 글로벌 비즈니스 기회",
+            "든든한 글로벌 파트너 연결",
+            "해외 진출을 위한 맞춤 상담",
+            "다양한 국제 교류 프로그램",
+            "실시간 해외 시장 정보"
+          ]
+        }
+      },
+      newsletterPage: {
+        title: "뉴스레터",
+        webzineTitle: "웹진",
+        readMore: "자세히 보기",
+        viewMore: "📚 더 많은 웹진 보기",
+        webzine17: "월드옥타 웹진 22호",
+        webzine16: "월드옥타 웹진 16호",
+        webzine15: "월드옥타 웹진 15호",
+        webzine21: "월드옥타 웹진 21호",
+        webzine20: "월드옥타 웹진 20호"
       }
-    }
   },
   en: {
     navigation: {
@@ -434,7 +473,46 @@ export const translations = {
             description: "Annual golf tournament and networking event"
           }
         ]
+      },
+    },
+      sponsors: {
+        title: "Sponsors",
+        premiumTitle: "Premium Partners",
+        memberTitle: "Member Companies",
+        premiumPartner: "Premium Partner",
+        memberCompany: "Member Company",
+        availableSpot: "Available Spot",
+        recruitment: {
+          title: "Become a Sponsor!",
+          description: "Contribute to the development of the Korean community with OKTA Denver<br/>and expand your business networking opportunities.",
+          button: "Contact Us"
+        }
+      },
+      resources: {
+        title: "Resources",
+        mouTitle: "What is an MOU?",
+        mouContent: {
+          title: "MOU (Memorandum of Understanding)",
+          description: "An MOU (Memorandum of Understanding) is a promise to cooperate with each other.<br/><br/>The OKTA Denver Chapter collaborates with various chapters around the world to expand business opportunities, share information, and grow together. Through this, we connect our members to a wider global stage.",
+          benefits: [
+            "More global business opportunities",
+            "Reliable global partner connections",
+            "Customized consulting for overseas expansion",
+            "Various international exchange programs",
+            "Real-time overseas market information"
+          ]
+        }
+      },
+      newsletterPage: {
+        title: "Newsletter",
+        webzineTitle: "Webzine",
+        readMore: "Read More",
+        viewMore: "📚 View More Webzines",
+        webzine17: "World-OKTA Webzine No. 22",
+        webzine16: "World-OKTA Webzine No. 16",
+        webzine15: "World-OKTA Webzine No. 15",
+        webzine21: "World-OKTA Webzine No. 21",
+        webzine20: "World-OKTA Webzine No. 20"
       }
-    }
   }
 }; 

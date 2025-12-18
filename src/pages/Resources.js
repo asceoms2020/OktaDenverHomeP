@@ -16,8 +16,10 @@ import { translations } from '../translations/translations';
 
 const Resources = () => {
   const { language } = useLanguage();
-  // 임시로 한국어 사용 (나중에 translations에 추가)
+  const t = translations[language]?.resources || translations.ko.resources;
   
+  if (!t) return null;
+
   // 언어에 따른 MOU 지도 이미지 선택
   const mouMapImage = language === 'ko' ? mouKorImage : mouEngImage;
   const mapAltText = language === 'ko' ? '세계지도' : 'World Map';
@@ -74,27 +76,19 @@ const Resources = () => {
 
   return (
     <div className="resources-container">
-      <Title>자료실</Title>
+      <Title>{t.title}</Title>
       
       {/* MOU 섹션 */}
       <Section>
-        <SectionTitle>MOU란 무엇인가요?</SectionTitle>
+        <SectionTitle>{t.mouTitle}</SectionTitle>
         <div className="mou-section">
           <div className="mou-content">
-            <h3 className="mou-title">MOU (Memorandum of Understanding)</h3>
-            <p className="mou-text">
-              MOU는 양해각서(Memorandum of Understanding)의 줄임말로, 두 개 이상의 당사자 간에 
-              상호 이해와 협력을 위한 기본적인 합의사항을 문서화한 것입니다.
-            </p>
-            <p className="mou-text">
-              세계한인무역협회(World-OKTA) 덴버 지회는 상호 협조 및 발전에 기여하고, 관심 사업과 정보 교류 및 협력 증진을 도모하기 위해 세계 여러 지회와 업무제휴 양해각서(MOU)를 체결하고 늘려가고 있습니다.
-            </p>
+            <h3 className="mou-title">{t.mouContent.title}</h3>
+            <p className="mou-text" dangerouslySetInnerHTML={{ __html: t.mouContent.description }} />
             <ul className="mou-benefits">
-              <li>국제 비즈니스 기회 확대</li>
-              <li>글로벌 파트너십 구축 지원</li>
-              <li>해외 진출 컨설팅 서비스</li>
-              <li>국제 교류 프로그램 참여</li>
-              <li>글로벌 시장 정보 공유</li>
+              {t.mouContent.benefits.map((benefit, index) => (
+                <li key={index}>{benefit}</li>
+              ))}
             </ul>
           </div>
           

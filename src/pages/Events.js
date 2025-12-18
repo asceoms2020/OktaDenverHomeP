@@ -27,7 +27,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../translations/translations';
 
 // 다가오는 이벤트 데이터 (export)
-import upcomingEvent1Poster from '../assets/images/event/upcomingevent1.png';
+import upcomingEvent1Poster from '../assets/images/event/okta_denver_new_year_2026.png';
 import pastEvent1Poster from '../assets/images/event/pastevent1.png';
 import pastEvent2Poster from '../assets/images/event/pastevent2.png'; 
 import pastEvent3Poster from '../assets/images/event/pastevent3.png';
@@ -50,8 +50,8 @@ const Events = () => {
       pastEvents: "지난 이벤트",
       clickToView: "클릭하여 자세히 보기 →",
       upcomingEvent1: {
-        title: "Discover Korea at Dragon Boat Festival",
-        description: "콜로라도 드래곤 보트 페스티벌에서 한국 문화를 소개하는 특별한 기회입니다.",
+        title: "2026년 맞이 연말 송년회",
+        description: "K-BBQ에서 연말 송년회를 개최합니다.",
         badge: "참가 모집중"
       }
     },
@@ -61,8 +61,8 @@ const Events = () => {
       pastEvents: "Past Events", 
       clickToView: "Click to view details →",
       upcomingEvent1: {
-        title: "Discover Korea at Dragon Boat Festival",
-        description: "Special opportunity to introduce Korean culture at the Colorado Dragon Boat Festival.",
+        title: "2026 New Year's Eve",
+        description: "",
         badge: "Registration Open"
       }
     }
@@ -75,10 +75,10 @@ const Events = () => {
     {
       id: 1,
       title: t?.upcomingEventsList?.[0]?.title || defaults.upcomingEvent1.title,
-      date: "09.07.2025~09.08.2025",
+      date: "12.20.2026",
       description: t?.upcomingEventsList?.[0]?.description || defaults.upcomingEvent1.description,
       poster: upcomingEvent1Poster,
-      url: "https://www.cdbf.org",
+      url: "",
       badge: t?.upcomingEventsList?.[0]?.badge || defaults.upcomingEvent1.badge
     }
   ];
