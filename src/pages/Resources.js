@@ -105,7 +105,7 @@ const Resources = () => {
       </Section>
 
       {/* 회원혜택 섹션 */}
-      <Section>
+      {/* <Section>
         <SectionTitle>회원혜택</SectionTitle>
         <div className="benefits-grid">
           {benefitData.map((benefit) => (
@@ -123,7 +123,7 @@ const Resources = () => {
             </div>
           ))}
         </div>
-      </Section>
+      </Section> */}
     </div>
   );
 };

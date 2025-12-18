@@ -20,7 +20,6 @@ const Footer = () => {
     <FooterContainer>
       <h2>OKTA Denver</h2>
       <p>Contact: info@oktadenver.org</p>
-      <p>Phone: 303.555.0123</p>
       <p>All Rights Reserved ©2024 by Denver Chapter, World-OKTA</p>
       {t && <p>Translation loaded: {language}</p>}
     </FooterContainer>

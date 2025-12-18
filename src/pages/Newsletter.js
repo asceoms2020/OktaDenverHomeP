@@ -192,7 +192,7 @@ const Newsletter = () => {
       </Section>
 
       {/* 뉴스 섹션 */}
-      <Section>
+      {/* <Section>
         <SectionTitle>국제 정세 & 보안 뉴스</SectionTitle>
         <NewsletterContainer>
           {newsData.map((news) => (
@@ -207,7 +207,7 @@ const Newsletter = () => {
             </NewsCard>
           ))}
         </NewsletterContainer>
-      </Section>
+      </Section> */}
     </AboutContainer>
   );
 };

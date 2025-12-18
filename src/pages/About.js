@@ -106,7 +106,7 @@ const About = () => {
       </Section>
       
       {/* 하는 일 */}
-      <Section>
+      {/* <Section>
         <SectionTitle>{t.services.title}</SectionTitle>
         <ServiceGrid>
           {t.services.items.map((service, index) => (
@@ -119,7 +119,7 @@ const About = () => {
             </ServiceCard>
           ))}
         </ServiceGrid>
-      </Section>
+      </Section> */}
 
 
     </AboutContainer>
