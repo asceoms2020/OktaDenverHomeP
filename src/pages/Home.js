@@ -22,6 +22,7 @@ import {
 } from '../styles/Events.styles';
 // Events 데이터 import
 import { eventsData } from '../data/eventsData';
+import SignUpModal from '../components/SignUpModal';
 
 const Home = () => {
   const { language } = useLanguage();
@@ -30,6 +31,7 @@ const Home = () => {
 
   // 슬라이더 상태 관리
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const backgroundImages = [main1, main2, main3];
 
   // 자동 슬라이딩 효과
@@ -75,7 +77,9 @@ const Home = () => {
               {t.subtitle}
             </p>
           </div>
-          <Link to="/about" className="cta-button">{t.ctaButton}</Link>
+          <div className="hero-buttons" style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+            <Link to="/about" className="cta-button">{t.ctaButton}</Link>
+          </div>
         </div>
       </section>
       
@@ -151,6 +155,8 @@ const Home = () => {
           ))}
         </div>
       </section>
+      
+      <SignUpModal isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
     </div>
   );
 };

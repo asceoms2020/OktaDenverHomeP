@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import logoImage from '../../assets/images/World-Okta.png';
 import LanguageSwitch from '../LanguageSwitch';
+import LoginModal from '../LoginModal';
+import SignUpModal from '../../components/SignUpModal';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 import { translations } from '../../translations/translations';
 import '../../styles/components/Header.css';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const { language } = useLanguage();
+  const { user, signOut } = useAuth();
   const t = translations[language].navigation || {
     home: "Home",
     events: "Events",
@@ -49,6 +55,36 @@ const Header = () => {
           <Link to="/newsletter" className="nav-link" onClick={closeMenu}>{t.newsletter}</Link>
           <Link to="/about" className="nav-link" onClick={closeMenu}>{t.about}</Link>
           <Link to="/sponsors" className="nav-link" onClick={closeMenu}>{t.sponsors}</Link>
+          
+          {/* Conditional Menu: Trading (Only for Logged in users) */}
+          {user && (
+            <Link to="/trading" className="nav-link" onClick={closeMenu}>
+              {language === 'ko' ? '무역하기' : 'Trading'}
+            </Link>
+          )}
+
+          {user ? (
+            <button 
+              className="auth-button" 
+              onClick={() => {
+                signOut();
+                closeMenu();
+              }}
+            >
+              {language === 'ko' ? '로그아웃' : 'Logout'}
+            </button>
+          ) : (
+            <button 
+              className="auth-button" 
+              onClick={() => {
+                setIsLoginOpen(true);
+                closeMenu();
+              }}
+            >
+              Login
+            </button>
+          )}
+
           <a 
             href="https://www.zeffy.com/donation-form/donate-to-change-lives-1296"
             target="_blank" 
@@ -61,6 +97,15 @@ const Header = () => {
           <LanguageSwitch />
         </div>
       </nav>
+      <LoginModal 
+        isOpen={isLoginOpen} 
+        onClose={() => setIsLoginOpen(false)} 
+        onSignUpClick={() => {
+          setIsLoginOpen(false);
+          setIsSignUpOpen(true);
+        }}
+      />
+      <SignUpModal isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
     </header>
   );
 };

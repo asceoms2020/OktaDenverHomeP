@@ -144,6 +144,30 @@
   transform: translateY(0);
 }
 
+/* Auth 버튼 (로그인/로그아웃) */
+.auth-button {
+  background-color: #2ecc71; /* Green color matching hover states */
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+}
+
+.auth-button:hover {
+  background-color: #27ae60;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+}
+
+.auth-button:active {
+  transform: translateY(0);
+}
+
 /* 모바일 반응형 */
 @media (max-width: 768px) {
   .header {
