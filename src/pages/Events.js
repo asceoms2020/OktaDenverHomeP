@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AboutContainer,
   Title,
-  Section,
   SectionTitle
 } from '../styles/About.styles';
 import {
@@ -13,34 +13,29 @@ import {
   EventTitle,
   EventDate,
   EventDescription,
-  EventButton,
   EventsGrid,
   UpcomingSection,
   PastSection,
-  ZeffyButton,
-  ZeffySection,
   EventBadge,
   ClickIndicator,
-  PosterContainer
+  PosterContainer,
+  AdminActionContainer,
+  AddEventButton
 } from '../styles/Events.styles';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 import { translations } from '../translations/translations';
-
-// 다가오는 이벤트 데이터 (export)
-import upcomingEvent1Poster from '../assets/images/event/okta_denver_new_year_2026.png';
-import pastEvent1Poster from '../assets/images/event/pastevent1.png';
-import pastEvent2Poster from '../assets/images/event/pastevent2.png'; 
-import pastEvent3Poster from '../assets/images/event/pastevent3.png';
-import pastEvent4Poster from '../assets/images/event/pastevent4.png';
-import pastEvent5Poster from '../assets/images/event/pastevent5.png';
+import { supabase } from '../lib/supabaseClient';
 
 const Events = () => {
   const { language } = useLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const t = translations[language]?.events || translations.ko.events;
   
-  // 디버깅: 현재 언어와 번역 데이터 확인
-  console.log('Current language:', language);
-  console.log('Events translations:', t);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [pastEvents, setPastEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   // 언어별 기본값 설정
   const defaultTexts = {
@@ -49,83 +44,126 @@ const Events = () => {
       upcomingEvents: "다가오는 이벤트", 
       pastEvents: "지난 이벤트",
       clickToView: "클릭하여 자세히 보기 →",
-      upcomingEvent1: {
-        title: "2026년 맞이 연말 송년회",
-        description: "Mr. Kim Korean BBQ 에서 연말 송년회를 개최합니다.",
-        badge: "참가 모집중"
-      }
+      loading: "이벤트를 불러오는 중입니다...",
+      noEvents: "예정된 이벤트가 없습니다.",
+      noPastEvents: "지난 이벤트가 없습니다.",
+      addEvent: "이벤트 추가 (관리자)"
     },
     en: {
       title: "Events",
       upcomingEvents: "Upcoming Events",
       pastEvents: "Past Events", 
       clickToView: "Click to view details →",
-      upcomingEvent1: {
-        title: "2026 New Year's Eve",
-        description: "Mr. Kim Korean BBQ",
-        badge: "Registration Open"
-      }
+      loading: "Loading events...",
+      noEvents: "No upcoming events.",
+      noPastEvents: "No past events.",
+      addEvent: "Add Event (Admin)"
     }
   };
   
   const defaults = defaultTexts[language] || defaultTexts.ko;
 
-  // 다가오는 이벤트 데이터 (번역 적용)
-  const upcomingEvents = [
-    {
-      id: 1,
-      title: t?.upcomingEventsList?.[0]?.title || defaults.upcomingEvent1.title,
-      date: "12.20.2026",
-      description: t?.upcomingEventsList?.[0]?.description || defaults.upcomingEvent1.description,
-      poster: upcomingEvent1Poster,
-      url: "",
-      badge: t?.upcomingEventsList?.[0]?.badge || defaults.upcomingEvent1.badge
-    }
-  ];
+  // Helper function to parse diverse date formats
+  const parseEventDate = (dateStr) => {
+    if (!dateStr) return new Date(0); // Fallback for invalid dates
 
-  // 과거 이벤트 데이터 (번역 적용)
-  const pastEvents = [
-    {
-      id: 1,
-      title: t?.pastEventsList?.[0]?.title || "제 4회 OKTA 비즈니스 세미나",
-      date: "06.28.2025",
-      description: t?.pastEventsList?.[0]?.description || "최신 금융 트렌드와 투자 전략에 대한 전문가 세미나",
-      poster: pastEvent5Poster,
-      url: "https://www.zeffy.com/ticketing/3"
-    },
-    {
-      id: 2,
-      title: t?.pastEventsList?.[1]?.title || "제 3회 월드옥타 덴버 차세대 세미나",
-      date: "11.23.2023",
-      description: t?.pastEventsList?.[1]?.description || "차세대 리더십과 성장 전략에 대한 세미나",
-      poster: pastEvent1Poster,
-      url: null
-    },
-    {
-      id: 3,
-      title: t?.pastEventsList?.[2]?.title || "제 2회 월드옥타 덴버 차세대 세미나",
-      date: "02.18.2023",
-      description: t?.pastEventsList?.[2]?.description || "젊은 전문가들을 위한 네트워킹과 교육",
-      poster: pastEvent2Poster,
-      url: null
-    },
-    {
-      id: 4,
-      title: t?.pastEventsList?.[3]?.title || "디스커버 코리아(Discover Korea)",
-      date: "06.29.2024 ~ 06.30.2024",
-      description: t?.pastEventsList?.[3]?.description || "글로벌 경제 전망과 투자 기회",
-      poster: pastEvent3Poster,
-      url: null
-    },
-    {
-      id: 5,
-      title: t?.pastEventsList?.[4]?.title || "골프 토너먼트 (Golf Tournament)",
-      date: "07.16.2024",
-      description: t?.pastEventsList?.[4]?.description || "연례 골프 토너먼트 및 네트워킹 이벤트",
-      poster: pastEvent4Poster,
-      url: "https://www.zeffy.com/en-US/ticketing/526bb733-8248-4987-be28-edd572e750c6"
+    // Case 1: Range "06.29.2024 ~ 06.30.2024" -> Take the END date for "past" check
+    if (dateStr.includes('~')) {
+      const parts = dateStr.split('~');
+      const endDateStr = parts[1].trim();
+      return parseSingleDate(endDateStr);
     }
-  ];
+
+    // Case 2: Single date
+    return parseSingleDate(dateStr);
+  };
+
+  const parseSingleDate = (dateStr) => {
+    // Trim whitespace
+    const cleanDateStr = dateStr.trim();
+
+    // Check YYYY.MM.DD (e.g. 2026.12.20)
+    const ymdRegex = /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/;
+    const ymdMatch = cleanDateStr.match(ymdRegex);
+    if (ymdMatch) {
+      return new Date(ymdMatch[1], ymdMatch[2] - 1, ymdMatch[3]);
+    }
+
+    // Check MM.DD.YYYY (e.g. 12.20.2026 or 06.28.2025)
+    const mdyRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/;
+    const mdyMatch = cleanDateStr.match(mdyRegex);
+    if (mdyMatch) {
+      return new Date(mdyMatch[3], mdyMatch[1] - 1, mdyMatch[2]);
+    }
+
+    // Check YYYY-MM-DD (ISO)
+    const isoRegex = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
+    const isoMatch = cleanDateStr.match(isoRegex);
+    if (isoMatch) {
+      return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3]);
+    }
+
+    // Fallback
+    const parsed = new Date(cleanDateStr);
+    return isNaN(parsed.getTime()) ? new Date(0) : parsed;
+  };
+
+  // Fetch and sort events
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch all events from Supabase
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .order('date', { ascending: false }); // Fetch latest first
+          
+        if (error) {
+          throw error;
+        }
+
+        const events = data || [];
+        console.log("Fetched Events:", events); // Debug log
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalize today to start of day
+
+        const upcoming = [];
+        const past = [];
+
+        events.forEach(event => {
+          const eventDate = parseEventDate(event.date);
+          
+          console.log(`Event: ${event.title}, DateStr: ${event.date}, Parsed: ${eventDate.toDateString()}`); // Debug log
+
+          // If the event date is valid and is today or in the future
+          if (eventDate >= today) {
+            upcoming.push(event);
+          } else {
+            past.push(event);
+          }
+        });
+
+        // Upcoming: Nearest future date first (Ascending)
+        upcoming.sort((a, b) => parseEventDate(a.date) - parseEventDate(b.date));
+        
+        // Past: Most recent past date first (Descending)
+        past.sort((a, b) => parseEventDate(b.date) - parseEventDate(a.date));
+
+        setUpcomingEvents(upcoming);
+        setPastEvents(past);
+
+      } catch (error) {
+        console.error("Error fetching events: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const handleEventClick = (url) => {
     if (url) {
@@ -133,77 +171,98 @@ const Events = () => {
     }
   };
 
-  const handleZeffyClick = () => {
-    window.open('https://www.zeffy.com', '_blank');
+  const handleAddEventClick = () => {
+    navigate('/admin');
   };
 
   return (
     <AboutContainer>
       <Title>{t?.title || defaults.title}</Title>
       
+      {/* 관리자 전용: 이벤트 추가 버튼 */}
+      {user && (
+        <AdminActionContainer>
+          <AddEventButton onClick={handleAddEventClick}>
+            {defaults.addEvent}
+          </AddEventButton>
+        </AdminActionContainer>
+      )}
+      
       {/* 다가오는 이벤트 섹션 */}
       <UpcomingSection>
         <SectionTitle>{t?.upcomingEvents || defaults.upcomingEvents}</SectionTitle>
-        <EventsGrid>
-          {upcomingEvents.map((event) => (
-            <EventCard 
-              key={event.id}
-              onClick={() => handleEventClick(event.url)}
-              clickable={!!event.url}
-            >
-              {event.badge && <EventBadge>{event.badge}</EventBadge>}
-              <PosterContainer>
-                <EventPoster src={event.poster} alt={event.title} />
-                <EventOverlay>
-                  <EventTitle>{event.title}</EventTitle>
-                  <EventDate>{event.date}</EventDate>
-                  <EventDescription>{event.description}</EventDescription>
-                  {event.url && (
-                    <ClickIndicator>{t?.clickToView || defaults.clickToView}</ClickIndicator>
-                  )}
-                </EventOverlay>
-              </PosterContainer>
-            </EventCard>
-          ))}
-        </EventsGrid>
+        {loading ? (
+          <p style={{ textAlign: 'center', fontSize: '1.2rem', padding: '2rem' }}>
+            {defaults.loading}
+          </p>
+        ) : upcomingEvents.length > 0 ? (
+          <EventsGrid>
+            {upcomingEvents.map((event) => (
+              <EventCard 
+                key={event.id}
+                onClick={() => handleEventClick(event.url)}
+                clickable={!!event.url}
+              >
+                {event.badge && <EventBadge>{event.badge}</EventBadge>}
+                <PosterContainer>
+                  <EventPoster src={event.poster} alt={event.title} />
+                  <EventOverlay>
+                    <EventTitle>{event.title}</EventTitle>
+                    <EventDate>{event.date}</EventDate>
+                    <EventDescription>{event.description}</EventDescription>
+                    {event.url && (
+                      <ClickIndicator>{t?.clickToView || defaults.clickToView}</ClickIndicator>
+                    )}
+                  </EventOverlay>
+                </PosterContainer>
+              </EventCard>
+            ))}
+          </EventsGrid>
+        ) : (
+          <p style={{ textAlign: 'center', fontSize: '1.2rem', padding: '2rem', color: '#666' }}>
+            {defaults.noEvents}
+          </p>
+        )}
       </UpcomingSection>
-
-      {/* Zeffy 등록 섹션 */}
-      {/* <ZeffySection>
-        <h3>{t.eventRegistration.title}</h3>
-        <p>{t.eventRegistration.description}</p>
-        <ZeffyButton onClick={handleZeffyClick}>
-          {t.eventRegistration.buttonText}
-        </ZeffyButton>
-      </ZeffySection> */}
 
       {/* 과거 이벤트 섹션 */}
       <PastSection>
         <SectionTitle>{t?.pastEvents || defaults.pastEvents}</SectionTitle>
-        <EventsGrid>
-          {pastEvents.map((event) => (
-            <EventCard 
-              key={event.id}
-              onClick={() => handleEventClick(event.url)}
-              clickable={!!event.url}
-            >
-              <PosterContainer>
-                <EventPoster src={event.poster} alt={event.title} />
-                <EventOverlay className="past-event">
-                  <EventTitle>{event.title}</EventTitle>
-                  <EventDate>{event.date}</EventDate>
-                  <EventDescription>{event.description}</EventDescription>
-                  {event.url && (
-                    <ClickIndicator>{t?.clickToView || defaults.clickToView}</ClickIndicator>
-                  )}
-                </EventOverlay>
-              </PosterContainer>
-            </EventCard>
-          ))}
-        </EventsGrid>
+        {loading ? (
+          <p style={{ textAlign: 'center', fontSize: '1.2rem', padding: '2rem' }}>
+            {defaults.loading}
+          </p>
+        ) : pastEvents.length > 0 ? (
+          <EventsGrid>
+            {pastEvents.map((event) => (
+              <EventCard 
+                key={event.id}
+                onClick={() => handleEventClick(event.url)}
+                clickable={!!event.url}
+              >
+                <PosterContainer>
+                  <EventPoster src={event.poster} alt={event.title} />
+                  <EventOverlay className="past-event">
+                    <EventTitle>{event.title}</EventTitle>
+                    <EventDate>{event.date}</EventDate>
+                    <EventDescription>{event.description}</EventDescription>
+                    {event.url && (
+                      <ClickIndicator>{t?.clickToView || defaults.clickToView}</ClickIndicator>
+                    )}
+                  </EventOverlay>
+                </PosterContainer>
+              </EventCard>
+            ))}
+          </EventsGrid>
+        ) : (
+          <p style={{ textAlign: 'center', fontSize: '1.2rem', padding: '2rem', color: '#666' }}>
+            {defaults.noPastEvents}
+          </p>
+        )}
       </PastSection>
     </AboutContainer>
   );
 };
 
-export default Events; 
+export default Events;
+

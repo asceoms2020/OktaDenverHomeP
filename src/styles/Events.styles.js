@@ -237,6 +237,25 @@ export const EventButton = styled.button`
   }
 `;
 
+// 관리자 액션 컨테이너
+export const AdminActionContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+`;
+
+// 이벤트 추가 버튼
+export const AddEventButton = styled(EventButton)`
+  background: linear-gradient(45deg, #9b59b6, #8e44ad);
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  
+  &:hover {
+    background: linear-gradient(45deg, #8e44ad, #7d3c98);
+    box-shadow: 0 8px 20px rgba(155, 89, 182, 0.4);
+  }
+`;
+
 // 반응형 조정
 export const ResponsiveEventSection = styled.div`
   @media (max-width: 1024px) {
@@ -335,4 +354,4 @@ export const EventCategory = styled.span`
   font-weight: 500;
   margin-bottom: 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.3);
-`; 
+`;
