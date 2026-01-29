@@ -82,10 +82,10 @@ const Header = () => {
         </button>
         <div className={`nav-links ${isMenuOpen ? 'nav-links-open' : ''}`}>
           <Link to="/" className="nav-link" onClick={closeMenu}>{t.home}</Link>
+          <Link to="/about" className="nav-link" onClick={closeMenu}>{t.about}</Link>
           <Link to="/events" className="nav-link" onClick={closeMenu}>{t.events}</Link>
           <Link to="/resources" className="nav-link" onClick={closeMenu}>{t.resources}</Link>
           <Link to="/newsletter" className="nav-link" onClick={closeMenu}>{t.newsletter}</Link>
-          <Link to="/about" className="nav-link" onClick={closeMenu}>{t.about}</Link>
           <Link to="/sponsors" className="nav-link" onClick={closeMenu}>{t.sponsors}</Link>
           
           {/* Conditional Menu: Trading (Only for Logged in users) */}
@@ -96,18 +96,22 @@ const Header = () => {
           )}
 
           {user ? (
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <div className="auth-buttons-container">
               <button 
-                className="auth-button"
+                className="profile-button"
                 onClick={() => {
                   setIsProfileOpen(true);
                   closeMenu();
                 }}
               >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
                 {language === 'ko' ? '내 정보' : 'Profile'}
               </button>
               <button 
-                className="auth-button" 
+                className="logout-button" 
                 onClick={handleLogout}
               >
                 {language === 'ko' ? '로그아웃' : 'Logout'}
@@ -115,7 +119,7 @@ const Header = () => {
             </div>
           ) : (
             <button 
-              className="auth-button" 
+              className="login-button" 
               onClick={() => {
                 setIsLoginOpen(true);
                 closeMenu();

@@ -256,6 +256,36 @@ export const AddEventButton = styled(EventButton)`
   }
 `;
 
+export const EditButton = styled.button`
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #333;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 100;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #3498db;
+    color: white;
+    transform: scale(1.1);
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+`;
+
 // 반응형 조정
 export const ResponsiveEventSection = styled.div`
   @media (max-width: 1024px) {

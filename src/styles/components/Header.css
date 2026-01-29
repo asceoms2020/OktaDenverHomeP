@@ -144,9 +144,57 @@
   transform: translateY(0);
 }
 
-/* Auth 버튼 (로그인/로그아웃) */
-.auth-button {
-  background-color: #2ecc71; /* Green color matching hover states */
+/* Auth Buttons Container */
+.auth-buttons-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Profile Button (Green Oval with Icon) */
+.profile-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2ecc71;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-button:hover {
+  background-color: #27ae60;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+}
+
+/* Logout Button (Red Oval) */
+.logout-button {
+  background-color: #e74c3c;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #c0392b;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+/* Login Button (Default Green) */
+.login-button {
+  background-color: #2ecc71;
   color: white;
   padding: 8px 16px;
   border: none;
@@ -158,14 +206,10 @@
   margin-left: 10px;
 }
 
-.auth-button:hover {
+.login-button:hover {
   background-color: #27ae60;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
-}
-
-.auth-button:active {
-  transform: translateY(0);
 }
 
 /* 모바일 반응형 */
@@ -214,6 +258,17 @@
   
   .donation-button {
     margin-top: 10px;
+  }
+  
+  .auth-buttons-container {
+    flex-direction: column;
+    width: 100%;
+    gap: 15px;
+  }
+  
+  .profile-button, .logout-button, .login-button {
+    width: 100%;
+    justify-content: center;
   }
   
   /* 모바일에서 조직 정보 크기 조정 */

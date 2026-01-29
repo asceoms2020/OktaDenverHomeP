@@ -1,28 +1,40 @@
 .language-switch {
-  margin-left: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
 }
 
 .language-button {
-  background-color: transparent;
-  border: 2px solid #2ecc71;
-  color: #2ecc71;
-  padding: 6px 12px;
-  border-radius: 20px;
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
+  font-size: 1.5rem;
+  transition: all 0.2s ease;
+  padding: 0;
+  line-height: 1;
 }
 
 .language-button:hover {
-  background-color: #2ecc71;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  background-color: #f8f9fa;
+  transform: scale(1.1);
+  border-color: #bdc3c7;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.language-button:active {
+  transform: scale(0.95);
 }
 
 @media (max-width: 768px) {
   .language-switch {
     margin-left: 0;
+    margin-top: 10px;
   }
-} 
+}

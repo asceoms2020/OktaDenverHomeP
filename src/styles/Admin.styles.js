@@ -123,3 +123,110 @@ export const SuccessMessage = styled.div`
   margin-bottom: 1.5rem;
   text-align: center;
 `;
+
+export const CancelButton = styled.button`
+  background: #95a5a6;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 0.5rem;
+  
+  &:hover {
+    background: #7f8c8d;
+  }
+`;
+
+export const EventListContainer = styled.div`
+  max-width: 800px;
+  margin: 3rem auto 0;
+`;
+
+export const EventListHeader = styled.h2`
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 0.5rem;
+`;
+
+export const EventList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+export const EventItem = styled.div`
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
+`;
+
+export const EventInfo = styled.div`
+  h3 {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  .date {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+  }
+  
+  .badge {
+    display: inline-block;
+    background: #3498db;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+  }
+`;
+
+export const ActionButtons = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+export const ActionButton = styled.button`
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &.edit {
+    background: #f39c12;
+    color: white;
+    
+    &:hover {
+      background: #d68910;
+    }
+  }
+  
+  &.delete {
+    background: #e74c3c;
+    color: white;
+    
+    &:hover {
+      background: #c0392b;
+    }
+  }
+`;

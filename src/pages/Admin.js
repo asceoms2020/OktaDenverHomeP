@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import {
@@ -9,13 +9,24 @@ import {
   FormGroup,
   ImagePreview,
   SubmitButton,
+  CancelButton,
   ErrorMessage,
-  SuccessMessage
+  SuccessMessage,
+  EventListContainer,
+  EventListHeader,
+  EventList,
+  EventItem,
+  EventInfo,
+  ActionButtons,
+  ActionButton
 } from '../styles/Admin.styles';
 
 const Admin = () => {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  // Form State
   const [formData, setFormData] = useState({
     title: '',
     date: '',
@@ -25,9 +36,45 @@ const Admin = () => {
   });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  
+  // UI State
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [events, setEvents] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+
+  // Fetch events on mount
+  useEffect(() => {
+    if (user && isAdmin) {
+      fetchEvents();
+    }
+  }, [user, isAdmin]);
+
+  // Handle URL edit parameter
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (editId && events.length > 0) {
+      const eventToEdit = events.find(e => e.id === editId);
+      if (eventToEdit) {
+        handleEdit(eventToEdit);
+      }
+    }
+  }, [searchParams, events]);
+
+  const fetchEvents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setEvents(data || []);
+    } catch (err) {
+      console.error('Error fetching events:', err);
+    }
+  };
 
   // Protect the route
   if (!user) {
@@ -41,7 +88,6 @@ const Admin = () => {
     );
   }
 
-  // Check if user is admin using isAdmin from context
   if (!isAdmin) {
     return (
       <AdminContainer>
@@ -76,6 +122,57 @@ const Admin = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      date: '',
+      description: '',
+      url: '',
+      badge: ''
+    });
+    setImageFile(null);
+    setImagePreview(null);
+    setEditingId(null);
+    setError('');
+    setSuccess('');
+    // Clear URL param without reloading
+    navigate('/admin', { replace: true });
+  };
+
+  const handleEdit = (event) => {
+    setEditingId(event.id);
+    setFormData({
+      title: event.title,
+      date: event.date,
+      description: event.description,
+      url: event.url || '',
+      badge: event.badge || ''
+    });
+    setImagePreview(event.poster);
+    setImageFile(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setError('');
+    setSuccess('');
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this event?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setSuccess('Event deleted successfully!');
+      fetchEvents();
+    } catch (err) {
+      setError(`Failed to delete event: ${err.message}`);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -83,24 +180,19 @@ const Admin = () => {
     setSuccess('');
 
     try {
-      let posterUrl = '';
+      let posterUrl = imagePreview;
 
-      // 1. Upload Image to Supabase Storage if selected
       if (imageFile) {
         const fileExt = imageFile.name.split('.').pop();
         const fileName = `${Date.now()}_${Math.random()}.${fileExt}`;
         const filePath = `${fileName}`;
 
-        // Upload
         const { error: uploadError } = await supabase.storage
-          .from('events') // 'events' bucket must exist in Supabase
+          .from('events')
           .upload(filePath, imageFile);
 
-        if (uploadError) {
-          throw uploadError;
-        }
+        if (uploadError) throw uploadError;
 
-        // Get Public URL
         const { data: { publicUrl } } = supabase.storage
           .from('events')
           .getPublicUrl(filePath);
@@ -108,7 +200,6 @@ const Admin = () => {
         posterUrl = publicUrl;
       }
 
-      // 2. Insert Event into Supabase Database
       const eventData = {
         title: formData.title,
         date: formData.date,
@@ -116,32 +207,31 @@ const Admin = () => {
         url: formData.url,
         badge: formData.badge,
         poster: posterUrl,
-        created_by: user.id
-        // created_at is usually auto-handled by Supabase, but you can pass it if needed
+        ...(editingId ? {} : { created_by: user.id })
       };
 
-      const { error: insertError } = await supabase
-        .from('events') // 'events' table must exist in Supabase
-        .insert([eventData]);
+      if (editingId) {
+        const { error: updateError } = await supabase
+          .from('events')
+          .update(eventData)
+          .eq('id', editingId);
 
-      if (insertError) {
-        throw insertError;
+        if (updateError) throw updateError;
+        setSuccess('Event updated successfully!');
+      } else {
+        const { error: insertError } = await supabase
+          .from('events')
+          .insert([eventData]);
+
+        if (insertError) throw insertError;
+        setSuccess('Event created successfully!');
       }
 
-      setSuccess('Event created successfully!');
-      setFormData({
-        title: '',
-        date: '',
-        description: '',
-        url: '',
-        badge: ''
-      });
-      setImageFile(null);
-      setImagePreview(null);
-      
+      resetForm();
+      fetchEvents();
     } catch (err) {
-      console.error("Error creating event: ", err);
-      setError(`Failed to create event: ${err.message}`);
+      console.error("Error saving event: ", err);
+      setError(`Failed to save event: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -151,7 +241,7 @@ const Admin = () => {
     <AdminContainer>
       <AdminHeader>
         <h1>Admin Dashboard</h1>
-        <p>Register a new event</p>
+        <p>{editingId ? 'Edit Event' : 'Register a new event'}</p>
       </AdminHeader>
 
       <AdminForm onSubmit={handleSubmit}>
@@ -223,7 +313,7 @@ const Admin = () => {
             id="poster"
             accept="image/*"
             onChange={handleImageChange}
-            required
+            required={!editingId && !imagePreview}
           />
           {imagePreview && (
             <ImagePreview>
@@ -233,9 +323,42 @@ const Admin = () => {
         </FormGroup>
 
         <SubmitButton type="submit" disabled={loading}>
-          {loading ? 'Creating...' : 'Create Event'}
+          {loading ? 'Processing...' : (editingId ? 'Update Event' : 'Create Event')}
         </SubmitButton>
+        
+        {editingId && (
+          <CancelButton type="button" onClick={resetForm}>
+            Cancel Edit
+          </CancelButton>
+        )}
       </AdminForm>
+
+      <EventListContainer>
+        <EventListHeader>Existing Events</EventListHeader>
+        <EventList>
+          {events.length === 0 ? (
+            <p style={{ color: '#666', textAlign: 'center' }}>No events found.</p>
+          ) : (
+            events.map(event => (
+              <EventItem key={event.id}>
+                <EventInfo>
+                  <h3>{event.title}</h3>
+                  <div className="date">{event.date}</div>
+                  {event.badge && <div className="badge">{event.badge}</div>}
+                </EventInfo>
+                <ActionButtons>
+                  <ActionButton className="edit" onClick={() => handleEdit(event)}>
+                    Edit
+                  </ActionButton>
+                  <ActionButton className="delete" onClick={() => handleDelete(event.id)}>
+                    Delete
+                  </ActionButton>
+                </ActionButtons>
+              </EventItem>
+            ))
+          )}
+        </EventList>
+      </EventListContainer>
     </AdminContainer>
   );
 };
