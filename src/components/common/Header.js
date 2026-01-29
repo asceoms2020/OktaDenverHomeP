@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import logoImage from '../../assets/images/World-Okta.png';
 import LanguageSwitch from '../LanguageSwitch';
@@ -25,12 +25,29 @@ const Header = () => {
     donation: "Donation"
   };
 
+  // 로그인 상태가 변경되면(로그인 성공 시) 모달을 닫습니다.
+  useEffect(() => {
+    if (user) {
+      setIsLoginOpen(false);
+      setIsSignUpOpen(false);
+    }
+  }, [user]);
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      closeMenu();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
@@ -66,10 +83,7 @@ const Header = () => {
           {user ? (
             <button 
               className="auth-button" 
-              onClick={() => {
-                signOut();
-                closeMenu();
-              }}
+              onClick={handleLogout}
             >
               {language === 'ko' ? '로그아웃' : 'Logout'}
             </button>

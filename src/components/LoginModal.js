@@ -69,6 +69,21 @@ const Button = styled.button`
   }
 `;
 
+const GoogleButton = styled(Button)`
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 1rem;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
 const CloseButton = styled.button`
   position: absolute;
   top: 1rem;
@@ -89,6 +104,23 @@ const Message = styled.p`
   margin-top: 1rem;
   font-size: 0.9rem;
   color: ${props => props.error ? 'red' : 'green'};
+`;
+
+const Divider = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: #666;
+  font-size: 0.9rem;
+  
+  &::before, &::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  &::before { margin-right: .5em; }
+  &::after { margin-left: .5em; }
 `;
 
 const LoginModal = ({ isOpen, onClose, onSignUpClick }) => {
@@ -120,6 +152,18 @@ const LoginModal = ({ isOpen, onClose, onSignUpClick }) => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        // options: { redirectTo: window.location.origin } // Supabase Site URL 설정을 따름
+      });
+      if (error) throw error;
+    } catch (err) {
+      setMessage(err.message || 'Google 로그인 중 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <Overlay onClick={onClose}>
       <ModalContainer onClick={e => e.stopPropagation()}>
@@ -144,6 +188,14 @@ const LoginModal = ({ isOpen, onClose, onSignUpClick }) => {
             {loading ? '로그인 중...' : '로그인'}
           </Button>
         </Form>
+
+        <Divider>또는</Divider>
+
+        <GoogleButton type="button" onClick={handleGoogleLogin}>
+          <img src="https://www.google.com/favicon.ico" alt="Google" style={{width: '20px'}} />
+          Google로 로그인
+        </GoogleButton>
+
         <div style={{ marginTop: '1rem', textAlign: 'center' }}>
           <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>계정이 없으신가요?</p>
           <Button 
