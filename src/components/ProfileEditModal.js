@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { getAuthenticatedClient } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { OKTA_CHAPTERS } from '../constants/oktaChapters';
+import { useLanguage } from '../context/LanguageContext';
 
 const Overlay = styled.div`
   position: fixed;
@@ -118,7 +119,7 @@ const Message = styled.p`
   text-align: center;
   margin-top: 1rem;
   font-size: 0.9rem;
-  color: ${props => props.error ? 'red' : 'green'};
+  color: ${props => props.$error ? 'red' : 'green'};
 `;
 
 const CheckboxGroup = styled.div`
@@ -130,9 +131,11 @@ const CheckboxGroup = styled.div`
 
 const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
   const { user, fetchUserProfile } = useAuth();
+  const { language } = useLanguage();
+  const isKo = language === 'ko';
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
-  const [error, setError] = useState(false);
+  const [isError, setIsError] = useState(false);
   
   const [formData, setFormData] = useState({
     full_name: '',
@@ -188,7 +191,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
       setFormData(prev => ({
         ...prev,
         [name]: value,
-        okta_chapter_city: '' // Reset city when country changes
+        okta_chapter_city: ''
       }));
     } else {
       setFormData(prev => ({
@@ -202,7 +205,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
-    setError(false);
+    setIsError(false);
 
     try {
       const authClient = getAuthenticatedClient();
@@ -216,7 +219,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
 
       if (error) throw error;
 
-      setMessage('프로필이 성공적으로 업데이트되었습니다.');
+      setMessage(isKo ? '프로필이 성공적으로 업데이트되었습니다.' : 'Your profile has been updated successfully.');
       
       // Update local profile state
       await fetchUserProfile(user.id);
@@ -225,16 +228,13 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
         if (!force) {
           onClose();
         } else {
-          // If forced mode (registration completion), just clear message and potentially trigger callback
-          // But effectively the parent component will close this modal when it detects profile is complete
           setMessage(null);
-          // Force a reload if strictly needed, but state update should be enough if parent watches it
           window.location.reload(); 
         }
       }, 1000);
     } catch (err) {
-      setMessage(err.message || '프로필 업데이트 중 오류가 발생했습니다.');
-      setError(true);
+      setMessage(err.message || (isKo ? '프로필 업데이트 중 오류가 발생했습니다.' : 'An error occurred while updating your profile.'));
+      setIsError(true);
     } finally {
       setLoading(false);
     }
@@ -252,13 +252,17 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
     <Overlay onClick={handleOverlayClick}>
       <ModalContainer onClick={e => e.stopPropagation()}>
         <CloseButton onClick={onClose} force={force}>&times;</CloseButton>
-        <Title>{force ? '회원가입 완료를 위해 정보를 입력해주세요' : '내 정보 수정'}</Title>
+        <Title>
+          {force
+            ? (isKo ? '회원가입 완료를 위해 정보를 입력해주세요' : 'Please complete your profile to continue')
+            : (isKo ? '내 정보 수정' : 'Edit Profile')}
+        </Title>
         <Form onSubmit={handleSubmit}>
           <FormGroup>
-            <Label>이름 (Full Name)</Label>
+            <Label>{isKo ? '이름 (Full Name)' : 'Full Name'}</Label>
             <Input
               name="full_name"
-              placeholder="홍길동"
+              placeholder={isKo ? '홍길동' : 'Your name'}
               value={formData.full_name}
               onChange={handleChange}
               required
@@ -266,7 +270,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
           </FormGroup>
 
           <FormGroup>
-            <Label>핸드폰 번호 (국가번호 포함)</Label>
+            <Label>{isKo ? '핸드폰 번호 (국가번호 포함)' : 'Phone Number (with country code)'}</Label>
             <Input
               name="phone_number"
               placeholder="+1 123-456-7890"
@@ -277,10 +281,10 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
           </FormGroup>
 
           <FormGroup>
-            <Label>카카오톡 ID</Label>
+            <Label>{isKo ? '카카오톡 ID' : 'KakaoTalk ID'}</Label>
             <Input
               name="kakaotalk_id"
-              placeholder="카카오톡 ID 입력"
+              placeholder={isKo ? '카카오톡 ID 입력' : 'Enter your KakaoTalk ID'}
               value={formData.kakaotalk_id}
               onChange={handleChange}
             />
@@ -294,27 +298,29 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
               checked={formData.is_okta_member}
               onChange={handleChange}
             />
-            <Label htmlFor="is_okta_member" style={{ marginBottom: 0 }}>OKTA 정회원입니다</Label>
+            <Label htmlFor="is_okta_member" style={{ marginBottom: 0 }}>
+              {isKo ? 'OKTA 정회원입니다' : 'I am an OKTA member'}
+            </Label>
           </CheckboxGroup>
 
           {formData.is_okta_member && (
             <>
               <FormGroup>
-                <Label>소속 지회 (국가)</Label>
+                <Label>{isKo ? '소속 지회 (국가)' : 'Chapter Country'}</Label>
                 <Select
                   name="okta_chapter_country"
                   value={formData.okta_chapter_country}
                   onChange={handleChange}
                   required={formData.is_okta_member}
                 >
-                  <option value="">국가를 선택하세요</option>
+                  <option value="">{isKo ? '국가를 선택하세요' : 'Select a country'}</option>
                   {Object.keys(OKTA_CHAPTERS).map(country => (
                     <option key={country} value={country}>{country}</option>
                   ))}
                 </Select>
               </FormGroup>
               <FormGroup>
-                <Label>소속 지회 (도시)</Label>
+                <Label>{isKo ? '소속 지회 (도시)' : 'Chapter City'}</Label>
                 <Select
                   name="okta_chapter_city"
                   value={formData.okta_chapter_city}
@@ -322,7 +328,11 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
                   required={formData.is_okta_member}
                   disabled={!formData.okta_chapter_country}
                 >
-                  <option value="">{formData.okta_chapter_country ? '도시를 선택하세요' : '국가를 먼저 선택하세요'}</option>
+                  <option value="">
+                    {formData.okta_chapter_country
+                      ? (isKo ? '도시를 선택하세요' : 'Select a city')
+                      : (isKo ? '국가를 먼저 선택하세요' : 'Select a country first')}
+                  </option>
                   {cities.map(city => (
                     <option key={city} value={city}>{city}</option>
                   ))}
@@ -332,10 +342,10 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
           )}
 
           <Button type="submit" disabled={loading}>
-            {loading ? '저장 중...' : '저장하기'}
+            {loading ? (isKo ? '저장 중...' : 'Saving...') : (isKo ? '저장하기' : 'Save')}
           </Button>
         </Form>
-        {message && <Message error={error}>{message}</Message>}
+        {message && <Message $error={isError}>{message}</Message>}
       </ModalContainer>
     </Overlay>
   );

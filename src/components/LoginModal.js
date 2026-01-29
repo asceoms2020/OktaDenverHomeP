@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const Overlay = styled.div`
   position: fixed;
@@ -104,7 +105,7 @@ const Message = styled.p`
   text-align: center;
   margin-top: 1rem;
   font-size: 0.9rem;
-  color: ${props => props.error ? 'red' : 'green'};
+  color: ${props => props.$error ? 'red' : 'green'};
 `;
 
 const Divider = styled.div`
@@ -130,6 +131,8 @@ const LoginModal = ({ isOpen, onClose, onSignUpClick }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const { signInWithEmail } = useAuth();
+  const { language } = useLanguage();
+  const isKo = language === 'ko';
   
   if (!isOpen) return null;
 
@@ -142,7 +145,7 @@ const LoginModal = ({ isOpen, onClose, onSignUpClick }) => {
       await signInWithEmail(email, password);
       onClose(); // 로그인 성공 시 모달 닫기
     } catch (err) {
-      setMessage(err.message || '로그인 중 오류가 발생했습니다.');
+      setMessage(err.message || (isKo ? '로그인 중 오류가 발생했습니다.' : 'An error occurred during login.'));
     } finally {
       setLoading(false);
     }
@@ -156,7 +159,7 @@ const LoginModal = ({ isOpen, onClose, onSignUpClick }) => {
       });
       if (error) throw error;
     } catch (err) {
-      setMessage(err.message || 'Google 로그인 중 오류가 발생했습니다.');
+      setMessage(err.message || (isKo ? 'Google 로그인 중 오류가 발생했습니다.' : 'An error occurred during Google login.'));
     }
   };
 
@@ -164,45 +167,47 @@ const LoginModal = ({ isOpen, onClose, onSignUpClick }) => {
     <Overlay onClick={onClose}>
       <ModalContainer onClick={e => e.stopPropagation()}>
         <CloseButton onClick={onClose}>&times;</CloseButton>
-        <Title>로그인</Title>
+        <Title>{isKo ? '로그인' : 'Login'}</Title>
         <Form onSubmit={handleLogin}>
           <Input
             type="email"
-            placeholder="이메일"
+            placeholder={isKo ? '이메일' : 'Email'}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
           <Input
             type="password"
-            placeholder="비밀번호"
+            placeholder={isKo ? '비밀번호' : 'Password'}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
           <Button type="submit" disabled={loading}>
-            {loading ? '로그인 중...' : '로그인'}
+            {loading ? (isKo ? '로그인 중...' : 'Logging in...') : (isKo ? '로그인' : 'Login')}
           </Button>
         </Form>
 
-        <Divider>또는</Divider>
+        <Divider>{isKo ? '또는' : 'OR'}</Divider>
 
         <GoogleButton type="button" onClick={handleGoogleLogin}>
           <img src="https://www.google.com/favicon.ico" alt="Google" style={{width: '20px'}} />
-          Google로 로그인
+          {isKo ? 'Google로 로그인' : 'Continue with Google'}
         </GoogleButton>
 
         <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-          <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>계정이 없으신가요?</p>
+          <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>
+            {isKo ? '계정이 없으신가요?' : "Don't have an account?"}
+          </p>
           <Button 
             type="button" 
             onClick={onSignUpClick}
             style={{ backgroundColor: '#6c757d', width: '100%' }}
           >
-            회원가입
+            {isKo ? '회원가입' : 'Sign Up'}
           </Button>
         </div>
-        {message && <Message error>{message}</Message>}
+        {message && <Message $error>{message}</Message>}
       </ModalContainer>
     </Overlay>
   );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { supabase } from '../lib/supabaseClient';
-import { OKTA_CHAPTERS } from '../constants/oktaChapters';
+import { useLanguage } from '../context/LanguageContext';
 
 const Overlay = styled.div`
   position: fixed;
@@ -62,25 +62,6 @@ const Input = styled.input`
   }
 `;
 
-const Select = styled.select`
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  background-color: white;
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-`;
-
-const CheckboxGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
-`;
-
 const Button = styled.button`
   padding: 0.75rem;
   background-color: #007bff;
@@ -134,8 +115,12 @@ const CloseButton = styled.button`
 const Message = styled.p`
   text-align: center;
   margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 6px;
   font-size: 0.9rem;
-  color: ${props => props.error ? 'red' : 'green'};
+  background-color: ${props => props.$error ? '#ffe6e6' : '#e6ffe6'};
+  color: ${props => props.$error ? '#cc0000' : '#006600'};
+  border: 1px solid ${props => props.$error ? '#ff9999' : '#99ff99'};
 `;
 
 const Divider = styled.div`
@@ -158,21 +143,13 @@ const Divider = styled.div`
 const SignUpModal = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  // Extended fields
-  const [fullName, setFullName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [kakaoId, setKakaoId] = useState('');
-  const [isOktaMember, setIsOktaMember] = useState(false);
-  const [chapterCountry, setChapterCountry] = useState('');
-  const [chapterCity, setChapterCity] = useState('');
-  
-  // Update city options when country changes
-  const cities = chapterCountry ? OKTA_CHAPTERS[chapterCountry] || [] : [];
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(false);
+  const { language } = useLanguage();
+  const isKo = language === 'ko';
 
   if (!isOpen) return null;
 
@@ -182,8 +159,15 @@ const SignUpModal = ({ isOpen, onClose }) => {
     setMessage(null);
     setError(false);
 
+    // Check password confirmation
+    if (password !== confirmPassword) {
+      setMessage(isKo ? '비밀번호가 일치하지 않습니다.' : 'Passwords do not match.');
+      setError(true);
+      setLoading(false);
+      return;
+    }
+
     try {
-      // 1. Sign up user
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -191,32 +175,29 @@ const SignUpModal = ({ isOpen, onClose }) => {
 
       if (signUpError) throw signUpError;
 
-      if (data?.user) {
-        // 2. Create profile entry
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: data.user.id,
-            full_name: fullName,
-            phone_number: phoneNumber,
-            kakaotalk_id: kakaoId,
-            is_okta_member: isOktaMember,
-            okta_chapter_country: isOktaMember ? chapterCountry : null,
-            okta_chapter_city: isOktaMember ? chapterCity : null,
-            updated_at: new Date()
-          });
-
-        if (profileError) {
-          console.error('Profile creation error:', profileError);
-          // Note: User is created but profile might have failed.
-          // We still consider signup successful but warn or handle accordingly.
-        }
+      // Check if user already exists (Supabase returns empty identities for existing users)
+      if (data?.user?.identities?.length === 0) {
+        setMessage(
+          isKo
+            ? '이미 가입된 계정입니다. 로그인을 시도해주세요.'
+            : 'This email is already registered. Please try logging in.'
+        );
+        setError(true);
+        return;
       }
 
-      setMessage('회원가입 확인 메일을 발송했습니다. 이메일을 확인해주세요.');
+      // Profile creation happens after email confirmation via ProfileEditModal
+      setMessage(
+        isKo
+          ? '회원가입 확인 메일을 발송했습니다. 이메일을 확인해주세요.'
+          : "We've sent a confirmation email. Please check your inbox."
+      );
       setError(false);
     } catch (err) {
-      setMessage(err.message || '회원가입 중 오류가 발생했습니다.');
+      console.error('SignUp error:', err);
+      setMessage(
+        err.message || (isKo ? '회원가입 중 오류가 발생했습니다.' : 'An error occurred during sign up.')
+      );
       setError(true);
     } finally {
       setLoading(false);
@@ -227,11 +208,12 @@ const SignUpModal = ({ isOpen, onClose }) => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        // options: { redirectTo: window.location.origin } // Supabase Site URL 설정을 따름
       });
       if (error) throw error;
     } catch (err) {
-      setMessage(err.message || 'Google 로그인 중 오류가 발생했습니다.');
+      setMessage(
+        err.message || (isKo ? 'Google 로그인 중 오류가 발생했습니다.' : 'An error occurred during Google sign-in.')
+      );
       setError(true);
     }
   };
@@ -240,10 +222,10 @@ const SignUpModal = ({ isOpen, onClose }) => {
     <Overlay onClick={onClose}>
       <ModalContainer onClick={e => e.stopPropagation()}>
         <CloseButton onClick={onClose}>&times;</CloseButton>
-        <Title>회원가입</Title>
+        <Title>{isKo ? '회원가입' : 'Sign Up'}</Title>
         <Form onSubmit={handleSignUp}>
           <FormGroup>
-            <Label>이메일</Label>
+            <Label>{isKo ? '이메일' : 'Email'}</Label>
             <Input
               type="email"
               placeholder="example@email.com"
@@ -254,10 +236,10 @@ const SignUpModal = ({ isOpen, onClose }) => {
           </FormGroup>
 
           <FormGroup>
-            <Label>비밀번호</Label>
+            <Label>{isKo ? '비밀번호' : 'Password'}</Label>
             <Input
               type="password"
-              placeholder="6자 이상 입력해주세요"
+              placeholder={isKo ? '6자 이상 입력해주세요' : 'Minimum 6 characters'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -266,95 +248,36 @@ const SignUpModal = ({ isOpen, onClose }) => {
           </FormGroup>
 
           <FormGroup>
-            <Label>이름 (Full Name)</Label>
+            <Label>{isKo ? '비밀번호 확인' : 'Confirm Password'}</Label>
             <Input
-              type="text"
-              placeholder="홍길동"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              type="password"
+              placeholder={isKo ? '비밀번호를 다시 입력해주세요' : 'Enter password again'}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              minLength={6}
+              style={confirmPassword && password !== confirmPassword ? { borderColor: '#cc0000' } : {}}
             />
+            {confirmPassword && password !== confirmPassword && (
+              <span style={{ color: '#cc0000', fontSize: '0.8rem' }}>
+                {isKo ? '비밀번호가 일치하지 않습니다.' : 'Passwords do not match.'}
+              </span>
+            )}
           </FormGroup>
-
-          <FormGroup>
-            <Label>핸드폰 번호 (국가번호 포함)</Label>
-            <Input
-              type="tel"
-              placeholder="+1 123-456-7890"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Label>카카오톡 ID (선택)</Label>
-            <Input
-              type="text"
-              placeholder="카카오톡 ID"
-              value={kakaoId}
-              onChange={(e) => setKakaoId(e.target.value)}
-            />
-          </FormGroup>
-
-          <CheckboxGroup>
-            <input
-              type="checkbox"
-              id="signup_is_okta_member"
-              checked={isOktaMember}
-              onChange={(e) => setIsOktaMember(e.target.checked)}
-            />
-            <Label htmlFor="signup_is_okta_member" style={{ marginBottom: 0 }}>OKTA 정회원입니다</Label>
-          </CheckboxGroup>
-
-          {isOktaMember && (
-            <>
-              <FormGroup>
-                <Label>소속 지회 (국가)</Label>
-                <Select
-                  value={chapterCountry}
-                  onChange={(e) => {
-                    setChapterCountry(e.target.value);
-                    setChapterCity(''); // Reset city when country changes
-                  }}
-                  required={isOktaMember}
-                >
-                  <option value="">국가를 선택하세요</option>
-                  {Object.keys(OKTA_CHAPTERS).map(country => (
-                    <option key={country} value={country}>{country}</option>
-                  ))}
-                </Select>
-              </FormGroup>
-              <FormGroup>
-                <Label>소속 지회 (도시)</Label>
-                <Select
-                  value={chapterCity}
-                  onChange={(e) => setChapterCity(e.target.value)}
-                  required={isOktaMember}
-                  disabled={!chapterCountry}
-                >
-                  <option value="">{chapterCountry ? '도시를 선택하세요' : '국가를 먼저 선택하세요'}</option>
-                  {cities.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </Select>
-              </FormGroup>
-            </>
-          )}
 
           <Button type="submit" disabled={loading}>
-            {loading ? '처리중...' : '가입하기'}
+            {loading ? (isKo ? '처리중...' : 'Signing up...') : (isKo ? '가입하기' : 'Sign Up')}
           </Button>
+          
+          {message && <Message $error={error}>{message}</Message>}
         </Form>
 
-        <Divider>또는</Divider>
+        <Divider>{isKo ? '또는' : 'OR'}</Divider>
 
         <GoogleButton type="button" onClick={handleGoogleLogin}>
           <img src="https://www.google.com/favicon.ico" alt="Google" style={{width: '20px'}} />
-          Google로 회원가입
+          {isKo ? 'Google로 회원가입' : 'Continue with Google'}
         </GoogleButton>
-
-        {message && <Message error={error}>{message}</Message>}
       </ModalContainer>
     </Overlay>
   );
