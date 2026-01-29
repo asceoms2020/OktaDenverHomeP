@@ -8,6 +8,7 @@ import Events from '../pages/Events';
 import Newsletter from '../pages/Newsletter';
 import Resources from '../pages/Resources';
 import Sponsors from '../pages/Sponsors';
+import Trading from '../pages/Trading';
 import Admin from '../pages/Admin';
 
 const AppRoutes = () => {
@@ -23,6 +24,7 @@ const AppRoutes = () => {
           <Route path="/resources" element={<Resources />} />
           <Route path="/newsletter" element={<Newsletter />} />
           <Route path="/sponsors" element={<Sponsors />} />
+          <Route path="/trading" element={<Trading />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
       </main>
