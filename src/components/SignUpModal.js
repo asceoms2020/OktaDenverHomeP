@@ -62,6 +62,18 @@ const Input = styled.input`
   }
 `;
 
+const Select = styled.select`
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: white;
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+`;
+
 const CheckboxGroup = styled.div`
   display: flex;
   align-items: center;
