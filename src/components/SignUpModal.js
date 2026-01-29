@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { supabase } from '../lib/supabaseClient';
+import { OKTA_CHAPTERS } from '../constants/oktaChapters';
 
 const Overlay = styled.div`
   position: fixed;
@@ -38,6 +39,18 @@ const Form = styled.form`
   gap: 1rem;
 `;
 
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const Label = styled.label`
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+`;
+
 const Input = styled.input`
   padding: 0.75rem;
   border: 1px solid #ddd;
@@ -47,6 +60,13 @@ const Input = styled.input`
     outline: none;
     border-color: #007bff;
   }
+`;
+
+const CheckboxGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
 `;
 
 const Button = styled.button`
@@ -126,6 +146,18 @@ const Divider = styled.div`
 const SignUpModal = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
+  // Extended fields
+  const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [kakaoId, setKakaoId] = useState('');
+  const [isOktaMember, setIsOktaMember] = useState(false);
+  const [chapterCountry, setChapterCountry] = useState('');
+  const [chapterCity, setChapterCity] = useState('');
+  
+  // Update city options when country changes
+  const cities = chapterCountry ? OKTA_CHAPTERS[chapterCountry] || [] : [];
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(false);
@@ -139,12 +171,35 @@ const SignUpModal = ({ isOpen, onClose }) => {
     setError(false);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      // 1. Sign up user
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (signUpError) throw signUpError;
+
+      if (data?.user) {
+        // 2. Create profile entry
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: data.user.id,
+            full_name: fullName,
+            phone_number: phoneNumber,
+            kakaotalk_id: kakaoId,
+            is_okta_member: isOktaMember,
+            okta_chapter_country: isOktaMember ? chapterCountry : null,
+            okta_chapter_city: isOktaMember ? chapterCity : null,
+            updated_at: new Date()
+          });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+          // Note: User is created but profile might have failed.
+          // We still consider signup successful but warn or handle accordingly.
+        }
+      }
 
       setMessage('회원가입 확인 메일을 발송했습니다. 이메일을 확인해주세요.');
       setError(false);
@@ -175,21 +230,106 @@ const SignUpModal = ({ isOpen, onClose }) => {
         <CloseButton onClick={onClose}>&times;</CloseButton>
         <Title>회원가입</Title>
         <Form onSubmit={handleSignUp}>
-          <Input
-            type="email"
-            placeholder="이메일"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <Input
-            type="password"
-            placeholder="비밀번호"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-          />
+          <FormGroup>
+            <Label>이메일</Label>
+            <Input
+              type="email"
+              placeholder="example@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>비밀번호</Label>
+            <Input
+              type="password"
+              placeholder="6자 이상 입력해주세요"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>이름 (Full Name)</Label>
+            <Input
+              type="text"
+              placeholder="홍길동"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>핸드폰 번호 (국가번호 포함)</Label>
+            <Input
+              type="tel"
+              placeholder="+1 123-456-7890"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              required
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>카카오톡 ID (선택)</Label>
+            <Input
+              type="text"
+              placeholder="카카오톡 ID"
+              value={kakaoId}
+              onChange={(e) => setKakaoId(e.target.value)}
+            />
+          </FormGroup>
+
+          <CheckboxGroup>
+            <input
+              type="checkbox"
+              id="signup_is_okta_member"
+              checked={isOktaMember}
+              onChange={(e) => setIsOktaMember(e.target.checked)}
+            />
+            <Label htmlFor="signup_is_okta_member" style={{ marginBottom: 0 }}>OKTA 정회원입니다</Label>
+          </CheckboxGroup>
+
+          {isOktaMember && (
+            <>
+              <FormGroup>
+                <Label>소속 지회 (국가)</Label>
+                <Select
+                  value={chapterCountry}
+                  onChange={(e) => {
+                    setChapterCountry(e.target.value);
+                    setChapterCity(''); // Reset city when country changes
+                  }}
+                  required={isOktaMember}
+                >
+                  <option value="">국가를 선택하세요</option>
+                  {Object.keys(OKTA_CHAPTERS).map(country => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </Select>
+              </FormGroup>
+              <FormGroup>
+                <Label>소속 지회 (도시)</Label>
+                <Select
+                  value={chapterCity}
+                  onChange={(e) => setChapterCity(e.target.value)}
+                  required={isOktaMember}
+                  disabled={!chapterCountry}
+                >
+                  <option value="">{chapterCountry ? '도시를 선택하세요' : '국가를 먼저 선택하세요'}</option>
+                  {cities.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </Select>
+              </FormGroup>
+            </>
+          )}
+
           <Button type="submit" disabled={loading}>
             {loading ? '처리중...' : '가입하기'}
           </Button>

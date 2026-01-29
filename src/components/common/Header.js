@@ -4,6 +4,7 @@ import logoImage from '../../assets/images/World-Okta.png';
 import LanguageSwitch from '../LanguageSwitch';
 import LoginModal from '../LoginModal';
 import SignUpModal from '../../components/SignUpModal';
+import ProfileEditModal from '../../components/ProfileEditModal';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { translations } from '../../translations/translations';
@@ -13,8 +14,9 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { language } = useLanguage();
-  const { user, signOut } = useAuth();
+  const { user, userProfile, signOut } = useAuth();
   const t = translations[language].navigation || {
     home: "Home",
     events: "Events",
@@ -32,6 +34,19 @@ const Header = () => {
       setIsSignUpOpen(false);
     }
   }, [user]);
+
+  // Profile Completion Gate
+  useEffect(() => {
+    if (user && userProfile) {
+      // Check for missing required fields
+      // Assuming full_name and phone_number are mandatory
+      const isProfileIncomplete = !userProfile.full_name || !userProfile.phone_number;
+      
+      if (isProfileIncomplete) {
+        setIsProfileOpen(true);
+      }
+    }
+  }, [user, userProfile]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -81,12 +96,23 @@ const Header = () => {
           )}
 
           {user ? (
-            <button 
-              className="auth-button" 
-              onClick={handleLogout}
-            >
-              {language === 'ko' ? '로그아웃' : 'Logout'}
-            </button>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <button 
+                className="auth-button"
+                onClick={() => {
+                  setIsProfileOpen(true);
+                  closeMenu();
+                }}
+              >
+                {language === 'ko' ? '내 정보' : 'Profile'}
+              </button>
+              <button 
+                className="auth-button" 
+                onClick={handleLogout}
+              >
+                {language === 'ko' ? '로그아웃' : 'Logout'}
+              </button>
+            </div>
           ) : (
             <button 
               className="auth-button" 
@@ -120,6 +146,11 @@ const Header = () => {
         }}
       />
       <SignUpModal isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
+      <ProfileEditModal 
+        isOpen={isProfileOpen} 
+        onClose={() => setIsProfileOpen(false)} 
+        force={user && userProfile && (!userProfile.full_name || !userProfile.phone_number)}
+      />
     </header>
   );
 };

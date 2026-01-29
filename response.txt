@@ -1,0 +1,4 @@
+Plan is ready. How would you like to proceed?
+
+1. Start Work (Execute now with /start-work. Plan looks solid.)
+2. High Accuracy Review (Have Momus rigorously verify every detail. Adds review loop but guarantees precision.)

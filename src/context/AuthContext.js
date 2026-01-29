@@ -6,36 +6,38 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [userRole, setUserRole] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  
+  // userRole is derived from userProfile for backward compatibility
+  const userRole = userProfile?.role || 'user';
 
-  const fetchUserRole = async (userId) => {
+  const fetchUserProfile = async (userId) => {
     if (!userId) {
-      setUserRole(null);
+      setUserProfile(null);
       return;
     }
     
     try {
-      // maybeSingle() 대신 select().limit(1) 사용 (호환성 및 안전성 강화)
       const { data, error } = await supabase
         .from('profiles')
-        .select('role')
+        .select('*')
         .eq('id', userId)
         .limit(1);
         
       if (data && data.length > 0) {
-        setUserRole(data[0].role);
+        setUserProfile(data[0]);
       } else {
-        // 프로필이 없으면 기본 'user'로 설정
-        console.warn('No profile found for user, defaulting to user role.');
-        setUserRole('user');
+        console.warn('No profile found for user');
+        // If no profile exists, create a basic one or just handle as empty
+        setUserProfile({ id: userId, role: 'user' });
       }
       
       if (error) {
         console.error('Profile fetch error:', error.message);
       }
     } catch (err) {
-      console.error('Error fetching user role:', err);
-      setUserRole('user');
+      console.error('Error fetching user profile:', err);
+      setUserProfile({ id: userId, role: 'user' });
     }
   };
 
@@ -117,7 +119,7 @@ export const AuthProvider = ({ children }) => {
           
           if (mounted) {
             setUser(user);
-            await fetchUserRole(user.id);
+            await fetchUserProfile(user.id);
           }
         } else {
           // 저장된 세션 로드
@@ -126,13 +128,13 @@ export const AuthProvider = ({ children }) => {
             console.log('Restored session for:', storedSession.user.email);
             if (mounted) {
               setUser(storedSession.user);
-              await fetchUserRole(storedSession.user.id);
+              await fetchUserProfile(storedSession.user.id);
             }
           } else {
             console.log('No valid session found');
             if (mounted) {
               setUser(null);
-              setUserRole(null);
+              setUserProfile(null);
             }
           }
         }
@@ -140,7 +142,7 @@ export const AuthProvider = ({ children }) => {
         console.error('Session check error:', error);
         if (mounted) {
           setUser(null);
-          setUserRole(null);
+          setUserProfile(null);
         }
       } finally {
         if (mounted) {
@@ -183,7 +185,7 @@ export const AuthProvider = ({ children }) => {
       
       // 상태 업데이트
       setUser(data.user);
-      await fetchUserRole(data.user.id);
+      await fetchUserProfile(data.user.id);
       
       console.log('Email login successful:', data.user.email);
     }
@@ -194,7 +196,7 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     // 1. UI 즉시 업데이트 (사용자 경험 우선)
     setUser(null);
-    setUserRole(null);
+    setUserProfile(null);
 
     try {
       console.log('Signing out...');
@@ -217,11 +219,13 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    userProfile,
     userRole,
     isAdmin: userRole === 'admin',
     signOut,
     signInWithEmail,
-    loading
+    loading,
+    fetchUserProfile
   };
 
   // 로딩 상태 시각화 제거 (사용자가 기다리지 않게 함)
