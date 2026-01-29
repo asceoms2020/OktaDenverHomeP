@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../context/AuthContext';
 
 const Overlay = styled.div`
   position: fixed;
@@ -128,6 +129,7 @@ const LoginModal = ({ isOpen, onClose, onSignUpClick }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const { signInWithEmail } = useAuth();
   
   if (!isOpen) return null;
 
@@ -137,13 +139,7 @@ const LoginModal = ({ isOpen, onClose, onSignUpClick }) => {
     setMessage(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-      
+      await signInWithEmail(email, password);
       onClose(); // 로그인 성공 시 모달 닫기
     } catch (err) {
       setMessage(err.message || '로그인 중 오류가 발생했습니다.');

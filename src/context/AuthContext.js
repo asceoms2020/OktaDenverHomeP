@@ -158,6 +158,39 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
+  // 이메일 로그인 함수
+  const signInWithEmail = async (email, password) => {
+    const STORAGE_KEY = 'okta_auth_session';
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) {
+      throw error;
+    }
+    
+    if (data?.session) {
+      // 수동으로 세션 저장
+      const session = {
+        accessToken: data.session.access_token,
+        refreshToken: data.session.refresh_token,
+        expiresAt: data.session.expires_at,
+        user: data.user,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+      
+      // 상태 업데이트
+      setUser(data.user);
+      await fetchUserRole(data.user.id);
+      
+      console.log('Email login successful:', data.user.email);
+    }
+    
+    return data;
+  };
+
   const signOut = async () => {
     // 1. UI 즉시 업데이트 (사용자 경험 우선)
     setUser(null);
@@ -187,6 +220,7 @@ export const AuthProvider = ({ children }) => {
     userRole,
     isAdmin: userRole === 'admin',
     signOut,
+    signInWithEmail,
     loading
   };
 
