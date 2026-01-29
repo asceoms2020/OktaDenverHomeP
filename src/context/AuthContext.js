@@ -101,25 +101,35 @@ export const AuthProvider = ({ children }) => {
         if (hasAuthCallback && refreshToken) {
           console.log('OAuth callback detected, processing tokens...');
           
-          // JWT에서 사용자 정보 디코드
-          const payload = JSON.parse(atob(accessToken.split('.')[1]));
-          const user = {
-            id: payload.sub,
-            email: payload.email,
-            user_metadata: payload.user_metadata,
-          };
-          
-          // 세션 저장
-          saveSession(accessToken, refreshToken, parseInt(expiresAt), user);
-          
-          // URL 해시 정리
-          window.history.replaceState(null, '', window.location.pathname);
-          
-          console.log('Session saved for:', user.email);
-          
-          if (mounted) {
-            setUser(user);
-            await fetchUserProfile(user.id);
+          try {
+            // JWT에서 사용자 정보 디코드
+            const payload = JSON.parse(atob(accessToken.split('.')[1]));
+            const user = {
+              id: payload.sub,
+              email: payload.email,
+              user_metadata: payload.user_metadata,
+            };
+            
+            // 세션 저장
+            saveSession(accessToken, refreshToken, parseInt(expiresAt), user);
+            
+            console.log('Session saved for:', user.email);
+            
+            if (mounted) {
+              setUser(user);
+              // fetchUserProfile은 별도로 실행하되 실패해도 무시
+              fetchUserProfile(user.id).catch(console.error);
+              setLoading(false);
+            }
+            
+            // URL 해시 정리 후 홈으로 리다이렉트
+            window.history.replaceState(null, '', '/');
+          } catch (parseError) {
+            console.error('Failed to parse OAuth tokens:', parseError);
+            if (mounted) {
+              setLoading(false);
+            }
+            window.history.replaceState(null, '', '/');
           }
         } else {
           // 저장된 세션 로드

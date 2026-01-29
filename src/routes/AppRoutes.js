@@ -10,6 +10,7 @@ import Resources from '../pages/Resources';
 import Sponsors from '../pages/Sponsors';
 import Trading from '../pages/Trading';
 import Admin from '../pages/Admin';
+import MouEvent2026 from '../pages/MouEvent2026';
 
 const AppRoutes = () => {
   return (
@@ -26,6 +27,7 @@ const AppRoutes = () => {
           <Route path="/sponsors" element={<Sponsors />} />
           <Route path="/trading" element={<Trading />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/mouevent2026" element={<MouEvent2026 />} />
         </Routes>
       </main>
       <Footer />
