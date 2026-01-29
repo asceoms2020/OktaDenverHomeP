@@ -36,6 +36,7 @@ const Events = () => {
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [pastEvents, setPastEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   // 언어별 기본값 설정
   const defaultTexts = {
@@ -66,66 +67,59 @@ const Events = () => {
   // Helper function to parse diverse date formats
   const parseEventDate = (dateStr) => {
     if (!dateStr) return new Date(0); // Fallback for invalid dates
+    const cleanStr = String(dateStr).trim();
 
     // Case 1: Range "06.29.2024 ~ 06.30.2024" -> Take the END date for "past" check
-    if (dateStr.includes('~')) {
-      const parts = dateStr.split('~');
+    if (cleanStr.includes('~')) {
+      const parts = cleanStr.split('~');
       const endDateStr = parts[1].trim();
-      return parseSingleDate(endDateStr);
+      return parseEventDate(endDateStr);
     }
 
-    // Case 2: Single date
-    return parseSingleDate(dateStr);
-  };
+    // Normalize delimiters (allow . / -)
+    const normalized = cleanStr.replace(/[\/\-]/g, '.');
+    const parts = normalized.split('.');
 
-  const parseSingleDate = (dateStr) => {
-    // Trim whitespace
-    const cleanDateStr = dateStr.trim();
+    if (parts.length === 3) {
+      const p0 = parseInt(parts[0], 10);
+      const p1 = parseInt(parts[1], 10);
+      const p2 = parseInt(parts[2], 10);
 
-    // Check YYYY.MM.DD (e.g. 2026.12.20)
-    const ymdRegex = /^(\d{4})\.(\d{1,2})\.(\d{1,2})$/;
-    const ymdMatch = cleanDateStr.match(ymdRegex);
-    if (ymdMatch) {
-      return new Date(ymdMatch[1], ymdMatch[2] - 1, ymdMatch[3]);
-    }
-
-    // Check MM.DD.YYYY (e.g. 12.20.2026 or 06.28.2025)
-    const mdyRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/;
-    const mdyMatch = cleanDateStr.match(mdyRegex);
-    if (mdyMatch) {
-      return new Date(mdyMatch[3], mdyMatch[1] - 1, mdyMatch[2]);
-    }
-
-    // Check YYYY-MM-DD (ISO)
-    const isoRegex = /^(\d{4})-(\d{1,2})-(\d{1,2})$/;
-    const isoMatch = cleanDateStr.match(isoRegex);
-    if (isoMatch) {
-      return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3]);
+      // Simple heuristic: if first part is > 1000, assume YYYY.MM.DD
+      if (p0 > 1000) {
+        return new Date(p0, p1 - 1, p2);
+      }
+      // Otherwise assume MM.DD.YYYY (US format)
+      else {
+        return new Date(p2, p0 - 1, p1);
+      }
     }
 
     // Fallback
-    const parsed = new Date(cleanDateStr);
+    const parsed = new Date(cleanStr);
     return isNaN(parsed.getTime()) ? new Date(0) : parsed;
   };
 
   // Fetch and sort events
   useEffect(() => {
+    let isMounted = true;
+
     const fetchEvents = async () => {
       try {
         setLoading(true);
+        setError(null);
         
-        // Fetch all events from Supabase
         const { data, error } = await supabase
           .from('events')
-          .select('*')
-          .order('date', { ascending: false }); // Fetch latest first
+          .select('*');
           
         if (error) {
           throw error;
         }
 
+        if (!isMounted) return;
+
         const events = data || [];
-        console.log("Fetched Events:", events); // Debug log
 
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Normalize today to start of day
@@ -134,11 +128,13 @@ const Events = () => {
         const past = [];
 
         events.forEach(event => {
-          const eventDate = parseEventDate(event.date);
+          const dateStr = event.date ? String(event.date) : ''; 
+          const eventDate = parseEventDate(dateStr);
           
-          console.log(`Event: ${event.title}, DateStr: ${event.date}, Parsed: ${eventDate.toDateString()}`); // Debug log
+          // Debug date parsing
+          // console.log(`Event: ${event.title}, Parsed: ${eventDate.toISOString()}`);
 
-          // If the event date is valid and is today or in the future
+          // 오늘 날짜 포함해서 미래면 upcoming
           if (eventDate >= today) {
             upcoming.push(event);
           } else {
@@ -147,22 +143,34 @@ const Events = () => {
         });
 
         // Upcoming: Nearest future date first (Ascending)
+        // 날짜 차이가 양수면 b가 뒤에, 음수면 a가 앞에
         upcoming.sort((a, b) => parseEventDate(a.date) - parseEventDate(b.date));
         
         // Past: Most recent past date first (Descending)
         past.sort((a, b) => parseEventDate(b.date) - parseEventDate(a.date));
 
-        setUpcomingEvents(upcoming);
-        setPastEvents(past);
+        if (isMounted) {
+          setUpcomingEvents(upcoming);
+          setPastEvents(past);
+        }
 
       } catch (error) {
         console.error("Error fetching events: ", error);
+        if (isMounted) {
+          setError(error.message || "Failed to load events");
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchEvents();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleEventClick = (url) => {
@@ -195,13 +203,23 @@ const Events = () => {
           <p style={{ textAlign: 'center', fontSize: '1.2rem', padding: '2rem' }}>
             {defaults.loading}
           </p>
+        ) : error ? (
+          <div style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>
+            <p>{error}</p>
+            <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
+              (Tip: Check if your Supabase project is Paused in the dashboard)
+            </p>
+            <button onClick={() => window.location.reload()} style={{ marginTop: '1rem', padding: '0.5rem 1rem', cursor: 'pointer' }}>
+              Retry
+            </button>
+          </div>
         ) : upcomingEvents.length > 0 ? (
           <EventsGrid>
             {upcomingEvents.map((event) => (
               <EventCard 
                 key={event.id}
                 onClick={() => handleEventClick(event.url)}
-                clickable={!!event.url}
+                $clickable={!!event.url}
               >
                 {event.badge && <EventBadge>{event.badge}</EventBadge>}
                 <PosterContainer>
@@ -238,7 +256,7 @@ const Events = () => {
               <EventCard 
                 key={event.id}
                 onClick={() => handleEventClick(event.url)}
-                clickable={!!event.url}
+                $clickable={!!event.url}
               >
                 <PosterContainer>
                   <EventPoster src={event.poster} alt={event.title} />

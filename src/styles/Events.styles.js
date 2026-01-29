@@ -56,10 +56,10 @@ export const EventCard = styled.div`
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   height: 400px;
-  cursor: ${props => props.clickable ? 'pointer' : 'default'};
+  cursor: ${props => props.$clickable ? 'pointer' : 'default'};
   
   &:hover {
-    transform: translateY(-10px) ${props => props.clickable ? 'scale(1.02)' : 'scale(1.01)'};
+    transform: translateY(-10px) ${props => props.$clickable ? 'scale(1.02)' : 'scale(1.01)'};
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   }
   

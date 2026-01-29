@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { supabaseAuth as supabase } from '../lib/supabaseClient';
 
 const AuthContext = createContext();
 
@@ -43,36 +43,106 @@ export const AuthProvider = ({ children }) => {
     let mounted = true;
     console.log('AuthProvider mounted');
 
-    // 안전장치: 0.1초 후 강제 로딩 종료 (무조건 실행)
+    const STORAGE_KEY = 'okta_auth_session';
+
+    // URL 해시에서 OAuth 토큰 파싱
+    const parseHashParams = () => {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      return {
+        accessToken: params.get('access_token'),
+        refreshToken: params.get('refresh_token'),
+        expiresAt: params.get('expires_at'),
+      };
+    };
+
+    // localStorage에서 저장된 세션 로드
+    const loadStoredSession = () => {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const session = JSON.parse(stored);
+          // 만료 여부 확인
+          if (session.expiresAt && Date.now() / 1000 < session.expiresAt) {
+            return session;
+          } else {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load stored session:', e);
+      }
+      return null;
+    };
+
+    // 세션 저장
+    const saveSession = (accessToken, refreshToken, expiresAt, user) => {
+      const session = { accessToken, refreshToken, expiresAt, user };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+    };
+
+    const { accessToken, refreshToken, expiresAt } = parseHashParams();
+    const hasAuthCallback = !!accessToken;
+    
     const timeoutId = setTimeout(() => {
       if (mounted) {
         console.log('Force loading false by timeout');
         setLoading(false);
       }
-    }, 100);
+    }, hasAuthCallback ? 3000 : 500);
 
     const initializeAuth = async () => {
       try {
         console.log('Checking session...');
-        const { data: { session }, error } = await supabase.auth.getSession();
         
-        if (error) throw error;
-        
-        if (mounted) {
-          const currentUser = session?.user ?? null;
-          console.log('Current user:', currentUser?.email);
-          setUser(currentUser);
+        // OAuth 콜백인 경우
+        if (hasAuthCallback && refreshToken) {
+          console.log('OAuth callback detected, processing tokens...');
           
-          if (currentUser) {
-            await fetchUserRole(currentUser.id);
+          // JWT에서 사용자 정보 디코드
+          const payload = JSON.parse(atob(accessToken.split('.')[1]));
+          const user = {
+            id: payload.sub,
+            email: payload.email,
+            user_metadata: payload.user_metadata,
+          };
+          
+          // 세션 저장
+          saveSession(accessToken, refreshToken, parseInt(expiresAt), user);
+          
+          // URL 해시 정리
+          window.history.replaceState(null, '', window.location.pathname);
+          
+          console.log('Session saved for:', user.email);
+          
+          if (mounted) {
+            setUser(user);
+            await fetchUserRole(user.id);
+          }
+        } else {
+          // 저장된 세션 로드
+          const storedSession = loadStoredSession();
+          if (storedSession && storedSession.user) {
+            console.log('Restored session for:', storedSession.user.email);
+            if (mounted) {
+              setUser(storedSession.user);
+              await fetchUserRole(storedSession.user.id);
+            }
           } else {
-            setUserRole(null);
+            console.log('No valid session found');
+            if (mounted) {
+              setUser(null);
+              setUserRole(null);
+            }
           }
         }
       } catch (error) {
         console.error('Session check error:', error);
+        if (mounted) {
+          setUser(null);
+          setUserRole(null);
+        }
       } finally {
-        // 이미 타임아웃에 의해 false가 되었을 수 있지만, 확실히 하기 위해
         if (mounted) {
           console.log('Auth initialization complete');
           setLoading(false);
@@ -82,25 +152,9 @@ export const AuthProvider = ({ children }) => {
     
     initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log('Auth state changed:', _event);
-      if (mounted) {
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-        
-        if (currentUser) {
-          await fetchUserRole(currentUser.id);
-        } else {
-          setUserRole(null);
-        }
-        setLoading(false);
-      }
-    });
-
     return () => {
       mounted = false;
       clearTimeout(timeoutId);
-      subscription.unsubscribe();
     };
   }, []);
 
@@ -111,26 +165,20 @@ export const AuthProvider = ({ children }) => {
 
     try {
       console.log('Signing out...');
-      // 2. Supabase 로그아웃 시도 (5초 타임아웃)
-      await Promise.race([
-        supabase.auth.signOut(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Sign out timeout')), 5000))
-      ]);
+      
+      // 수동 세션 스토리지 삭제
+      localStorage.removeItem('okta_auth_session');
+      
+      // Supabase 관련 localStorage 항목도 정리
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
       console.log('Sign out successful');
     } catch (error) {
-      // 타임아웃이어도 로컬 세션은 이미 정리되었으므로 warn으로 처리
-      console.warn('Sign out notice:', error.message, '(local session already cleared)');
-      // 로컬 스토리지 강제 정리 (혹시 모를 잔여 데이터)
-      // 'sb-' 접두사로 시작하는 모든 Supabase 관련 항목 삭제
-      try {
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('sb-')) {
-            localStorage.removeItem(key);
-          }
-        });
-      } catch (storageError) {
-        console.warn('Failed to clear localStorage:', storageError);
-      }
+      console.warn('Sign out error:', error.message);
     }
   };
 
