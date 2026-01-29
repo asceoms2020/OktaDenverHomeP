@@ -122,8 +122,10 @@ export const Help = styled.div`
 export const Actions = styled.div`
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 10px;
   margin-top: 10px;
+  flex-wrap: wrap;
 `;
 
 export const PrimaryButton = styled.button`
@@ -141,6 +143,31 @@ export const PrimaryButton = styled.button`
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 14px 28px rgba(46, 204, 113, 0.28);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+`;
+
+export const DangerButton = styled.button`
+  appearance: none;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 16px;
+  background: linear-gradient(45deg, #e74c3c, #c0392b);
+  color: #ffffff;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(231, 76, 60, 0.18);
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(231, 76, 60, 0.22);
   }
 
   &:disabled {

@@ -20,6 +20,7 @@ import {
   Help,
   Actions,
   PrimaryButton,
+  DangerButton,
   Message,
   LoginGate
 } from '../styles/MouEvent2026.styles';
@@ -58,6 +59,8 @@ const MouEvent2026 = () => {
     departure_date: '',
     departure_time: ''
   });
+
+  const [cancelled, setCancelled] = useState(false);
 
   const timeOptions = useMemo(() => buildTimeOptions(30), []);
   const countryOptions = useMemo(() => Object.keys(OKTA_CHAPTERS), []);
@@ -116,6 +119,7 @@ const MouEvent2026 = () => {
 
         if (row) {
           setRowId(row.id || null);
+          setCancelled(row.cancelled === 'O');
           setFormData({
             ...base,
             email: row.email ?? base.email,
@@ -132,6 +136,7 @@ const MouEvent2026 = () => {
           });
         } else {
           setRowId(null);
+          setCancelled(false);
           setFormData(prev => ({
             ...prev,
             ...base
@@ -199,6 +204,8 @@ const MouEvent2026 = () => {
         arrival_time: formData.arrival_time || null,
         departure_date: formData.departure_date || null,
         departure_time: formData.departure_time || null,
+        cancelled: 'X',
+        cancelled_at: null,
         updated_at: new Date().toISOString()
       };
 
@@ -215,10 +222,45 @@ const MouEvent2026 = () => {
         setRowId(data[0].id);
       }
 
+      setCancelled(false);
+
       setMessage('신청 정보가 저장되었습니다. 언제든지 다시 들어와 수정할 수 있습니다.');
       setMessageError(false);
     } catch (e) {
       setMessage('저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      setMessageError(true);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!user || !rowId) return;
+    const ok = window.confirm('참가 신청을 취소하시겠습니까?');
+    if (!ok) return;
+
+    setSaving(true);
+    setMessage(null);
+    setMessageError(false);
+
+    try {
+      const authClient = getAuthenticatedClient();
+      const { error } = await authClient
+        .from('mouevent2026')
+        .update({
+          cancelled: 'O',
+          cancelled_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', rowId);
+
+      if (error) throw error;
+
+      setCancelled(true);
+      setMessage('참가 신청이 취소되었습니다. 다시 신청하려면 정보를 수정하고 신청하기를 누르세요.');
+      setMessageError(false);
+    } catch (e) {
+      setMessage('취소 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
       setMessageError(true);
     } finally {
       setSaving(false);
@@ -332,8 +374,11 @@ const MouEvent2026 = () => {
 
             <FullRow>
               <Actions>
+                <DangerButton type="button" onClick={handleCancel} disabled={loading || saving || !rowId || cancelled}>
+                  {cancelled ? '취소됨' : '취소하기'}
+                </DangerButton>
                 <PrimaryButton type="submit" disabled={loading || saving}>
-                  {saving ? '저장 중...' : '저장하기'}
+                  {saving ? '신청 중...' : '신청하기'}
                 </PrimaryButton>
               </Actions>
               {message && <Message $error={messageError}>{message}</Message>}
