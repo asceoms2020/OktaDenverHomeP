@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
+  const [redirectPath, setRedirectPath] = useState(null);
   
   // userRole is derived from userProfile for backward compatibility
   const userRole = userProfile?.role || 'user';
@@ -55,6 +56,19 @@ export const AuthProvider = ({ children }) => {
         accessToken: params.get('access_token'),
         refreshToken: params.get('refresh_token'),
         expiresAt: params.get('expires_at'),
+        type: params.get('type'),
+        error: params.get('error'),
+        errorDescription: params.get('error_description'),
+      };
+    };
+
+    const parseQueryParams = () => {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        code: params.get('code'),
+        type: params.get('type'),
+        error: params.get('error'),
+        errorDescription: params.get('error_description'),
       };
     };
 
@@ -83,8 +97,12 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
     };
 
-    const { accessToken, refreshToken, expiresAt } = parseHashParams();
-    const hasAuthCallback = !!accessToken;
+    const { accessToken, refreshToken, expiresAt, type: hashType, error: hashError, errorDescription: hashErrorDescription } = parseHashParams();
+    const { code, type: queryType, error: queryError, errorDescription: queryErrorDescription } = parseQueryParams();
+    const callbackType = queryType || hashType;
+    const callbackError = queryError || hashError;
+    const callbackErrorDescription = queryErrorDescription || hashErrorDescription;
+    const hasAuthCallback = !!accessToken || !!code;
     
     const timeoutId = setTimeout(() => {
       if (mounted) {
@@ -96,22 +114,74 @@ export const AuthProvider = ({ children }) => {
     const initializeAuth = async () => {
       try {
         console.log('Checking session...');
+
+        if (callbackError) {
+          console.error('Auth callback error:', callbackError, callbackErrorDescription);
+          window.history.replaceState(null, '', window.location.pathname);
+          if (mounted) {
+            setUser(null);
+            setUserProfile(null);
+          }
+          return;
+        }
         
         // OAuth 콜백인 경우
-        if (hasAuthCallback && refreshToken) {
+        if (code) {
+          console.log('Auth code callback detected, exchanging code for session...');
+
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+
+          const session = data?.session;
+          const sessionUser = session?.user;
+          const sessionAccessToken = session?.access_token;
+          const sessionRefreshToken = session?.refresh_token;
+          const sessionExpiresAt = session?.expires_at;
+
+          if (!sessionAccessToken || !sessionRefreshToken || !sessionExpiresAt || !sessionUser) {
+            throw new Error('Invalid session returned from code exchange');
+          }
+
+          saveSession(sessionAccessToken, sessionRefreshToken, sessionExpiresAt, sessionUser);
+
+          if (mounted) {
+            setUser(sessionUser);
+            fetchUserProfile(sessionUser.id).catch(console.error);
+            if (callbackType === 'recovery') {
+              setRedirectPath('/reset-password');
+            } else {
+              setRedirectPath('/');
+            }
+            setLoading(false);
+          }
+
+          window.history.replaceState(null, '', window.location.pathname);
+        } else if (hasAuthCallback && refreshToken) {
           console.log('OAuth callback detected, processing tokens...');
           
           try {
-            // JWT에서 사용자 정보 디코드
-            const payload = JSON.parse(atob(accessToken.split('.')[1]));
-            const user = {
-              id: payload.sub,
-              email: payload.email,
-              user_metadata: payload.user_metadata,
-            };
+            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+
+            if (sessionError) {
+              console.error('Failed to set session from callback tokens:', sessionError);
+            }
+
+            const sessionUser = sessionData?.session?.user;
+            const user = sessionUser || (() => {
+              const payload = JSON.parse(atob(accessToken.split('.')[1]));
+              return {
+                id: payload.sub,
+                email: payload.email,
+                user_metadata: payload.user_metadata,
+              };
+            })();
             
             // 세션 저장
-            saveSession(accessToken, refreshToken, parseInt(expiresAt), user);
+            const parsedExpiresAt = expiresAt ? parseInt(expiresAt, 10) : null;
+            saveSession(accessToken, refreshToken, parsedExpiresAt, user);
             
             console.log('Session saved for:', user.email);
             
@@ -119,17 +189,22 @@ export const AuthProvider = ({ children }) => {
               setUser(user);
               // fetchUserProfile은 별도로 실행하되 실패해도 무시
               fetchUserProfile(user.id).catch(console.error);
+              if (callbackType === 'recovery') {
+                setRedirectPath('/reset-password');
+              } else {
+                setRedirectPath('/');
+              }
               setLoading(false);
             }
             
-            // URL 해시 정리 후 홈으로 리다이렉트
-            window.history.replaceState(null, '', '/');
+            // URL 토큰 정리 (hash/query 제거)
+            window.history.replaceState(null, '', window.location.pathname);
           } catch (parseError) {
             console.error('Failed to parse OAuth tokens:', parseError);
             if (mounted) {
               setLoading(false);
             }
-            window.history.replaceState(null, '', '/');
+            window.history.replaceState(null, '', window.location.pathname);
           }
         } else {
           // 저장된 세션 로드
@@ -137,6 +212,21 @@ export const AuthProvider = ({ children }) => {
           if (storedSession && storedSession.user) {
             console.log('Restored session for:', storedSession.user.email);
             if (mounted) {
+              if (storedSession.accessToken && storedSession.refreshToken) {
+                supabase.auth
+                  .setSession({
+                    access_token: storedSession.accessToken,
+                    refresh_token: storedSession.refreshToken,
+                  })
+                  .then(({ error }) => {
+                    if (error) {
+                      console.warn('Failed to restore Supabase in-memory session:', error.message);
+                    }
+                  })
+                  .catch((e) => {
+                    console.warn('Failed to restore Supabase in-memory session:', e);
+                  });
+              }
               setUser(storedSession.user);
               await fetchUserProfile(storedSession.user.id);
             }
@@ -207,6 +297,7 @@ export const AuthProvider = ({ children }) => {
     // 1. UI 즉시 업데이트 (사용자 경험 우선)
     setUser(null);
     setUserProfile(null);
+    setRedirectPath(null);
 
     try {
       console.log('Signing out...');
@@ -235,7 +326,9 @@ export const AuthProvider = ({ children }) => {
     signOut,
     signInWithEmail,
     loading,
-    fetchUserProfile
+    fetchUserProfile,
+    redirectPath,
+    clearRedirectPath: () => setRedirectPath(null),
   };
 
   // 로딩 상태 시각화 제거 (사용자가 기다리지 않게 함)

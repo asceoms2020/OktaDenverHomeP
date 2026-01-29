@@ -1,5 +1,5 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import Home from '../pages/Home';
@@ -11,12 +11,30 @@ import Sponsors from '../pages/Sponsors';
 import Trading from '../pages/Trading';
 import Admin from '../pages/Admin';
 import MouEvent2026 from '../pages/MouEvent2026';
+import ResetPassword from '../pages/ResetPassword';
+import { useAuth } from '../context/AuthContext';
+
+const AuthRedirector = () => {
+  const { redirectPath, clearRedirectPath } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!redirectPath) return;
+    clearRedirectPath();
+    if (location.pathname === redirectPath) return;
+    navigate(redirectPath, { replace: true });
+  }, [redirectPath, clearRedirectPath, navigate, location.pathname]);
+
+  return null;
+};
 
 const AppRoutes = () => {
   return (
     <div className="app">
       <Header />
       <main>
+        <AuthRedirector />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/home" element={<Home />} />
@@ -28,6 +46,7 @@ const AppRoutes = () => {
           <Route path="/trading" element={<Trading />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/mouevent2026" element={<MouEvent2026 />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
       </main>
       <Footer />
