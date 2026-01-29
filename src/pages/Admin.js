@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabaseClient';
@@ -14,7 +14,7 @@ import {
 } from '../styles/Admin.styles';
 
 const Admin = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
@@ -36,6 +36,21 @@ const Admin = () => {
         <AdminHeader>
           <h1>Access Denied</h1>
           <p>Please log in to access the admin panel.</p>
+        </AdminHeader>
+      </AdminContainer>
+    );
+  }
+
+  // Check if user is admin using isAdmin from context
+  if (!isAdmin) {
+    return (
+      <AdminContainer>
+        <AdminHeader>
+          <h1>Unauthorized</h1>
+          <p>You do not have permission to access this page.</p>
+          <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '1rem' }}>
+            Current user: {user.email}
+          </p>
         </AdminHeader>
       </AdminContainer>
     );

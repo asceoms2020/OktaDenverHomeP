@@ -29,7 +29,7 @@ import { supabase } from '../lib/supabaseClient';
 
 const Events = () => {
   const { language } = useLanguage();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const t = translations[language]?.events || translations.ko.events;
   
@@ -180,7 +180,7 @@ const Events = () => {
       <Title>{t?.title || defaults.title}</Title>
       
       {/* 관리자 전용: 이벤트 추가 버튼 */}
-      {user && (
+      {isAdmin && (
         <AdminActionContainer>
           <AddEventButton onClick={handleAddEventClick}>
             {defaults.addEvent}
@@ -265,4 +265,3 @@ const Events = () => {
 };
 
 export default Events;
-

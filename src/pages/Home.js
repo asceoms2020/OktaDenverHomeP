@@ -12,8 +12,9 @@ import SignUpModal from '../components/SignUpModal';
 
 const Home = () => {
   const { language } = useLanguage();
-  const t = translations[language].home;
-  const eventT = translations[language]?.events || translations.ko.events;
+  // Safety check for translations
+  const t = translations?.[language]?.home || {}; 
+  const eventT = translations?.[language]?.events || translations.ko.events;
 
   // 슬라이더 상태 관리
   const [currentSlide, setCurrentSlide] = useState(0);
