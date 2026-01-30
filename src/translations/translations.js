@@ -80,7 +80,13 @@ export const translations = {
           { name: "신윤주", position: "부회장", image: "syk.png" },
           { name: "이승우", position: "이사장", image: "swl.png" },
           { name: "신동윤", position: "감사이사", image: "dys.png" },
-          { name: "김소연", position: "재무이사", image: "yjs.png" }
+          { name: "김소연", position: "재무이사", image: "yjs.png" },
+          { name: "윤정민", position: "총무" },
+          { name: "김경숙", position: "홍보위원장" },
+          { name: "김은주", position: "기금조성위원장" },
+          { name: "박수영", position: "행사진행위원장" },
+          { name: "정민수", position: "차세대위원장" },
+          { name: "최제민", position: "차세대부위원장" }
         ]
       },
       organization: {
@@ -337,7 +343,13 @@ export const translations = {
           { name: "Yunju Shin", position: "Vice President", image: "syk.png" },
           { name: "Seun gwoo Lee", position: "Board Chairman", image: "swl.png" },
           { name: "Dong Shin", position: "Audit Director", image: "dys.png" },
-          { name: "Soyeon Kim", position: "Finance Director", image: "yjs.png" }
+          { name: "Soyeon Kim", position: "Finance Director", image: "yjs.png" },
+          { name: "Jungmin Yoon", position: "Secretary General" },
+          { name: "Kyung-sook Kim", position: "PR Chair" },
+          { name: "Eunju Kim", position: "Fundraising Chair" },
+          { name: "Sooyoung Park", position: "Event Operations Chair" },
+          { name: "Minsoo Jung", position: "Next Generation Chair" },
+          { name: "Jaemin Choi", position: "Next Generation Vice Chair" }
         ]
       },
       organization: {

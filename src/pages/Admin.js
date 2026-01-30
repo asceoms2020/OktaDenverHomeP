@@ -25,6 +25,7 @@ const Admin = () => {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const goToAboutAdmin = () => navigate('/admin/about');
   
   // Form State
   const [formData, setFormData] = useState({
@@ -242,6 +243,11 @@ const Admin = () => {
       <AdminHeader>
         <h1>Admin Dashboard</h1>
         <p>{editingId ? 'Edit Event' : 'Register a new event'}</p>
+        <div style={{ marginTop: '1rem' }}>
+          <CancelButton type="button" onClick={goToAboutAdmin}>
+            Manage About Page
+          </CancelButton>
+        </div>
       </AdminHeader>
 
       <AdminForm onSubmit={handleSubmit}>

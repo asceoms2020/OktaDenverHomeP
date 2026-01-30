@@ -158,6 +158,22 @@ export const BoardImage = styled.img`
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 `;
 
+export const BoardAvatar = styled.div`
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+  border: 4px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+`;
+
 export const BoardName = styled.h4`
   font-size: 1.4rem;
   font-weight: 700;

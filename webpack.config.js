@@ -1,11 +1,12 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const Dotenv = require('dotenv-webpack');
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
-  
+
   return {
     entry: './src/index.js',
     output: {
@@ -45,6 +46,10 @@ module.exports = (env, argv) => {
     },
     plugins: [
       new Dotenv(),
+      new webpack.DefinePlugin({
+        'process.env.SUPABASE_URL': JSON.stringify('https://hbpgebflcnaqsyeqmaii.supabase.co'),
+        'process.env.SUPABASE_ANON_KEY': JSON.stringify('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhicGdlYmZsY25hcXN5ZXFtYWlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczMDMxMzQsImV4cCI6MjA4Mjg3OTEzNH0.NoGlJnjiNvjkBTayCV6q7U9tasQaNzblpWkeE-5qjdA'),
+      }),
       new HtmlWebpackPlugin({
         template: './public/index.html',
         minify: isProduction,

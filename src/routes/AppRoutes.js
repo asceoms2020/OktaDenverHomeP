@@ -10,6 +10,7 @@ import Resources from '../pages/Resources';
 import Sponsors from '../pages/Sponsors';
 import Trading from '../pages/Trading';
 import Admin from '../pages/Admin';
+import AdminAbout from '../pages/AdminAbout';
 import MouEvent2026 from '../pages/MouEvent2026';
 import ResetPassword from '../pages/ResetPassword';
 import { useAuth } from '../context/AuthContext';
@@ -45,6 +46,7 @@ const AppRoutes = () => {
           <Route path="/sponsors" element={<Sponsors />} />
           <Route path="/trading" element={<Trading />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/about" element={<AdminAbout />} />
           <Route path="/mouevent2026" element={<MouEvent2026 />} />
           <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
