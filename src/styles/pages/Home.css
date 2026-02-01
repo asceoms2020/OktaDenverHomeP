@@ -1,11 +1,12 @@
 .home-container {
   width: 100%;
   min-height: 100vh;
-  padding: 2rem 1rem;
+  padding: 0;
 }
 
 .hero-section {
-  height: 100vh;
+  height: calc(100vh - 80px);
+  min-height: calc(100vh - 80px);
   position: relative;
   display: flex;
   align-items: center;
@@ -13,7 +14,8 @@
   text-align: center;
   color: white;
   padding: 0 1rem;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 /* 배경 이미지와 오버레이를 위한 클래스 */
@@ -117,6 +119,19 @@
 
 .cta-button:hover {
   background-color: #27ae60;
+}
+
+.mou-event-cta-button {
+  background-color: #f39c12;
+}
+
+.mou-event-cta-button:hover {
+  background-color: #e67e22;
+}
+
+.mou-event-cta-button:focus-visible {
+  outline: 3px solid rgba(243, 156, 18, 0.55);
+  outline-offset: 3px;
 }
 
 .about-section,
@@ -275,12 +290,21 @@
 
 /* 모바일 반응형 */
 @media (max-width: 768px) {
+  .hero-content-box {
+    padding: 1.75rem 1.25rem;
+  }
+
   .hero-title {
     font-size: 2.5rem;
   }
 
   .hero-subtitle {
     font-size: 1.2rem;
+  }
+
+  .cta-button {
+    padding: 0.85rem 1.75rem;
+    font-size: 1rem;
   }
 
   .about-section h2,

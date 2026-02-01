@@ -13,14 +13,14 @@ import SignUpModal from '../components/SignUpModal';
 const Home = () => {
   const { language } = useLanguage();
   // Safety check for translations
-  const t = translations?.[language]?.home || {}; 
+  const t = translations?.[language]?.home || {};
   const eventT = translations?.[language]?.events || translations.ko.events;
 
   // 슬라이더 상태 관리
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const backgroundImages = [main1, main2, main3];
-  
+
   // 이벤트 데이터 상태 관리
   const [upcomingEvent, setUpcomingEvent] = useState(null);
   const [pastEvents, setPastEvents] = useState([]);
@@ -40,7 +40,7 @@ const Home = () => {
       try {
         // Fetch upcoming events (future dates)
         const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        
+
         // 다가오는 이벤트 1개 가져오기
         const { data: upcomingData } = await supabase
           .from('events')
@@ -48,7 +48,7 @@ const Home = () => {
           .gte('date', today) // date >= today
           .order('date', { ascending: true }) // 가장 가까운 미래
           .limit(1);
-          
+
         if (upcomingData && upcomingData.length > 0) {
           setUpcomingEvent(upcomingData[0]);
         }
@@ -60,7 +60,7 @@ const Home = () => {
           .lt('date', today) // date < today
           .order('date', { ascending: false }) // 가장 최근 과거
           .limit(2);
-          
+
         if (pastData) {
           setPastEvents(pastData);
         }
@@ -85,13 +85,13 @@ const Home = () => {
     <div className="home-container">
       <section className="hero-section hero-section-background">
         <div className="hero-slider">
-          <div 
-            className="slide-container" 
+          <div
+            className="slide-container"
             style={{ transform: `translateX(-${currentSlide * 33.333}%)` }}
           >
             {backgroundImages.map((image, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="slide"
                 style={{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${image})` }}
               />
@@ -105,43 +105,53 @@ const Home = () => {
               {t.subtitle}
             </p>
           </div>
-          <div className="hero-buttons" style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+          <div
+            className="hero-buttons"
+            style={{
+              display: 'flex',
+              gap: '10px',
+              marginTop: '20px',
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}
+          >
+            <Link to="/mouevent2026" className="cta-button mou-event-cta-button">덴버에서 만나는 세계 참가신청!</Link>
             <Link to="/about" className="cta-button">{t.ctaButton}</Link>
           </div>
         </div>
       </section>
-      
+
       {upcomingEvent && (
         <section className="projects-section">
           <h2>{t.projectsTitle}</h2>
           <div className="project-main-content">
             <div className="project-poster-section">
-              <div 
+              <div
                 className="project-poster-container"
                 onClick={() => handleProjectClick(upcomingEvent.url)}
               >
                 {upcomingEvent.badge && (
                   <div className="project-badge">{upcomingEvent.badge}</div>
                 )}
-                <img 
-                  src={upcomingEvent.poster} 
+                <img
+                  src={upcomingEvent.poster}
                   alt={upcomingEvent.title}
                   className="project-poster"
                 />
               </div>
             </div>
-            
+
             <div className="project-info-section">
               <h3 className="project-main-title">{upcomingEvent.title}</h3>
               <p className="project-subtitle">{t.projectMain?.subtitle}</p>
               <div className="project-date">{upcomingEvent.date}</div>
-              
+
               <p className="project-description-text" style={{ whiteSpace: 'pre-line' }}>
                 {upcomingEvent.description}
               </p>
-              
+
               {upcomingEvent.url && (
-                <a 
+                <a
                   href={upcomingEvent.url}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -154,28 +164,28 @@ const Home = () => {
           </div>
         </section>
       )}
-      
+
       {/* 지난 이벤트 섹션 */}
       {pastEvents.length > 0 && (
         <section className="past-events-section">
           <h2>{t.pastEventsSection?.title || "지난 주요 행사"}</h2>
           <div className="past-events-grid">
             {pastEvents.map((event) => (
-              <div 
+              <div
                 key={event.id}
                 className="past-event-item"
                 onClick={() => handleProjectClick(event.url)}
               >
                 <div className="past-event-poster-section">
                   <div className="past-event-poster-container">
-                    <img 
-                      src={event.poster} 
+                    <img
+                      src={event.poster}
                       alt={event.title}
                       className="past-event-poster"
                     />
                   </div>
                 </div>
-                
+
                 <div className="past-event-info-section">
                   {/* Category is not in DB schema currently, defaulting or omitting */}
                   {/* <div className="past-event-category">{event.category}</div> */}
@@ -188,7 +198,7 @@ const Home = () => {
           </div>
         </section>
       )}
-      
+
       <SignUpModal isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
     </div>
   );
