@@ -84,20 +84,18 @@ const MouEvent2026 = () => {
     // 골프 관련 정보
     golf_handicap: '',
     golf_level: '',
-    golf_club_rental: '', // 추가
+    golf_club_rental: '',
     cart_share: '',
     cart_share_with: '',
     // 동반자 정보
     companion_count: '',
     companion_names: '',
-    // 동반자 프로그램 선택
-    companion_program_golf: false,
-    companion_program_train: false,
-    companion_program_dinner: false,
+    // 동반자 프로그램 선택 (단일 선택으로 변경)
+    companion_program_selection: '',
     // 동반자 골프 정보 (동반자가 골프 참가 시)
     companion_golf_handicap: '',
     companion_golf_level: '',
-    companion_golf_club_rental: '', // 추가
+    companion_golf_club_rental: '',
     companion_cart_share: '',
     // 교류 관련
     expectations: '',
@@ -185,9 +183,7 @@ const MouEvent2026 = () => {
           cart_share_with: '',
           companion_count: '',
           companion_names: '',
-          companion_program_golf: false,
-          companion_program_train: false,
-          companion_program_dinner: false,
+          companion_program_selection: '',
           companion_golf_handicap: '',
           companion_golf_level: '',
           companion_golf_club_rental: '',
@@ -210,6 +206,13 @@ const MouEvent2026 = () => {
         if (row) {
           setRowId(row.id || null);
           setCancelled(row.cancelled === 'O');
+
+          // 동반자 프로그램 선택 상태 변환
+          let compSel = '';
+          if (row.companion_program_golf) compSel = 'golf';
+          else if (row.companion_program_train) compSel = 'train';
+          else if (row.companion_program_dinner) compSel = 'dinner';
+
           setFormData({
             ...base,
             email: row.email ?? base.email,
@@ -225,17 +228,15 @@ const MouEvent2026 = () => {
             program_self: row.program_self ?? base.program_self,
             golf_handicap: row.golf_handicap ?? base.golf_handicap,
             golf_level: row.golf_level ?? base.golf_level,
-            golf_club_rental: row.golf_club_rental ?? base.golf_club_rental, // 추가
+            golf_club_rental: row.golf_club_rental ?? base.golf_club_rental,
             cart_share: row.cart_share ?? base.cart_share,
             cart_share_with: row.cart_share_with ?? base.cart_share_with,
             companion_count: row.companion_count === null || row.companion_count === undefined ? '' : String(row.companion_count),
             companion_names: row.companion_names ?? base.companion_names,
-            companion_program_golf: row.companion_program_golf ?? base.companion_program_golf,
-            companion_program_train: row.companion_program_train ?? base.companion_program_train,
-            companion_program_dinner: row.companion_program_dinner ?? base.companion_program_dinner,
+            companion_program_selection: compSel, // 설정
             companion_golf_handicap: row.companion_golf_handicap ?? base.companion_golf_handicap,
             companion_golf_level: row.companion_golf_level ?? base.companion_golf_level,
-            companion_golf_club_rental: row.companion_golf_club_rental ?? base.companion_golf_club_rental, // 추가
+            companion_golf_club_rental: row.companion_golf_club_rental ?? base.companion_golf_club_rental,
             companion_cart_share: row.companion_cart_share ?? base.companion_cart_share,
             expectations: row.expectations ?? base.expectations,
             interest_areas: row.interest_areas ?? base.interest_areas,
@@ -328,6 +329,10 @@ const MouEvent2026 = () => {
         return;
       }
 
+      // 동반자 프로그램 선택 값 변환
+      const compSel = formData.companion_program_selection;
+      const isCompGolf = companionCount > 0 && compSel === 'golf';
+
       const payload = {
         ...(rowId ? { id: rowId } : {}),
         user_id: user.id,
@@ -344,18 +349,20 @@ const MouEvent2026 = () => {
         program_self: formData.program_self || null,
         golf_handicap: formData.program_self === 'golf' ? formData.golf_handicap || null : null,
         golf_level: formData.program_self === 'golf' ? formData.golf_level || null : null,
-        golf_club_rental: formData.program_self === 'golf' ? formData.golf_club_rental || null : null, // 추가
+        golf_club_rental: formData.program_self === 'golf' ? formData.golf_club_rental || null : null,
         cart_share: formData.program_self === 'golf' ? formData.cart_share || null : null,
         cart_share_with: formData.program_self === 'golf' && (formData.cart_share === 'yes' || formData.cart_share === 'with_companion') ? formData.cart_share_with || null : null,
         companion_count: companionCount,
         companion_names: companionCount > 0 ? formData.companion_names || null : null,
-        companion_program_golf: companionCount > 0 ? formData.companion_program_golf : false,
-        companion_program_train: companionCount > 0 ? formData.companion_program_train : false,
-        companion_program_dinner: companionCount > 0 ? formData.companion_program_dinner : false,
-        companion_golf_handicap: companionCount > 0 && formData.companion_program_golf ? formData.companion_golf_handicap || null : null,
-        companion_golf_level: companionCount > 0 && formData.companion_program_golf ? formData.companion_golf_level || null : null,
-        companion_golf_club_rental: companionCount > 0 && formData.companion_program_golf ? formData.companion_golf_club_rental || null : null, // 추가
-        companion_cart_share: companionCount > 0 && formData.companion_program_golf ? formData.companion_cart_share || null : null,
+        // 변환된 값 저장
+        companion_program_golf: isCompGolf,
+        companion_program_train: companionCount > 0 && compSel === 'train',
+        companion_program_dinner: companionCount > 0 && compSel === 'dinner',
+
+        companion_golf_handicap: isCompGolf ? formData.companion_golf_handicap || null : null,
+        companion_golf_level: isCompGolf ? formData.companion_golf_level || null : null,
+        companion_golf_club_rental: isCompGolf ? formData.companion_golf_club_rental || null : null,
+        companion_cart_share: isCompGolf ? formData.companion_cart_share || null : null,
         expectations: formData.expectations || null,
         interest_areas: formData.interest_areas.length > 0 ? formData.interest_areas : null,
         agree_paid_program: formData.agree_paid_program,
@@ -676,7 +683,7 @@ const MouEvent2026 = () => {
                       />
                       {t.cartShareOptions.no}
                     </RadioLabel>
-                    {hasCompanion && formData.companion_program_golf && (
+                    {hasCompanion && formData.companion_program_selection === 'golf' && (
                       <RadioLabel className={formData.cart_share === 'with_companion' ? 'selected' : ''}>
                         <input
                           type="radio"
@@ -732,35 +739,38 @@ const MouEvent2026 = () => {
                 <FullRow>
                   <Field>
                     <Label>{t.companionProgram}</Label>
-                    <CheckboxGroup>
-                      <CheckboxLabel className={formData.companion_program_golf ? 'checked' : ''}>
+                    <RadioGroup>
+                      <RadioLabel className={formData.companion_program_selection === 'golf' ? 'selected' : ''}>
                         <input
-                          type="checkbox"
-                          name="companion_program_golf"
-                          checked={formData.companion_program_golf}
+                          type="radio"
+                          name="companion_program_selection"
+                          value="golf"
+                          checked={formData.companion_program_selection === 'golf'}
                           onChange={handleChange}
                         />
                         {t.companionPrograms.golf}
-                      </CheckboxLabel>
-                      <CheckboxLabel className={formData.companion_program_train ? 'checked' : ''}>
+                      </RadioLabel>
+                      <RadioLabel className={formData.companion_program_selection === 'train' ? 'selected' : ''}>
                         <input
-                          type="checkbox"
-                          name="companion_program_train"
-                          checked={formData.companion_program_train}
+                          type="radio"
+                          name="companion_program_selection"
+                          value="train"
+                          checked={formData.companion_program_selection === 'train'}
                           onChange={handleChange}
                         />
                         {t.companionPrograms.train}
-                      </CheckboxLabel>
-                      <CheckboxLabel className={formData.companion_program_dinner ? 'checked' : ''}>
+                      </RadioLabel>
+                      <RadioLabel className={formData.companion_program_selection === 'dinner' ? 'selected' : ''}>
                         <input
-                          type="checkbox"
-                          name="companion_program_dinner"
-                          checked={formData.companion_program_dinner}
+                          type="radio"
+                          name="companion_program_selection"
+                          value="dinner"
+                          checked={formData.companion_program_selection === 'dinner'}
                           onChange={handleChange}
                         />
                         {t.companionPrograms.dinner}
-                      </CheckboxLabel>
-                    </CheckboxGroup>
+                      </RadioLabel>
+                    </RadioGroup>
                   </Field>
                 </FullRow>
 
@@ -769,7 +779,7 @@ const MouEvent2026 = () => {
                 </Notice>
 
                 {/* 동반자 골프 정보 (골프대회 참가 선택 시) */}
-                {formData.companion_program_golf && (
+                {formData.companion_program_selection === 'golf' && (
                   <>
                     <SectionTitle>{t.companionGolfInfo}</SectionTitle>
 

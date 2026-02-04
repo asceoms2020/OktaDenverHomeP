@@ -326,7 +326,7 @@ export const translations = {
       companionInfo: "동반자 정보",
       companionCount: "동반자 인원",
       companionNames: "동반자 성명 (한글 / 영문)",
-      companionNamesPlaceholder: "모두 기재해주세요.\\n예: 홍길동 / Gil-Dong Hong\\n김철수 / Chul-Su Kim",
+      companionNamesPlaceholder: "모두 기재해주세요.\n예): 홍길동, / Gil-Dong Hong \n김철수 / Chul-Su Kim",
       companionProgram: "동반자 참가 프로그램",
       companionPrograms: {
         golf: "동반자 골프대회 참가",
