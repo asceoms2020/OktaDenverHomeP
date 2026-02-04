@@ -40,8 +40,8 @@ const Header = () => {
     if (user && userProfile) {
       // Check for missing required fields
       // Assuming full_name and phone_number are mandatory
-      const isProfileIncomplete = !userProfile.full_name || !userProfile.phone_number;
-      
+      const isProfileIncomplete = !userProfile.full_name_ko || !userProfile.full_name_en || !userProfile.phone_number;
+
       if (isProfileIncomplete) {
         setIsProfileOpen(true);
       }
@@ -87,7 +87,7 @@ const Header = () => {
           <Link to="/resources" className="nav-link" onClick={closeMenu}>{t.resources}</Link>
           <Link to="/newsletter" className="nav-link" onClick={closeMenu}>{t.newsletter}</Link>
           <Link to="/sponsors" className="nav-link" onClick={closeMenu}>{t.sponsors}</Link>
-          
+
           {/* Conditional Menu: Trading (Only for Logged in users) */}
           {user && (
             <Link to="/trading" className="nav-link" onClick={closeMenu}>
@@ -97,7 +97,7 @@ const Header = () => {
 
           {user ? (
             <div className="auth-buttons-container">
-              <button 
+              <button
                 className="profile-button"
                 onClick={() => {
                   setIsProfileOpen(true);
@@ -110,16 +110,16 @@ const Header = () => {
                 </svg>
                 {language === 'ko' ? '내 정보' : 'Profile'}
               </button>
-              <button 
-                className="logout-button" 
+              <button
+                className="logout-button"
                 onClick={handleLogout}
               >
                 {language === 'ko' ? '로그아웃' : 'Logout'}
               </button>
             </div>
           ) : (
-            <button 
-              className="login-button" 
+            <button
+              className="login-button"
               onClick={() => {
                 setIsLoginOpen(true);
                 closeMenu();
@@ -129,9 +129,9 @@ const Header = () => {
             </button>
           )}
 
-          <a 
+          <a
             href="https://www.zeffy.com/donation-form/donate-to-change-lives-1296"
-            target="_blank" 
+            target="_blank"
             rel="noopener noreferrer"
             className="donation-button"
             onClick={closeMenu}
@@ -141,19 +141,19 @@ const Header = () => {
           <LanguageSwitch />
         </div>
       </nav>
-      <LoginModal 
-        isOpen={isLoginOpen} 
-        onClose={() => setIsLoginOpen(false)} 
+      <LoginModal
+        isOpen={isLoginOpen}
+        onClose={() => setIsLoginOpen(false)}
         onSignUpClick={() => {
           setIsLoginOpen(false);
           setIsSignUpOpen(true);
         }}
       />
       <SignUpModal isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
-      <ProfileEditModal 
-        isOpen={isProfileOpen} 
-        onClose={() => setIsProfileOpen(false)} 
-        force={user && userProfile && (!userProfile.full_name || !userProfile.phone_number)}
+      <ProfileEditModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        force={user && userProfile && (!userProfile.full_name_ko || !userProfile.full_name_en || !userProfile.phone_number)}
       />
     </header>
   );

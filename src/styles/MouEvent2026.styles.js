@@ -194,3 +194,124 @@ export const LoginGate = styled.div`
   padding: 120px 20px 60px;
   color: #111827;
 `;
+
+export const SectionTitle = styled.h3`
+  grid-column: 1 / -1;
+  margin: 20px 0 10px;
+  padding-bottom: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2a37;
+  border-bottom: 2px solid rgba(46, 204, 113, 0.3);
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+`;
+
+export const RadioGroup = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+`;
+
+export const RadioLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 120ms ease;
+  background: #ffffff;
+
+  &:hover {
+    border-color: rgba(52, 152, 219, 0.5);
+  }
+
+  input {
+    accent-color: #2ecc71;
+    width: 18px;
+    height: 18px;
+  }
+
+  &.selected {
+    border-color: #2ecc71;
+    background: rgba(46, 204, 113, 0.08);
+  }
+`;
+
+export const CheckboxGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+export const CheckboxLabel = styled.label`
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 120ms ease;
+  background: #ffffff;
+  line-height: 1.5;
+
+  &:hover {
+    border-color: rgba(52, 152, 219, 0.5);
+  }
+
+  input {
+    accent-color: #2ecc71;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  &.checked {
+    border-color: #2ecc71;
+    background: rgba(46, 204, 113, 0.08);
+  }
+`;
+
+export const Textarea = styled.textarea`
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  background: #ffffff;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+
+  &:focus {
+    border-color: rgba(52, 152, 219, 0.7);
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.12);
+  }
+`;
+
+export const Notice = styled.div`
+  grid-column: 1 / -1;
+  padding: 14px 16px;
+  background: rgba(52, 152, 219, 0.08);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: #1f5a7a;
+  line-height: 1.6;
+
+  p {
+    margin: 0;
+  }
+
+  p + p {
+    margin-top: 6px;
+  }
+`;

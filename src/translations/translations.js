@@ -224,45 +224,164 @@ export const translations = {
         ]
       },
     },
-      sponsors: {
-        title: "후원사",
-        premiumTitle: "Premium Partners",
-        memberTitle: "Member Companies",
-        premiumPartner: "Premium Partner",
-        memberCompany: "Member Company",
-        availableSpot: "Available Spot",
-        recruitment: {
-          title: "후원사가 되어주세요!",
-          description: "OKTA 덴버지회와 함께 한인 커뮤니티의 발전에 기여하고,<br/>비즈니스 네트워킹의 기회를 넓혀보세요.",
-          button: "후원사 문의하기"
-        }
-      },
-      resources: {
-        title: "자료실",
-        mouTitle: "MOU란 무엇인가요?",
-        mouContent: {
-          title: "MOU (Memorandum of Understanding)",
-          description: "MOU(양해각서)는 서로 협력하기로 한 약속입니다.<br/><br/>OKTA 덴버 지회는 전 세계 다양한 지회들과 협력하여 비즈니스 기회를 넓히고 정보를 공유하며 함께 성장하고 있습니다. 이를 통해 회원님들께 더 넓은 글로벌 무대를 연결해 드립니다.",
-          benefits: [
-            "더 많은 글로벌 비즈니스 기회",
-            "든든한 글로벌 파트너 연결",
-            "해외 진출을 위한 맞춤 상담",
-            "다양한 국제 교류 프로그램",
-            "실시간 해외 시장 정보"
-          ]
-        }
-      },
-      newsletterPage: {
-        title: "뉴스레터",
-        webzineTitle: "웹진",
-        readMore: "자세히 보기",
-        viewMore: "📚 더 많은 웹진 보기",
-        webzine17: "월드옥타 웹진 22호",
-        webzine16: "월드옥타 웹진 16호",
-        webzine15: "월드옥타 웹진 15호",
-        webzine21: "월드옥타 웹진 21호",
-        webzine20: "월드옥타 웹진 20호"
+    sponsors: {
+      title: "후원사",
+      premiumTitle: "Premium Partners",
+      memberTitle: "Member Companies",
+      premiumPartner: "Premium Partner",
+      memberCompany: "Member Company",
+      availableSpot: "Available Spot",
+      recruitment: {
+        title: "후원사가 되어주세요!",
+        description: "OKTA 덴버지회와 함께 한인 커뮤니티의 발전에 기여하고,<br/>비즈니스 네트워킹의 기회를 넓혀보세요.",
+        button: "후원사 문의하기"
       }
+    },
+    resources: {
+      title: "자료실",
+      mouTitle: "MOU란 무엇인가요?",
+      mouContent: {
+        title: "MOU (Memorandum of Understanding)",
+        description: "MOU(양해각서)는 서로 협력하기로 한 약속입니다.<br/><br/>OKTA 덴버 지회는 전 세계 다양한 지회들과 협력하여 비즈니스 기회를 넓히고 정보를 공유하며 함께 성장하고 있습니다. 이를 통해 회원님들께 더 넓은 글로벌 무대를 연결해 드립니다.",
+        benefits: [
+          "더 많은 글로벌 비즈니스 기회",
+          "든든한 글로벌 파트너 연결",
+          "해외 진출을 위한 맞춤 상담",
+          "다양한 국제 교류 프로그램",
+          "실시간 해외 시장 정보"
+        ]
+      }
+    },
+    newsletterPage: {
+      title: "뉴스레터",
+      webzineTitle: "웹진",
+      readMore: "자세히 보기",
+      viewMore: "📚 더 많은 웹진 보기",
+      webzine17: "월드옥타 웹진 22호",
+      webzine16: "월드옥타 웹진 16호",
+      webzine15: "월드옥타 웹진 15호",
+      webzine21: "월드옥타 웹진 21호",
+      webzine20: "월드옥타 웹진 20호"
+    },
+    mouEvent2026: {
+      title: "MOU Event 2026 참가 신청",
+      subtitle: "회원 정보는 자동으로 불러오며, 아래 내용을 입력하고 저장할 수 있습니다. 비행기 입국/출국 시간은 나중에 다시 들어와 수정 가능합니다.",
+      loginRequired: "로그인 후 신청서를 작성할 수 있습니다.",
+      formTitle: "참가 신청 양식",
+      basicInfo: "기본 정보",
+      email: "이메일",
+      nameKo: "이름 (한글)",
+      nameEn: "이름 (영문)",
+      memberType: "회원 구분",
+      memberTypes: {
+        regular: "정회원",
+        nextGen: "차세대회원"
+      },
+      jobTitle: "직함",
+      jobTitlePlaceholder: "예: 대표이사, 이사, 매니저",
+      companyName: "회사명",
+      companyNamePlaceholder: "소속 회사명",
+      phone: "핸드폰 번호 (국가번호 포함)",
+      kakaoId: "카카오톡 ID",
+      country: "소속 지회 (국가)",
+      city: "소속 지회 (도시)",
+      selectCountry: "국가를 선택하세요",
+      selectCity: "도시를 선택하세요",
+      selectCountryFirst: "국가를 먼저 선택하세요",
+      programSelf: "프로그램 선택 (본인)",
+      programLabel: "참가 프로그램",
+      programs: {
+        golf: "골프대회 참가",
+        train: "로컬 기차여행 참가 (비골퍼 프로그램)",
+        dinner: "만찬만 참석 (주간 프로그램 불참)"
+      },
+      programNotice: [
+        "※ 골프대회 및 로컬 기차여행은 추가 참가비가 있습니다.",
+        "※ 세부 일정 및 비용은 추후 안내드립니다."
+      ],
+      golfInfo: "골프 관련 정보",
+      golfHandicap: "골프 핸디캡",
+      handicapPlaceholder: "예: 12 / 18 / Beginner / 없음",
+      golfLevel: "골프 경험 수준",
+      golfLevels: {
+        advanced: "상급",
+        intermediate: "중급",
+        beginner: "초급",
+        friendly: "친선 위주"
+      },
+      golfClubRental: "골프채 대여",
+      golfClubRentalOptions: {
+        yes: "예",
+        no: "아니오"
+      },
+      rentalNotice: "※ 대여비 별도",
+      cartShare: "카트 동승 희망 여부",
+      cartShareOptions: {
+        yes: "예 (희망자 지정)",
+        no: "무관",
+        withCompanion: "동반자와 함께"
+      },
+      cartShareWith: "카트 동승 희망자 (성명 및 지회명)",
+      cartShareWithPlaceholder: "예: 홍길동 (덴버지회)",
+      companionInfo: "동반자 정보",
+      companionCount: "동반자 인원",
+      companionNames: "동반자 성명 (한글 / 영문)",
+      companionNamesPlaceholder: "모두 기재해주세요.\\n예: 홍길동 / Gil-Dong Hong\\n김철수 / Chul-Su Kim",
+      companionProgram: "동반자 참가 프로그램",
+      companionPrograms: {
+        golf: "동반자 골프대회 참가",
+        train: "동반자 로컬 기차여행 참가",
+        dinner: "동반자 만찬만 참석"
+      },
+      companionNotice: "※ 동반자 프로그램 선택에 따라 추가 비용이 발생할 수 있습니다.",
+      companionGolfInfo: "동반자 골프 정보",
+      companionGolfHandicap: "동반자 골프 핸디캡",
+      companionGolfLevel: "동반자 골프 경험 수준",
+      companionGolfClubRental: "동반자 골프채 대여",
+      companionCartShare: "동반자 카트 동승 희망",
+      companionCartShareOptions: {
+        withMe: "본인과 함께",
+        no: "무관"
+      },
+      networkingInfo: "교류 정보",
+      expectations: "이번 자매지회 교류 행사에 기대하는 점",
+      expectationsPlaceholder: "예: 네트워킹, 비즈니스, 친선 교류 등 자유롭게 작성해주세요",
+      interestAreas: "관심있는 교류 분야 (복수 선택 가능)",
+      areas: {
+        exportImport: "수출입",
+        investment: "투자",
+        retail: "유통/리테일",
+        startup: "스타트업",
+        other: "기타"
+      },
+      scheduleInfo: "일정 정보",
+      scheduleHelp: "비행기 입국/출국 시간은 지금 모르면 비워두어도 됩니다. 나중에 다시 들어와 저장하면 업데이트됩니다.",
+      arrivalDate: "비행기 입국 날짜",
+      arrivalTime: "비행기 입국 시간",
+      departureDate: "비행기 출국 날짜",
+      departureTime: "비행기 출국 시간",
+      selectTime: "시간 선택",
+      agreementInfo: "추가 비용 및 개인정보 활용 동의",
+      agreements: {
+        paidProgram: "본인은 골프대회 및 로컬 기차여행 프로그램이 유료임을 인지하였습니다.",
+        additionalCost: "본인 및 동반자 선택 프로그램에 따른 추가 비용 납부에 동의합니다.",
+        privacy: "본인은 행사 운영을 위한 개인정보 활용에 동의합니다."
+      },
+      buttons: {
+        cancel: "취소하기",
+        cancelled: "취소됨",
+        apply: "신청하기",
+        applying: "신청 중..."
+      },
+      messages: {
+        agreeAll: "모든 동의 항목에 체크해주세요.",
+        companionCountError: "예상 동반자 인원은 0 이상의 숫자로 입력해주세요.",
+        saved: "신청 정보가 저장되었습니다. 언제든지 다시 들어와 수정할 수 있습니다.",
+        error: "저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+        cancelConfirm: "참가 신청을 취소하시겠습니까?",
+        cancelSuccess: "참가 신청이 취소되었습니다. 다시 신청하려면 정보를 수정하고 신청하기를 누르세요."
+      }
+    }
   },
   en: {
     navigation: {
@@ -335,7 +454,8 @@ export const translations = {
       ceoMessage: {
         title: "President's Message",
         name: "Chairman June Choi",
-        greeting: "Dear Members and Visitors, Welcome to the official website of the Denver Chapter of the World-OKTA (World Federation of Overseas Korean Traders Associations). As a non-profit organization and part of a global network of Korean business professionals, our chapter is committed to strengthening economic ties between Korean entrepreneurs in the U.S. and around the world. We actively support trade, investment, and business cooperation through networking, mentoring, and partnership opportunities. The Denver Chapter serves as a bridge connecting local Korean-American businesses with global markets. We also place a strong emphasis on fostering the next generation of global leaders through youth mentorship and entrepreneurship programs. Through our nonprofit activities, we aim to empower the Korean business community while giving back through education, support, and shared resources. With your support and participation, we will continue to grow as a vibrant community that shares knowledge, expands business opportunities, and contributes to the prosperity of the Korean diaspora. Thank you for your interest, and we look forward to working with you.",         signature: "- With regards, Chairman June Choi" },
+        greeting: "Dear Members and Visitors, Welcome to the official website of the Denver Chapter of the World-OKTA (World Federation of Overseas Korean Traders Associations). As a non-profit organization and part of a global network of Korean business professionals, our chapter is committed to strengthening economic ties between Korean entrepreneurs in the U.S. and around the world. We actively support trade, investment, and business cooperation through networking, mentoring, and partnership opportunities. The Denver Chapter serves as a bridge connecting local Korean-American businesses with global markets. We also place a strong emphasis on fostering the next generation of global leaders through youth mentorship and entrepreneurship programs. Through our nonprofit activities, we aim to empower the Korean business community while giving back through education, support, and shared resources. With your support and participation, we will continue to grow as a vibrant community that shares knowledge, expands business opportunities, and contributes to the prosperity of the Korean diaspora. Thank you for your interest, and we look forward to working with you.", signature: "- With regards, Chairman June Choi"
+      },
       boardMembers: {
         title: "Board Members",
         members: [
@@ -487,44 +607,171 @@ export const translations = {
         ]
       },
     },
-      sponsors: {
-        title: "Sponsors",
-        premiumTitle: "Premium Partners",
-        memberTitle: "Member Companies",
-        premiumPartner: "Premium Partner",
-        memberCompany: "Member Company",
-        availableSpot: "Available Spot",
-        recruitment: {
-          title: "Become a Sponsor!",
-          description: "Contribute to the development of the Korean community with OKTA Denver<br/>and expand your business networking opportunities.",
-          button: "Contact Us"
-        }
-      },
-      resources: {
-        title: "Resources",
-        mouTitle: "What is an MOU?",
-        mouContent: {
-          title: "MOU (Memorandum of Understanding)",
-          description: "An MOU (Memorandum of Understanding) is a promise to cooperate with each other.<br/><br/>The OKTA Denver Chapter collaborates with various chapters around the world to expand business opportunities, share information, and grow together. Through this, we connect our members to a wider global stage.",
-          benefits: [
-            "More global business opportunities",
-            "Reliable global partner connections",
-            "Customized consulting for overseas expansion",
-            "Various international exchange programs",
-            "Real-time overseas market information"
-          ]
-        }
-      },
-      newsletterPage: {
-        title: "Newsletter",
-        webzineTitle: "Webzine",
-        readMore: "Read More",
-        viewMore: "📚 View More Webzines",
-        webzine17: "World-OKTA Webzine No. 22",
-        webzine16: "World-OKTA Webzine No. 16",
-        webzine15: "World-OKTA Webzine No. 15",
-        webzine21: "World-OKTA Webzine No. 21",
-        webzine20: "World-OKTA Webzine No. 20"
+    sponsors: {
+      title: "Sponsors",
+      premiumTitle: "Premium Partners",
+      memberTitle: "Member Companies",
+      premiumPartner: "Premium Partner",
+      memberCompany: "Member Company",
+      availableSpot: "Available Spot",
+      recruitment: {
+        title: "Become a Sponsor!",
+        description: "Contribute to the development of the Korean community with OKTA Denver<br/>and expand your business networking opportunities.",
+        button: "Contact Us"
       }
+    },
+    resources: {
+      title: "Resources",
+      mouTitle: "What is an MOU?",
+      mouContent: {
+        title: "MOU (Memorandum of Understanding)",
+        description: "An MOU (Memorandum of Understanding) is a promise to cooperate with each other.<br/><br/>The OKTA Denver Chapter collaborates with various chapters around the world to expand business opportunities, share information, and grow together. Through this, we connect our members to a wider global stage.",
+        benefits: [
+          "More global business opportunities",
+          "Reliable global partner connections",
+          "Customized consulting for overseas expansion",
+          "Various international exchange programs",
+          "Real-time overseas market information"
+        ]
+      }
+    },
+    newsletterPage: {
+      title: "Newsletter",
+      webzineTitle: "Webzine",
+      readMore: "Read More",
+      viewMore: "📚 View More Webzines",
+      webzine17: "World-OKTA Webzine No. 22",
+      webzine16: "World-OKTA Webzine No. 16",
+      webzine15: "World-OKTA Webzine No. 15",
+      webzine21: "World-OKTA Webzine No. 21",
+      webzine20: "World-OKTA Webzine No. 20"
+    },
+    mouEvent2026: {
+      title: "MOU Event 2026 Registration",
+      subtitle: "Member information is automatically loaded. You can enter and save the details below. Flight arrival/departure times can be updated later.",
+      loginRequired: "You can fill out the application after logging in.",
+      formTitle: "Registration Form",
+      basicInfo: "Basic Information",
+      email: "Email",
+      nameKo: "Name (Korean)",
+      nameEn: "Name (English)",
+      memberType: "Member Type",
+      memberTypes: {
+        regular: "Regular Member",
+        nextGen: "Next Gen Member"
+      },
+      jobTitle: "Job Title",
+      jobTitlePlaceholder: "e.g., CEO, Director, Manager",
+      companyName: "Company Name",
+      companyNamePlaceholder: "Your company name",
+      phone: "Phone Number (with country code)",
+      kakaoId: "KakaoTalk ID",
+      country: "Chapter Country",
+      city: "Chapter City",
+      selectCountry: "Select a country",
+      selectCity: "Select a city",
+      selectCountryFirst: "Select a country first",
+
+      programSelf: "Program Selection (Self)",
+      programLabel: "Participation Program",
+      programs: {
+        golf: "Golf Tournament",
+        train: "Local Train Trip (Non-golfer)",
+        dinner: "Dinner Only (No day program)"
+      },
+      programNotice: [
+        "※ Additional fees apply for Golf Tournament and Local Train Trip.",
+        "※ Details on schedule and costs will be announced later."
+      ],
+
+      golfInfo: "Golf Information",
+      golfHandicap: "Golf Handicap",
+      handicapPlaceholder: "e.g., 12 / 18 / Beginner / None",
+      golfLevel: "Golf Experience Level",
+      golfLevels: {
+        advanced: "Advanced",
+        intermediate: "Intermediate",
+        beginner: "Beginner",
+        friendly: "Friendly"
+      },
+      golfClubRental: "Golf Club Rental",
+      golfClubRentalOptions: {
+        yes: "Yes",
+        no: "No"
+      },
+      rentalNotice: "※ Rental fee not included",
+      cartShare: "Cart Sharing Preference",
+      cartShareOptions: {
+        yes: "Yes (Specify person)",
+        no: "Any",
+        withCompanion: "With Companion"
+      },
+      cartShareWith: "Preferred Cart Partner (Name & Chapter)",
+      cartShareWithPlaceholder: "e.g., John Doe (Denver)",
+
+      companionInfo: "Companion Information",
+      companionCount: "Number of Companions",
+      companionNames: "Companion Names (Korean / English)",
+      companionNamesPlaceholder: "Please list all.\\ne.g., Gil-Dong Hong / John Doe",
+      companionProgram: "Companion Program",
+      companionPrograms: {
+        golf: "Companion Golf Tournament",
+        train: "Companion Local Train Trip",
+        dinner: "Companion Dinner Only"
+      },
+      companionNotice: "※ Additional fees may apply depending on companion program selection.",
+
+      companionGolfInfo: "Companion Golf Information",
+      companionGolfHandicap: "Companion Golf Handicap",
+      companionGolfLevel: "Companion Golf Experience Level",
+      companionGolfClubRental: "Companion Golf Club Rental",
+      companionCartShare: "Companion Cart Sharing",
+      companionCartShareOptions: {
+        withMe: "With Me",
+        no: "Any"
+      },
+
+      networkingInfo: "Networking Information",
+      expectations: "Expectations for this exchange event",
+      expectationsPlaceholder: "e.g., Networking, Business, Friendship, etc.",
+      interestAreas: "Areas of Interest (Multiple selection)",
+      areas: {
+        exportImport: "Import/Export",
+        investment: "Investment",
+        retail: "Distribution/Retail",
+        startup: "Startup",
+        other: "Other"
+      },
+
+      scheduleInfo: "Schedule Information",
+      scheduleHelp: "You can leave flight times blank if unknown. Update later when available.",
+      arrivalDate: "Arrival Date",
+      arrivalTime: "Arrival Time",
+      departureDate: "Departure Date",
+      departureTime: "Departure Time",
+      selectTime: "Select Time",
+
+      agreementInfo: "Agreements",
+      agreements: {
+        paidProgram: "I acknowledge that the Golf Tournament and Train Trip are paid programs.",
+        additionalCost: "I agree to pay additional costs for selected programs for myself and companions.",
+        privacy: "I agree to the use of personal information for event operation."
+      },
+
+      buttons: {
+        cancel: "Cancel",
+        cancelled: "Cancelled",
+        apply: "Submit",
+        applying: "Submitting..."
+      },
+      messages: {
+        agreeAll: "Please check all agreement items.",
+        companionCountError: "Please enter a number 0 or greater for companion count.",
+        saved: "Application saved. You can always come back to edit.",
+        error: "Error saving. Please try again later.",
+        cancelConfirm: "Are you sure you want to cancel your application?",
+        cancelSuccess: "Application cancelled. Edit info and submit again to re-apply."
+      }
+    }
   }
-}; 
+};

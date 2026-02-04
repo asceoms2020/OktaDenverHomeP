@@ -108,7 +108,7 @@ const CloseButton = styled.button`
   font-size: 1.5rem;
   cursor: pointer;
   color: #666;
-  display: ${props => props.force ? 'none' : 'block'};
+  display: ${props => props.$force ? 'none' : 'block'};
   
   &:hover {
     color: #333;
@@ -136,14 +136,18 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [isError, setIsError] = useState(false);
-  
+
   const [formData, setFormData] = useState({
-    full_name: '',
+    full_name_ko: '',
+    full_name_en: '',
     phone_number: '',
     kakaotalk_id: '',
     is_okta_member: false,
     okta_chapter_country: '',
-    okta_chapter_city: ''
+    okta_chapter_city: '',
+    member_type: '',
+    job_title: '',
+    company_name: ''
   });
 
   const cities = formData.okta_chapter_country ? OKTA_CHAPTERS[formData.okta_chapter_country] || [] : [];
@@ -168,12 +172,16 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
 
       if (data) {
         setFormData({
-          full_name: data.full_name || '',
+          full_name_ko: data.full_name_ko || '',
+          full_name_en: data.full_name_en || '',
           phone_number: data.phone_number || '',
           kakaotalk_id: data.kakaotalk_id || '',
           is_okta_member: data.is_okta_member || false,
           okta_chapter_country: data.okta_chapter_country || '',
-          okta_chapter_city: data.okta_chapter_city || ''
+          okta_chapter_city: data.okta_chapter_city || '',
+          member_type: data.member_type || '',
+          job_title: data.job_title || '',
+          company_name: data.company_name || ''
         });
       }
     } catch (err) {
@@ -186,7 +194,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+
     if (name === 'okta_chapter_country') {
       setFormData(prev => ({
         ...prev,
@@ -220,7 +228,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
       if (error) throw error;
 
       setMessage(isKo ? '프로필이 성공적으로 업데이트되었습니다.' : 'Your profile has been updated successfully.');
-      
+
       // Update local profile state
       await fetchUserProfile(user.id);
 
@@ -229,7 +237,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
           onClose();
         } else {
           setMessage(null);
-          window.location.reload(); 
+          window.location.reload();
         }
       }, 1000);
     } catch (err) {
@@ -251,7 +259,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
   return (
     <Overlay onClick={handleOverlayClick}>
       <ModalContainer onClick={e => e.stopPropagation()}>
-        <CloseButton onClick={onClose} force={force}>&times;</CloseButton>
+        <CloseButton onClick={onClose} $force={force}>&times;</CloseButton>
         <Title>
           {force
             ? (isKo ? '회원가입 완료를 위해 정보를 입력해주세요' : 'Please complete your profile to continue')
@@ -259,11 +267,22 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
         </Title>
         <Form onSubmit={handleSubmit}>
           <FormGroup>
-            <Label>{isKo ? '이름 (Full Name)' : 'Full Name'}</Label>
+            <Label>{isKo ? '이름 (한글)' : 'Name (Korean)'} *</Label>
             <Input
-              name="full_name"
-              placeholder={isKo ? '홍길동' : 'Your name'}
-              value={formData.full_name}
+              name="full_name_ko"
+              placeholder="홍길동"
+              value={formData.full_name_ko}
+              onChange={handleChange}
+              required
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>{isKo ? '이름 (영문)' : 'Name (English)'} *</Label>
+            <Input
+              name="full_name_en"
+              placeholder="Gil-Dong Hong"
+              value={formData.full_name_en}
               onChange={handleChange}
               required
             />
@@ -290,20 +309,41 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
             />
           </FormGroup>
 
-          <CheckboxGroup>
-            <input
-              type="checkbox"
-              id="is_okta_member"
-              name="is_okta_member"
-              checked={formData.is_okta_member}
+          <FormGroup>
+            <Label>{isKo ? '회원 구분' : 'Membership Type'}</Label>
+            <Select
+              name="member_type"
+              value={formData.member_type}
+              onChange={handleChange}
+            >
+              <option value="">{isKo ? '선택하세요' : 'Select'}</option>
+              <option value="regular">{isKo ? 'OKTA 정회원' : 'OKTA Regular Member'}</option>
+              <option value="next_gen">{isKo ? 'OKTA 차세대회원' : 'OKTA Next Generation Member'}</option>
+              <option value="non_member">{isKo ? '비회원' : 'Non-member'}</option>
+            </Select>
+          </FormGroup>
+
+          <FormGroup>
+            <Label>{isKo ? '직책' : 'Job Title'}</Label>
+            <Input
+              name="job_title"
+              placeholder={isKo ? '예: 대표이사, 이사, 매니저' : 'e.g., CEO, Director, Manager'}
+              value={formData.job_title}
               onChange={handleChange}
             />
-            <Label htmlFor="is_okta_member" style={{ marginBottom: 0 }}>
-              {isKo ? 'OKTA 정회원입니다' : 'I am an OKTA member'}
-            </Label>
-          </CheckboxGroup>
+          </FormGroup>
 
-          {formData.is_okta_member && (
+          <FormGroup>
+            <Label>{isKo ? '회사명' : 'Company Name'}</Label>
+            <Input
+              name="company_name"
+              placeholder={isKo ? '소속 회사명' : 'Your company name'}
+              value={formData.company_name}
+              onChange={handleChange}
+            />
+          </FormGroup>
+
+          {(formData.member_type === 'regular' || formData.member_type === 'next_gen') && (
             <>
               <FormGroup>
                 <Label>{isKo ? '소속 지회 (국가)' : 'Chapter Country'}</Label>
@@ -311,7 +351,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
                   name="okta_chapter_country"
                   value={formData.okta_chapter_country}
                   onChange={handleChange}
-                  required={formData.is_okta_member}
+                  required={formData.member_type === 'regular' || formData.member_type === 'next_gen'}
                 >
                   <option value="">{isKo ? '국가를 선택하세요' : 'Select a country'}</option>
                   {Object.keys(OKTA_CHAPTERS).map(country => (
@@ -325,7 +365,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
                   name="okta_chapter_city"
                   value={formData.okta_chapter_city}
                   onChange={handleChange}
-                  required={formData.is_okta_member}
+                  required={formData.member_type === 'regular' || formData.member_type === 'next_gen'}
                   disabled={!formData.okta_chapter_country}
                 >
                   <option value="">
