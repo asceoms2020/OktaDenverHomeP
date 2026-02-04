@@ -78,6 +78,7 @@ export const Label = styled.label`
 
 export const Input = styled.input`
   width: 100%;
+  box-sizing: border-box;
   padding: 12px 12px;
   border: 1px solid rgba(17, 24, 39, 0.14);
   border-radius: 10px;
@@ -94,6 +95,7 @@ export const Input = styled.input`
 
 export const Select = styled.select`
   width: 100%;
+  box-sizing: border-box;
   padding: 12px 12px;
   border: 1px solid rgba(17, 24, 39, 0.14);
   border-radius: 10px;
@@ -219,6 +221,7 @@ export const RadioLabel = styled.label`
   display: flex;
   align-items: center;
   gap: 8px;
+  box-sizing: border-box;
   padding: 10px 16px;
   border: 1px solid rgba(17, 24, 39, 0.14);
   border-radius: 10px;
@@ -252,6 +255,7 @@ export const CheckboxLabel = styled.label`
   display: flex;
   align-items: flex-start;
   gap: 10px;
+  box-sizing: border-box;
   padding: 12px 14px;
   border: 1px solid rgba(17, 24, 39, 0.14);
   border-radius: 10px;
@@ -280,6 +284,7 @@ export const CheckboxLabel = styled.label`
 
 export const Textarea = styled.textarea`
   width: 100%;
+  box-sizing: border-box;
   padding: 12px;
   border: 1px solid rgba(17, 24, 39, 0.14);
   border-radius: 10px;
