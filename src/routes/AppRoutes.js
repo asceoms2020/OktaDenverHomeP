@@ -12,6 +12,7 @@ import Trading from '../pages/Trading';
 import Admin from '../pages/Admin';
 import AdminAbout from '../pages/AdminAbout';
 import MouEvent2026 from '../pages/MouEvent2026';
+import MouEvent2026Info from '../pages/MouEvent2026Info';
 import ResetPassword from '../pages/ResetPassword';
 import { useAuth } from '../context/AuthContext';
 
@@ -48,6 +49,7 @@ const AppRoutes = () => {
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/about" element={<AdminAbout />} />
           <Route path="/mouevent2026" element={<MouEvent2026 />} />
+          <Route path="/events/mouevent2026info" element={<MouEvent2026Info />} />
           <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
       </main>
