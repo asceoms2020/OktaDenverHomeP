@@ -111,7 +111,7 @@ const MouEvent2026Info = () => {
         <DeadlineBanner>
           <DeadlineText>
             신청 마감일
-            <span>2026년 4월 2일</span>
+            <span>2026년 5월 2일</span>
           </DeadlineText>
         </DeadlineBanner>
 
