@@ -105,19 +105,22 @@ const Home = () => {
               {t.subtitle}
             </p>
           </div>
-          <div
-            className="hero-buttons"
-            style={{
-              display: 'flex',
-              gap: '10px',
-              marginTop: '20px',
-              justifyContent: 'center',
-              flexWrap: 'wrap'
-            }}
-          >
+          <div className="hero-buttons">
             <Link to="/events/mouevent2026info" className="cta-button mou-event-cta-button">덴버에서 만나는 세계 참가신청!</Link>
             <Link to="/about" className="cta-button">{t.ctaButton}</Link>
           </div>
+        </div>
+
+        {/* 슬라이더 인디케이터 닷 */}
+        <div className="hero-slider-dots">
+          {backgroundImages.map((_, index) => (
+            <button
+              key={index}
+              className={`hero-dot${currentSlide === index ? ' active' : ''}`}
+              onClick={() => setCurrentSlide(index)}
+              aria-label={`Slide ${index + 1}`}
+            />
+          ))}
         </div>
       </section>
 

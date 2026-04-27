@@ -4,70 +4,82 @@ import styled from 'styled-components';
 export const NewsletterContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 2.5rem;
 `;
 
-// 웹진 카드 스타일
+// ──────────────────────────────────────────────
+// 웹진 카드
+// ──────────────────────────────────────────────
 export const WebzineCard = styled.div`
-  background: #fff;
+  background: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
   overflow: hidden;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(52, 152, 219, 0.1);
-  
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-top-color 0.28s ease;
+  border-top: 3px solid transparent;
+
   &:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    border-color: #3498db;
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+    border-top-color: #10b981;
   }
 `;
 
 export const WebzineImage = styled.img`
   width: 100%;
-  height: 200px;
+  height: 220px;
   object-fit: cover;
   display: block;
+  border-radius: 20px 20px 0 0;
 `;
 
 export const WebzineContent = styled.div`
-  padding: 2rem;
+  padding: 1.75rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
 `;
 
 export const WebzineDate = styled.div`
-  font-size: 0.9rem;
-  color: #3498db;
+  font-size: 0.8rem;
+  color: #10b981;
   font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   margin-bottom: 0.5rem;
 `;
 
 export const WebzineTitle = styled.h3`
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 1rem;
-  line-height: 1.4;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  line-height: 1.45;
+  margin-bottom: 0.85rem;
 `;
 
 export const WebzineExcerpt = styled.p`
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #666;
+  font-size: 0.97rem;
+  line-height: 1.7;
+  color: #64748b;
   margin-bottom: 1.5rem;
+  flex: 1;
 `;
 
-// 뉴스 카드 스타일
+// ──────────────────────────────────────────────
+// 뉴스 카드
+// ──────────────────────────────────────────────
 export const NewsCard = styled.div`
-  background: #fff;
-  padding: 2rem;
-  border-radius: 15px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  border-left: 4px solid #3498db;
-  
+  background: #ffffff;
+  padding: 2rem 2.25rem;
+  border-radius: 16px;
+  border-left: 4px solid #10b981;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.07);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
   &:hover {
-    transform: translateX(10px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    transform: translateX(6px);
+    box-shadow: 0 10px 32px rgba(15, 23, 42, 0.12);
   }
 `;
 
@@ -76,59 +88,65 @@ export const NewsHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-  
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
   }
 `;
 
 export const NewsDate = styled.span`
-  font-size: 0.9rem;
-  color: #7f8c8d;
+  font-size: 0.88rem;
+  color: #94a3b8;
   font-weight: 500;
 `;
 
 export const NewsSource = styled.span`
-  font-size: 0.9rem;
-  color: #e74c3c;
-  font-weight: 600;
-  background: rgba(231, 76, 60, 0.1);
-  padding: 0.3rem 0.8rem;
-  border-radius: 15px;
+  font-size: 0.82rem;
+  color: #059669;
+  font-weight: 700;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 0.3rem 0.85rem;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
 `;
 
 export const NewsTitle = styled.h3`
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 1rem;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.9rem;
   line-height: 1.4;
+  letter-spacing: -0.02em;
 `;
 
 export const NewsContent = styled.div`
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 `;
 
 export const NewsSummary = styled.p`
-  font-size: 1rem;
-  line-height: 1.7;
-  color: #555;
+  font-size: 0.97rem;
+  line-height: 1.75;
+  color: #64748b;
   margin-bottom: 1.5rem;
 `;
 
-// 이벤트 관련 스타일
+// ──────────────────────────────────────────────
+// 이벤트 카드
+// ──────────────────────────────────────────────
 export const EventCard = styled.div`
-  background: #fff;
-  border-radius: 15px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
   overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 14px 36px rgba(15, 23, 42, 0.11);
   }
 `;
 
@@ -136,119 +154,76 @@ export const EventImage = styled.img`
   width: 100%;
   height: 200px;
   object-fit: cover;
+  display: block;
 `;
 
 export const EventInfo = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  padding: 1.25rem 1.5rem 1.5rem;
 `;
 
 export const EventTitle = styled.h4`
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
   margin: 0;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
 `;
 
 export const EventDate = styled.span`
-  font-size: 0.9rem;
-  color: #7f8c8d;
+  font-size: 0.85rem;
+  color: #64748b;
   font-weight: 500;
 `;
 
-// 공통 버튼 스타일
+// ──────────────────────────────────────────────
+// 버튼
+// ──────────────────────────────────────────────
 export const ReadMoreBtn = styled.button`
-  background: linear-gradient(45deg, #3498db, #2ecc71);
-  color: white;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
   border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 25px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  align-self: flex-start;
-  
-  &:hover {
-    background: linear-gradient(45deg, #2980b9, #27ae60);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
-  }
-  
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-// 반응형 그리드 (웹진용)
-export const WebzineGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2rem;
-  
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-// 뉴스 섹션용 특별 스타일
-export const NewsSection = styled.div`
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  padding: 3rem;
-  border-radius: 20px;
-  margin: 2rem 0;
-`;
-
-// 카테고리 태그
-export const CategoryTag = styled.span`
-  display: inline-block;
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  color: white;
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-`;
-
-// 이벤트 그리드 (4개씩 배치)
-export const EventGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-// 더보기 버튼 섹션
-export const ViewMoreSection = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 3rem 0;
-  padding: 2rem 0;
-`;
-
-// 더 많은 웹진 보기 버튼
-export const ViewMoreWebzineBtn = styled.button`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 1.2rem 3rem;
-  border-radius: 50px;
-  font-size: 1.1rem;
+  padding: 0.72rem 1.6rem;
+  border-radius: 9999px;
+  font-size: 0.92rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.4s ease;
+  align-self: flex-start;
+  letter-spacing: 0.02em;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #0ea472, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.38);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+`;
+
+export const ViewMoreWebzineBtn = styled.button`
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a6e 100%);
+  color: #ffffff;
+  border: 1.5px solid transparent;
+  padding: 1.1rem 3rem;
+  border-radius: 9999px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+
+  /* shimmer sweep */
   &::before {
     content: '';
     position: absolute;
@@ -256,26 +231,86 @@ export const ViewMoreWebzineBtn = styled.button`
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.6s ease;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.18) 50%,
+      transparent 100%
+    );
+    transition: left 0.55s ease;
   }
-  
+
   &:hover {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4c93 100%);
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.6);
+    transform: translateY(-4px) scale(1.03);
+    border-color: #10b981;
+    box-shadow:
+      0 18px 44px rgba(15, 23, 42, 0.35),
+      0 0 0 3px rgba(16, 185, 129, 0.22);
   }
-  
+
   &:hover::before {
     left: 100%;
   }
-  
+
   &:active {
-    transform: translateY(-2px) scale(1.02);
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.25);
   }
-  
+
   @media (max-width: 768px) {
-    padding: 1rem 2rem;
-    font-size: 1rem;
+    padding: 0.95rem 2rem;
+    font-size: 0.95rem;
   }
-`; 
+`;
+
+// ──────────────────────────────────────────────
+// 레이아웃 / 섹션
+// ──────────────────────────────────────────────
+export const WebzineGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const NewsSection = styled.div`
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  padding: 2.75rem 3rem;
+  border-radius: 20px;
+  margin: 1.5rem 0;
+`;
+
+export const CategoryTag = styled.span`
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  padding: 0.35rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+`;
+
+export const EventGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const ViewMoreSection = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 3rem 0;
+  padding: 1.5rem 0;
+`;

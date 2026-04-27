@@ -15,6 +15,13 @@ const Header = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   const { language } = useLanguage();
   const { user, userProfile, signOut } = useAuth();
   const t = translations[language].navigation || {
@@ -66,7 +73,7 @@ const Header = () => {
   };
 
   return (
-    <header className="header">
+    <header className={`header${isScrolled ? ' header--scrolled' : ''}`}>
       <nav className="nav">
         <Link to="/" className="logo-link" onClick={closeMenu}>
           <div className="logo-container">
