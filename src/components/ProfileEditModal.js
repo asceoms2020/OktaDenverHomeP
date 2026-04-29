@@ -14,18 +14,19 @@ const Overlay = styled.div`
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: 2rem 1rem;
+  z-index: 9999;
 `;
 
 const ModalContainer = styled.div`
   background: white;
   padding: 2rem;
   border-radius: 12px;
-  width: 90%;
+  width: 100%;
   max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
+  margin: auto;
   position: relative;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
@@ -140,6 +141,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
   const [formData, setFormData] = useState({
     full_name_ko: '',
     full_name_en: '',
+    gender: '',
     phone_number: '',
     kakaotalk_id: '',
     is_okta_member: false,
@@ -174,6 +176,7 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
         setFormData({
           full_name_ko: data.full_name_ko || '',
           full_name_en: data.full_name_en || '',
+          gender: data.gender || '',
           phone_number: data.phone_number || '',
           kakaotalk_id: data.kakaotalk_id || '',
           is_okta_member: data.is_okta_member || false,
@@ -286,6 +289,21 @@ const ProfileEditModal = ({ isOpen, onClose, force = false }) => {
               onChange={handleChange}
               required
             />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>{isKo ? '성별' : 'Gender'}{force ? ' *' : ''}</Label>
+            <Select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              required={force}
+            >
+              <option value="">{isKo ? '선택하세요' : 'Select'}</option>
+              <option value="male">{isKo ? '남' : 'Male'}</option>
+              <option value="female">{isKo ? '여' : 'Female'}</option>
+              <option value="other">{isKo ? '기타' : 'Other'}</option>
+            </Select>
           </FormGroup>
 
           <FormGroup>

@@ -71,6 +71,7 @@ const MouEvent2026 = () => {
     email: '',
     full_name_ko: '',
     full_name_en: '',
+    gender: '',
     okta_chapter_country: '',
     okta_chapter_city: '',
     phone_number: '',
@@ -139,6 +140,7 @@ const MouEvent2026 = () => {
       const email = user?.email || '';
       const full_name_ko = userProfile?.full_name_ko || '';
       const full_name_en = userProfile?.full_name_en || '';
+      const gender = userProfile?.gender || '';
       const phone_number = userProfile?.phone_number || '';
       const okta_chapter_country = userProfile?.okta_chapter_country || '';
       const okta_chapter_city = userProfile?.okta_chapter_city || '';
@@ -150,6 +152,7 @@ const MouEvent2026 = () => {
         email,
         full_name_ko,
         full_name_en,
+        gender,
         okta_chapter_country,
         okta_chapter_city,
         phone_number,
@@ -218,6 +221,7 @@ const MouEvent2026 = () => {
             email: row.email ?? base.email,
             full_name_ko: row.full_name_ko ?? base.full_name_ko,
             full_name_en: row.full_name_en ?? base.full_name_en,
+            gender: row.gender ?? base.gender,
             okta_chapter_country: row.okta_chapter_country ?? base.okta_chapter_country,
             okta_chapter_city: row.okta_chapter_city ?? base.okta_chapter_city,
             phone_number: row.phone_number ?? base.phone_number,
@@ -339,6 +343,7 @@ const MouEvent2026 = () => {
         email: (formData.email || user.email || '').trim(),
         full_name_ko: formData.full_name_ko || null,
         full_name_en: formData.full_name_en || null,
+        gender: formData.gender || null,
         okta_chapter_country: formData.okta_chapter_country || null,
         okta_chapter_city: formData.okta_chapter_city || null,
         phone_number: formData.phone_number || null,
@@ -477,6 +482,24 @@ const MouEvent2026 = () => {
             <Field>
               <Label htmlFor="full_name_en">{t.nameEn}</Label>
               <Input id="full_name_en" name="full_name_en" value={formData.full_name_en} onChange={handleChange} placeholder="Gildong Hong" required />
+            </Field>
+
+            <Field>
+              <Label htmlFor="gender">{t.gender}</Label>
+              <RadioGroup>
+                <RadioLabel className={formData.gender === 'male' ? 'selected' : ''}>
+                  <input type="radio" name="gender" value="male" checked={formData.gender === 'male'} onChange={handleChange} />
+                  {t.genderOptions.male}
+                </RadioLabel>
+                <RadioLabel className={formData.gender === 'female' ? 'selected' : ''}>
+                  <input type="radio" name="gender" value="female" checked={formData.gender === 'female'} onChange={handleChange} />
+                  {t.genderOptions.female}
+                </RadioLabel>
+                <RadioLabel className={formData.gender === 'other' ? 'selected' : ''}>
+                  <input type="radio" name="gender" value="other" checked={formData.gender === 'other'} onChange={handleChange} />
+                  {t.genderOptions.other}
+                </RadioLabel>
+              </RadioGroup>
             </Field>
 
             <Field>

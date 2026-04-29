@@ -272,6 +272,12 @@ export const translations = {
       email: "이메일",
       nameKo: "이름 (한글)",
       nameEn: "이름 (영문)",
+      gender: "성별",
+      genderOptions: {
+        male: "남",
+        female: "여",
+        other: "기타"
+      },
       memberType: "회원 구분",
       memberTypes: {
         regular: "정회원",
@@ -655,6 +661,12 @@ export const translations = {
       email: "Email",
       nameKo: "Name (Korean)",
       nameEn: "Name (English)",
+      gender: "Gender",
+      genderOptions: {
+        male: "Male",
+        female: "Female",
+        other: "Other"
+      },
       memberType: "Member Type",
       memberTypes: {
         regular: "Regular Member",

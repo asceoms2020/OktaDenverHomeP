@@ -47,7 +47,7 @@ const Header = () => {
     if (user && userProfile) {
       // Check for missing required fields
       // Assuming full_name and phone_number are mandatory
-      const isProfileIncomplete = !userProfile.full_name_ko || !userProfile.full_name_en || !userProfile.phone_number;
+      const isProfileIncomplete = !userProfile.full_name_ko || !userProfile.full_name_en || !userProfile.phone_number || !userProfile.gender;
 
       if (isProfileIncomplete) {
         setIsProfileOpen(true);
@@ -73,81 +73,83 @@ const Header = () => {
   };
 
   return (
-    <header className={`header${isScrolled ? ' header--scrolled' : ''}`}>
-      <nav className="nav">
-        <Link to="/" className="logo-link" onClick={closeMenu}>
-          <div className="logo-container">
-            <img src={logoImage} alt="OKTA DENVER" className="logo-image" />
-            <div className="organization-info">
-              <div className="corp-name">Korean Community Association of Colorado, Inc.</div>
-              <div className="dba-name">OKTA Denver (D.B.A.)</div>
+    <>
+      <header className={`header${isScrolled ? ' header--scrolled' : ''}`}>
+        <nav className="nav">
+          <Link to="/" className="logo-link" onClick={closeMenu}>
+            <div className="logo-container">
+              <img src={logoImage} alt="OKTA DENVER" className="logo-image" />
+              <div className="organization-info">
+                <div className="corp-name">Korean Community Association of Colorado, Inc.</div>
+                <div className="dba-name">OKTA Denver (D.B.A.)</div>
+              </div>
             </div>
-          </div>
-        </Link>
-        <button className="mobile-menu-button" onClick={toggleMenu}>
-          {isMenuOpen ? '✕' : '☰'}
-        </button>
-        <div className={`nav-links ${isMenuOpen ? 'nav-links-open' : ''}`}>
-          <Link to="/" className="nav-link" onClick={closeMenu}>{t.home}</Link>
-          <Link to="/about" className="nav-link" onClick={closeMenu}>{t.about}</Link>
-          <Link to="/events" className="nav-link" onClick={closeMenu}>{t.events}</Link>
-          <Link to="/resources" className="nav-link" onClick={closeMenu}>{t.resources}</Link>
-          <Link to="/newsletter" className="nav-link" onClick={closeMenu}>{t.newsletter}</Link>
-          <Link to="/sponsors" className="nav-link" onClick={closeMenu}>{t.sponsors}</Link>
+          </Link>
+          <button className="mobile-menu-button" onClick={toggleMenu}>
+            {isMenuOpen ? '✕' : '☰'}
+          </button>
+          <div className={`nav-links ${isMenuOpen ? 'nav-links-open' : ''}`}>
+            <Link to="/" className="nav-link" onClick={closeMenu}>{t.home}</Link>
+            <Link to="/about" className="nav-link" onClick={closeMenu}>{t.about}</Link>
+            <Link to="/events" className="nav-link" onClick={closeMenu}>{t.events}</Link>
+            <Link to="/resources" className="nav-link" onClick={closeMenu}>{t.resources}</Link>
+            <Link to="/newsletter" className="nav-link" onClick={closeMenu}>{t.newsletter}</Link>
+            <Link to="/sponsors" className="nav-link" onClick={closeMenu}>{t.sponsors}</Link>
 
-          {/* Conditional Menu: Trading (Only for Logged in users) */}
-          {user && (
-            <Link to="/trading" className="nav-link" onClick={closeMenu}>
-              {language === 'ko' ? '무역하기' : 'Trading'}
-            </Link>
-          )}
+            {/* Conditional Menu: Trading (Only for Logged in users) */}
+            {user && (
+              <Link to="/trading" className="nav-link" onClick={closeMenu}>
+                {language === 'ko' ? '무역하기' : 'Trading'}
+              </Link>
+            )}
 
-          {user ? (
-            <div className="auth-buttons-container">
+            {user ? (
+              <div className="auth-buttons-container">
+                <button
+                  className="profile-button"
+                  onClick={() => {
+                    setIsProfileOpen(true);
+                    closeMenu();
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  {language === 'ko' ? '내 정보' : 'Profile'}
+                </button>
+                <button
+                  className="logout-button"
+                  onClick={handleLogout}
+                >
+                  {language === 'ko' ? '로그아웃' : 'Logout'}
+                </button>
+              </div>
+            ) : (
               <button
-                className="profile-button"
+                className="login-button"
                 onClick={() => {
-                  setIsProfileOpen(true);
+                  setIsLoginOpen(true);
                   closeMenu();
                 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                {language === 'ko' ? '내 정보' : 'Profile'}
+                Login
               </button>
-              <button
-                className="logout-button"
-                onClick={handleLogout}
-              >
-                {language === 'ko' ? '로그아웃' : 'Logout'}
-              </button>
-            </div>
-          ) : (
-            <button
-              className="login-button"
-              onClick={() => {
-                setIsLoginOpen(true);
-                closeMenu();
-              }}
-            >
-              Login
-            </button>
-          )}
+            )}
 
-          <a
-            href="https://www.zeffy.com/donation-form/donate-to-change-lives-1296"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="donation-button"
-            onClick={closeMenu}
-          >
-            {t.donation}
-          </a>
-          <LanguageSwitch />
-        </div>
-      </nav>
+            <a
+              href="https://www.zeffy.com/donation-form/donate-to-change-lives-1296"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="donation-button"
+              onClick={closeMenu}
+            >
+              {t.donation}
+            </a>
+            <LanguageSwitch />
+          </div>
+        </nav>
+      </header>
       <LoginModal
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
@@ -160,9 +162,9 @@ const Header = () => {
       <ProfileEditModal
         isOpen={isProfileOpen}
         onClose={() => setIsProfileOpen(false)}
-        force={user && userProfile && (!userProfile.full_name_ko || !userProfile.full_name_en || !userProfile.phone_number)}
+        force={user && userProfile && (!userProfile.full_name_ko || !userProfile.full_name_en || !userProfile.phone_number || !userProfile.gender)}
       />
-    </header>
+    </>
   );
 };
 

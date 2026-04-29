@@ -13,16 +13,19 @@ const Overlay = styled.div`
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: 2rem 1rem;
+  z-index: 9999;
 `;
 
 const ModalContainer = styled.div`
   background: white;
   padding: 2rem;
   border-radius: 12px;
-  width: 90%;
+  width: 100%;
   max-width: 400px;
+  margin: auto;
   position: relative;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
