@@ -248,9 +248,9 @@ const MouEvent2026 = () => {
             agree_additional_cost: row.agree_additional_cost ?? base.agree_additional_cost,
             agree_privacy: row.agree_privacy ?? base.agree_privacy,
             arrival_date: row.arrival_date || '',
-            arrival_time: row.arrival_time || '',
+            arrival_time: (row.arrival_time || '').slice(0, 5),
             departure_date: row.departure_date || '',
-            departure_time: row.departure_time || ''
+            departure_time: (row.departure_time || '').slice(0, 5)
           });
         } else {
           setRowId(null);
