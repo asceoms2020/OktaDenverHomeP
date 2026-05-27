@@ -1016,7 +1016,9 @@ const MouEvent2026 = () => {
                   {cancelled ? t.buttons.cancelled : t.buttons.cancel}
                 </DangerButton>
                 <PrimaryButton type="submit" disabled={loading || saving}>
-                  {saving ? t.buttons.applying : t.buttons.apply}
+                  {saving
+                    ? (rowId && !cancelled ? t.buttons.editing : t.buttons.applying)
+                    : (rowId && !cancelled ? t.buttons.edit : t.buttons.apply)}
                 </PrimaryButton>
               </Actions>
               {message && <Message $error={messageError}>{message}</Message>}

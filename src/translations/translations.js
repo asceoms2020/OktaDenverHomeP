@@ -377,7 +377,9 @@ export const translations = {
         cancel: "취소하기",
         cancelled: "취소됨",
         apply: "신청하기",
-        applying: "신청 중..."
+        applying: "신청 중...",
+        edit: "수정하기",
+        editing: "수정 중..."
       },
       messages: {
         agreeAll: "모든 동의 항목에 체크해주세요.",
@@ -774,7 +776,9 @@ export const translations = {
         cancel: "Cancel",
         cancelled: "Cancelled",
         apply: "Submit",
-        applying: "Submitting..."
+        applying: "Submitting...",
+        edit: "Edit",
+        editing: "Editing..."
       },
       messages: {
         agreeAll: "Please check all agreement items.",
