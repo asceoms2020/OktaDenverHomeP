@@ -8,6 +8,31 @@ import { insertParticipant, updateParticipant, PROGRAM_LABELS } from '../../serv
 
 const MEMBER_TYPES = ['정회원', '동반자', '차세대', '차세대봉사자', '덴버'];
 
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+
+// 비행 시간 입력: 시/분 셀렉트 (항상 HH:MM 형식 보장)
+const TimeSelect = ({ value, onChange }) => {
+  const [h = '', m = ''] = (value || '').split(':');
+  const set = (nh, nm) => {
+    if (!nh && !nm) { onChange(''); return; }
+    onChange(`${nh || '00'}:${nm || '00'}`);
+  };
+  return (
+    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+      <FieldSelect value={h} onChange={(e) => set(e.target.value, m)}>
+        <option value="">시</option>
+        {HOURS.map((x) => <option key={x} value={x}>{x}</option>)}
+      </FieldSelect>
+      <span style={{ fontWeight: 700, color: '#9ca3af' }}>:</span>
+      <FieldSelect value={m} onChange={(e) => set(h, e.target.value)}>
+        <option value="">분</option>
+        {MINUTES.map((x) => <option key={x} value={x}>{x}</option>)}
+      </FieldSelect>
+    </div>
+  );
+};
+
 const empty = {
   name_ko: '', name_en: '', chapter: '', position: '', member_type: '정회원',
   companion_count: 0, companion_name: '', phone: '', email: '', kakao_id: '',
@@ -108,10 +133,16 @@ const ParticipantEditModal = ({ initial, onClose, onSaved }) => {
             {F('카카오톡 ID', 'kakao_id')}
 
             {F('입국일', 'arrival_date', 'date')}
-            {F('입국 시간', 'arrival_time')}
+            <div>
+              <FieldLabel>입국 시간</FieldLabel>
+              <TimeSelect value={form.arrival_time} onChange={(v) => set('arrival_time', v)} />
+            </div>
             <FullRow>{F('입국 항공편', 'arrival_flight')}</FullRow>
             {F('출국일', 'departure_date', 'date')}
-            {F('출국 시간', 'departure_time')}
+            <div>
+              <FieldLabel>출국 시간</FieldLabel>
+              <TimeSelect value={form.departure_time} onChange={(v) => set('departure_time', v)} />
+            </div>
             <FullRow>{F('출국 항공편', 'departure_flight')}</FullRow>
 
             {F('룸 타입', 'room_type')}

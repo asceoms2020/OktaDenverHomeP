@@ -24,6 +24,10 @@ const Golf = ({ participants }) => {
     () => participants.filter((p) => (p.programs || []).includes('golf')),
     [participants]
   );
+  const golfCompanions = useMemo(
+    () => golfers.reduce((s, p) => s + (p.companion_count || (p.has_companion ? 1 : 0)), 0),
+    [golfers]
+  );
   const pMap = useMemo(() => {
     const m = {};
     participants.forEach((p) => { m[p.id] = p; });
@@ -98,7 +102,9 @@ const Golf = ({ participants }) => {
   return (
     <Card>
       <CardHead>
-        <CardTitle>골프 팀 편성 · 골퍼 {golfers.length}명 · {teams.length}개 조 · 미배정 {unassigned.length}명</CardTitle>
+        <CardTitle>
+          골프 팀 편성 · 골퍼 {golfers.length}명{golfCompanions > 0 ? ` + 동반자 ${golfCompanions}명` : ''} (총 {golfers.length + golfCompanions}명) · {teams.length}개 조 · 미배정 {unassigned.length}명
+        </CardTitle>
         <span style={{ display: 'flex', gap: 8 }}>
           <GhostButton onClick={exportCsv}>CSV 내보내기</GhostButton>
           <PrimaryButton onClick={addTeam}>+ 조 추가</PrimaryButton>
