@@ -94,6 +94,10 @@ export const upsertRoom = async (row) => {
   const { error } = await db().from('mou_rooms').upsert(row).select('id');
   if (error) throw error;
 };
+export const updateRoom = async (id, patch) => {
+  const { error } = await db().from('mou_rooms').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw error;
+};
 export const deleteRoom = async (id) => {
   const { error } = await db().from('mou_rooms').delete().eq('id', id);
   if (error) throw error;
@@ -113,6 +117,10 @@ export const upsertTrip = async (row) => {
   const { error } = await db().from('mou_transport_trips').upsert(row).select('id');
   if (error) throw error;
 };
+export const updateTrip = async (id, patch) => {
+  const { error } = await db().from('mou_transport_trips').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw error;
+};
 export const deleteTrip = async (id) => {
   const { error } = await db().from('mou_transport_trips').delete().eq('id', id);
   if (error) throw error;
@@ -126,6 +134,10 @@ export const fetchTrainGroups = async () => {
 };
 export const upsertTrainGroup = async (row) => {
   const { error } = await db().from('mou_train_groups').upsert(row).select('id');
+  if (error) throw error;
+};
+export const updateTrainGroup = async (id, patch) => {
+  const { error } = await db().from('mou_train_groups').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
   if (error) throw error;
 };
 export const deleteTrainGroup = async (id) => {
@@ -144,6 +156,10 @@ export const fetchGolfTeams = async () => {
 };
 export const upsertGolfTeam = async (row) => {
   const { error } = await db().from('mou_golf_teams').upsert(row).select('id');
+  if (error) throw error;
+};
+export const updateGolfTeam = async (id, patch) => {
+  const { error } = await db().from('mou_golf_teams').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
   if (error) throw error;
 };
 export const deleteGolfTeam = async (id) => {
@@ -165,6 +181,10 @@ export const upsertTask = async (row) => {
   const { error } = await db().from('mou_tasks').upsert(row).select('id');
   if (error) throw error;
 };
+export const updateTask = async (id, patch) => {
+  const { error } = await db().from('mou_tasks').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw error;
+};
 export const deleteTask = async (id) => {
   const { error } = await db().from('mou_tasks').delete().eq('id', id);
   if (error) throw error;
@@ -182,6 +202,10 @@ export const fetchSchedule = async () => {
 };
 export const upsertSchedule = async (row) => {
   const { error } = await db().from('mou_schedule').upsert(row).select('id');
+  if (error) throw error;
+};
+export const updateScheduleRow = async (id, patch) => {
+  const { error } = await db().from('mou_schedule').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
   if (error) throw error;
 };
 export const deleteScheduleRow = async (id) => {

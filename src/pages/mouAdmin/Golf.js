@@ -5,7 +5,7 @@ import {
   CapTag, Chip, ChipRow, Pool, Select, IconButton, Badge, MiniInput,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchGolfTeams, upsertGolfTeam, deleteGolfTeam, displayName, toCsv, downloadCsv,
+  fetchGolfTeams, upsertGolfTeam, updateGolfTeam, deleteGolfTeam, displayName, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const newId = () =>
@@ -61,7 +61,7 @@ const Golf = ({ participants }) => {
     try {
       const next = { ...team, ...patch };
       setTeams((prev) => prev.map((t) => (t.id === team.id ? next : t)));
-      await upsertGolfTeam(next);
+      await updateGolfTeam(team.id, patch);
     } catch (e) {
       setMsg({ error: true, text: `저장 실패: ${e.message}` });
       load();

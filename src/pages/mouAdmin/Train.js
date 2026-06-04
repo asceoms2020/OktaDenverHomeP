@@ -5,7 +5,7 @@ import {
   CapTag, Chip, ChipRow, Pool, Select, IconButton, Badge, MiniInput,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchTrainGroups, upsertTrainGroup, deleteTrainGroup, displayName, headcount, toCsv, downloadCsv,
+  fetchTrainGroups, upsertTrainGroup, updateTrainGroup, deleteTrainGroup, displayName, headcount, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const newId = () =>
@@ -63,7 +63,7 @@ const Train = ({ participants }) => {
     try {
       const next = { ...grp, ...patch };
       setGroups((prev) => prev.map((g) => (g.id === grp.id ? next : g)));
-      await upsertTrainGroup(next);
+      await updateTrainGroup(grp.id, patch);
     } catch (e) {
       setMsg({ error: true, text: `저장 실패: ${e.message}` });
       load();

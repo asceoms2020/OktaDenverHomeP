@@ -4,7 +4,7 @@ import {
   GhostButton, Message, Empty, Table, TableWrap, MiniInput, IconButton,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchSchedule, upsertSchedule, deleteScheduleRow, toCsv, downloadCsv,
+  fetchSchedule, upsertSchedule, updateScheduleRow, deleteScheduleRow, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const newId = () =>
@@ -47,7 +47,7 @@ const Schedule = () => {
     try {
       const next = { ...row, ...patch };
       setRows((prev) => prev.map((r) => (r.id === row.id ? next : r)));
-      await upsertSchedule(next);
+      await updateScheduleRow(row.id, patch);
     } catch (e) {
       setMsg({ error: true, text: `저장 실패: ${e.message}` });
       load();

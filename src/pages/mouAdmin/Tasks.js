@@ -4,7 +4,7 @@ import {
   GhostButton, Message, Empty, Table, TableWrap, MiniInput, IconButton, Badge,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchTasks, upsertTask, deleteTask, toCsv, downloadCsv,
+  fetchTasks, upsertTask, updateTask, deleteTask, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const newId = () =>
@@ -61,7 +61,7 @@ const Tasks = () => {
     try {
       const next = { ...task, ...patch };
       setTasks((prev) => prev.map((t) => (t.id === task.id ? next : t)));
-      await upsertTask(next);
+      await updateTask(task.id, patch);
     } catch (e) {
       setMsg({ error: true, text: `저장 실패: ${e.message}` });
       load();

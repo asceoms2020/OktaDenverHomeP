@@ -5,7 +5,7 @@ import {
   AssignCardTitle, CapTag, Chip, ChipRow, Pool, IconButton, Badge, MiniInput,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchTrips, upsertTrip, deleteTrip, updateParticipant,
+  fetchTrips, upsertTrip, updateTrip, deleteTrip, updateParticipant,
   displayName, headcount, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
@@ -65,6 +65,17 @@ const Transport = ({ participants }) => {
   const seatsOf = (ids) => (ids || []).reduce((s, id) => s + headcount(pMap[id]), 0);
   const unassignedHead = useMemo(() => unassigned.reduce((s, p) => s + headcount(p), 0), [unassigned]);
 
+  // 탑승자 배정 드롭다운: 날짜 → 이름 순 정렬
+  const unassignedSorted = useMemo(() => {
+    const f = dirCfg.dateField;
+    return unassigned.slice().sort((a, b) => {
+      const da = a[f] || '9999-99-99';
+      const db = b[f] || '9999-99-99';
+      if (da !== db) return da < db ? -1 : 1;
+      return String(a.name_ko || a.name_en || '').localeCompare(String(b.name_ko || b.name_en || ''), 'ko');
+    });
+  }, [unassigned, dirCfg]);
+
   const timeKey = (p) => p[dirCfg.timeField] || '99:99';
 
   // 항공 시간 기준 그룹 제안 (날짜 → 시간순 인원)
@@ -94,7 +105,7 @@ const Transport = ({ participants }) => {
     try {
       const next = { ...trip, ...patch };
       setTrips((prev) => prev.map((t) => (t.id === trip.id ? next : t)));
-      await upsertTrip(next);
+      await updateTrip(trip.id, patch);
     } catch (e) {
       setMsg({ error: true, text: `저장 실패: ${e.message}` });
       load();
@@ -274,9 +285,9 @@ const Transport = ({ participants }) => {
 
                       <Select defaultValue="" onChange={(e) => { addPassenger(trip, e.target.value); e.target.value = ''; }}>
                         <option value="">+ 탑승자 배정</option>
-                        {unassigned.map((p) => (
+                        {unassignedSorted.map((p) => (
                           <option key={p.id} value={p.id}>
-                            {displayName(p)} · {p[dirCfg.dateField] || '날짜미정'}{p[dirCfg.timeField] ? ` ${p[dirCfg.timeField]}` : ''}
+                            {p[dirCfg.dateField] || '날짜미정'}{p[dirCfg.timeField] ? ` ${p[dirCfg.timeField]}` : ''} · {displayName(p)}
                           </option>
                         ))}
                       </Select>

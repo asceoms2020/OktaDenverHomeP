@@ -5,7 +5,7 @@ import {
   AssignCardTitle, CapTag, Chip, ChipRow, Pool, PoolChip, IconButton, Badge,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchRooms, upsertRoom, deleteRoom, displayName, toCsv, downloadCsv,
+  fetchRooms, upsertRoom, updateRoom, deleteRoom, displayName, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const newId = () =>
@@ -63,7 +63,7 @@ const Rooms = ({ participants }) => {
       const next = { ...room, ...patch };
       // 낙관적 업데이트
       setRooms((prev) => prev.map((r) => (r.id === room.id ? next : r)));
-      await upsertRoom(next);
+      await updateRoom(room.id, patch);
     } catch (e) {
       setMsg({ error: true, text: `저장 실패: ${e.message}` });
       load();
