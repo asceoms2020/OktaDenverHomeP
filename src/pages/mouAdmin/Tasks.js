@@ -12,6 +12,7 @@ const newId = () =>
     ? crypto.randomUUID()
     : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
+const DAY_OPTIONS = ['사전준비(6/24)', 'Day1(6/25)', 'Day2(6/26)', 'Day3(6/27)', 'Day4(6/28)', '공통'];
 const STATUSES = ['Not Started', 'In Progress', 'Completed'];
 const STATUS_KO = { 'Not Started': '준비중', 'In Progress': '진행중', 'Completed': '완료' };
 const STATUS_STYLE = {
@@ -42,7 +43,7 @@ const Tasks = () => {
   useEffect(() => { load(); }, [load]);
 
   const days = useMemo(
-    () => Array.from(new Set(tasks.map((t) => t.day).filter(Boolean))).sort(),
+    () => Array.from(new Set([...DAY_OPTIONS, ...tasks.map((t) => t.day).filter(Boolean)])),
     [tasks]
   );
 
@@ -70,7 +71,7 @@ const Tasks = () => {
   const addTask = async () => {
     const task = {
       id: newId(),
-      day: fDay || '사전준비',
+      day: fDay || DAY_OPTIONS[0],
       category: '',
       task: '',
       responsible: [],
@@ -155,7 +156,16 @@ const Tasks = () => {
               <tbody>
                 {filtered.map((t) => (
                   <tr key={t.id}>
-                    <td><MiniInput defaultValue={t.day || ''} onBlur={(e) => save(t, { day: e.target.value })} /></td>
+                    <td>
+                      <Select
+                        value={t.day || ''}
+                        onChange={(e) => save(t, { day: e.target.value })}
+                        style={{ padding: '6px 8px', fontSize: '0.85rem' }}
+                      >
+                        {!DAY_OPTIONS.includes(t.day) && t.day && <option value={t.day}>{t.day}</option>}
+                        {DAY_OPTIONS.map((d) => <option key={d} value={d}>{d}</option>)}
+                      </Select>
+                    </td>
                     <td><MiniInput defaultValue={t.category || ''} onBlur={(e) => save(t, { category: e.target.value })} /></td>
                     <td><MiniInput defaultValue={t.task || ''} onBlur={(e) => save(t, { task: e.target.value })} /></td>
                     <td>
