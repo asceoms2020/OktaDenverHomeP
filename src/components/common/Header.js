@@ -23,7 +23,7 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   const { language } = useLanguage();
-  const { user, userProfile, signOut } = useAuth();
+  const { user, userProfile, isAdmin, signOut } = useAuth();
   const t = translations[language].navigation || {
     home: "Home",
     events: "Events",
@@ -97,9 +97,16 @@ const Header = () => {
             <Link to="/sponsors" className="nav-link" onClick={closeMenu}>{t.sponsors}</Link>
 
             {/* Conditional Menu: Trading (Only for Logged in users) */}
-            {user && (
+            {/* {user && (
               <Link to="/trading" className="nav-link" onClick={closeMenu}>
                 {language === 'ko' ? '무역하기' : 'Trading'}
+              </Link>
+            )} */}
+
+            {/* Conditional Menu: MOU Event Management (Admins only) */}
+            {user && isAdmin && (
+              <Link to="/admin/mouevent" className="nav-link" onClick={closeMenu}>
+                {language === 'ko' ? 'MOU 이벤트 관리' : 'MOU Event Mgmt'}
               </Link>
             )}
 

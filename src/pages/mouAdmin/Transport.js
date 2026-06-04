@@ -1,0 +1,295 @@
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import {
+  Card, CardHead, CardTitle, CardBody, Toolbar, Input, Select, PrimaryButton,
+  GhostButton, Message, Empty, AssignGrid, AssignCard, AssignCardHead,
+  AssignCardTitle, CapTag, Chip, ChipRow, Pool, IconButton, Badge, MiniInput,
+} from '../../styles/MouEventAdmin.styles';
+import {
+  fetchTrips, upsertTrip, deleteTrip, updateParticipant,
+  displayName, headcount, toCsv, downloadCsv,
+} from '../../services/mouAdmin';
+
+const newId = () =>
+  (typeof crypto !== 'undefined' && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+
+const DIRECTIONS = [
+  { key: 'pickup_in', label: '입국 픽업', dateField: 'arrival_date', timeField: 'arrival_time', flightField: 'arrival_flight' },
+  { key: 'dropoff_out', label: '출국 드랍', dateField: 'departure_date', timeField: 'departure_time', flightField: 'departure_flight' },
+];
+
+const Transport = ({ participants }) => {
+  const [trips, setTrips] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [msg, setMsg] = useState(null);
+  const [dir, setDir] = useState('pickup_in');
+
+  const pMap = useMemo(() => {
+    const m = {};
+    participants.forEach((p) => { m[p.id] = p; });
+    return m;
+  }, [participants]);
+
+  const load = useCallback(async () => {
+    try {
+      setMsg(null);
+      setTrips(await fetchTrips());
+    } catch (e) {
+      setMsg({ error: true, text: `운행 목록을 불러오지 못했습니다: ${e.message}` });
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const dirCfg = DIRECTIONS.find((d) => d.key === dir);
+  const dirTrips = useMemo(
+    () => trips.filter((t) => t.trip_type === dir),
+    [trips, dir]
+  );
+
+  const assignedIds = useMemo(() => {
+    const s = new Set();
+    dirTrips.forEach((t) => (t.passenger_ids || []).forEach((id) => s.add(id)));
+    return s;
+  }, [dirTrips]);
+
+  // 이 방향에서 아직 차량 미배정인 참가자 (해당 날짜/시간 정보 표시)
+  const unassigned = useMemo(
+    () => participants.filter((p) => !assignedIds.has(p.id)),
+    [participants, assignedIds]
+  );
+
+  const seatsOf = (ids) => (ids || []).reduce((s, id) => s + headcount(pMap[id]), 0);
+  const unassignedHead = useMemo(() => unassigned.reduce((s, p) => s + headcount(p), 0), [unassigned]);
+
+  const timeKey = (p) => p[dirCfg.timeField] || '99:99';
+
+  // 항공 시간 기준 그룹 제안 (날짜 → 시간순 인원)
+  const dateGroups = useMemo(() => {
+    const g = {};
+    unassigned.forEach((p) => {
+      const d = p[dirCfg.dateField] || '미정';
+      (g[d] = g[d] || []).push(p);
+    });
+    return Object.keys(g).sort().map((d) => {
+      const people = g[d].slice().sort((a, b) => timeKey(a).localeCompare(timeKey(b)));
+      const times = people.map((p) => p[dirCfg.timeField]).filter(Boolean);
+      return { date: d, people, span: times.length ? `${times[0]}~${times[times.length - 1]}` : '시간미정' };
+    });
+  }, [unassigned, dirCfg]);
+
+  // 차량 탑승객의 항공 시간대 (이르~늦)
+  const tripSpan = (trip) => {
+    const times = (trip.passenger_ids || [])
+      .map((id) => pMap[id] && pMap[id][dirCfg.timeField])
+      .filter(Boolean)
+      .sort();
+    return times.length ? `${times[0]}~${times[times.length - 1]}` : null;
+  };
+
+  const save = async (trip, patch) => {
+    try {
+      const next = { ...trip, ...patch };
+      setTrips((prev) => prev.map((t) => (t.id === trip.id ? next : t)));
+      await upsertTrip(next);
+    } catch (e) {
+      setMsg({ error: true, text: `저장 실패: ${e.message}` });
+      load();
+    }
+  };
+
+  const addTrip = async (presetDate) => {
+    const trip = {
+      id: newId(),
+      trip_type: dir,
+      trip_date: presetDate && presetDate !== '미정' ? presetDate : null,
+      trip_time: '',
+      vehicle_label: `밴 ${dirTrips.length + 1}`,
+      capacity: 9,
+      driver: '',
+      passenger_ids: [],
+    };
+    try {
+      await upsertTrip(trip);
+      load();
+    } catch (e) {
+      setMsg({ error: true, text: `운행 생성 실패: ${e.message}` });
+    }
+  };
+
+  const removeTrip = async (id) => {
+    if (!window.confirm('이 운행을 삭제할까요?')) return;
+    try { await deleteTrip(id); load(); }
+    catch (e) { setMsg({ error: true, text: `삭제 실패: ${e.message}` }); }
+  };
+
+  const addPassenger = (trip, pid) => {
+    if (!pid) return;
+    save(trip, { passenger_ids: [...(trip.passenger_ids || []), pid] });
+  };
+  const removePassenger = (trip, pid) => {
+    save(trip, { passenger_ids: (trip.passenger_ids || []).filter((x) => x !== pid) });
+  };
+
+  // 항공편/시간 인라인 보정 (참가자 테이블 업데이트)
+  const updateFlight = async (p, field, value) => {
+    try {
+      await updateParticipant(p.id, { [field]: value });
+      // 부모 participants는 다음 새로고침 때 반영. 여기선 메시지만.
+    } catch (e) {
+      setMsg({ error: true, text: `항공정보 저장 실패: ${e.message}` });
+    }
+  };
+
+  const exportCsv = () => {
+    const csv = toCsv(dirTrips, [
+      { label: '구분', value: () => dirCfg.label },
+      { label: '날짜', key: 'trip_date' },
+      { label: '시간', key: 'trip_time' },
+      { label: '차량', key: 'vehicle_label' },
+      { label: '운전자', key: 'driver' },
+      { label: '정원', key: 'capacity' },
+      { label: '탑승인원', value: (t) => (t.passenger_ids || []).length },
+      { label: '탑승자', value: (t) => (t.passenger_ids || []).map((id) => displayName(pMap[id])).join(' | ') },
+    ]);
+    downloadCsv(`mou_transport_${dir}.csv`, csv);
+  };
+
+  return (
+    <Card>
+      <CardHead>
+        <CardTitle>공항 픽업/드랍 · {dirCfg.label} · 운행 {dirTrips.length}대 · 미배정 {unassignedHead}명(동반자 포함)</CardTitle>
+        <GhostButton onClick={exportCsv}>CSV 내보내기</GhostButton>
+      </CardHead>
+      <CardBody>
+        <Toolbar>
+          {DIRECTIONS.map((d) => (
+            <GhostButton
+              key={d.key}
+              onClick={() => setDir(d.key)}
+              style={dir === d.key ? { borderColor: 'rgba(46,204,113,0.7)', color: '#1f7a3b', fontWeight: 800 } : {}}
+            >
+              {d.label}
+            </GhostButton>
+          ))}
+          <PrimaryButton onClick={() => addTrip()}>+ 9인승 밴 추가</PrimaryButton>
+        </Toolbar>
+
+        {msg && <Message $error={msg.error}>{msg.text}</Message>}
+        {loading && <Message>불러오는 중…</Message>}
+
+        {!loading && (
+          <>
+            {/* 항공 시간 기준 그룹 제안 */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontWeight: 700, marginBottom: 8, fontSize: '0.9rem', color: '#374151' }}>
+                {dirCfg.label} 미배정 — 날짜별 ({unassigned.length}명)
+              </div>
+              {dateGroups.length === 0 ? (
+                <Empty>모든 인원이 차량에 배정되었습니다 🎉</Empty>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {dateGroups.map((g) => (
+                    <div key={g.date} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                      <Badge $bg="rgba(52,152,219,0.12)" $color="#1f5a7a" style={{ minWidth: 92 }}>
+                        {g.date} · {g.people.length}명 · {g.span}
+                      </Badge>
+                      <Pool>
+                        {g.people.map((p) => (
+                          <Badge key={p.id} $bg="rgba(230,126,34,0.1)" $color="#b9530a">
+                            {displayName(p)}{p[dirCfg.timeField] ? ` ${p[dirCfg.timeField]}` : ''}
+                          </Badge>
+                        ))}
+                      </Pool>
+                      <GhostButton onClick={() => addTrip(g.date)}>이 날짜로 밴 생성</GhostButton>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {dirTrips.length === 0 ? (
+              <Empty>운행이 없습니다. 위에서 9인승 밴을 추가하세요.</Empty>
+            ) : (
+              <AssignGrid>
+                {dirTrips.map((trip) => {
+                  const pax = trip.passenger_ids || [];
+                  const seats = seatsOf(pax);
+                  const over = seats > (trip.capacity || 9);
+                  return (
+                    <AssignCard key={trip.id} $over={over}>
+                      <AssignCardHead>
+                        <AssignCardTitle>
+                          {trip.vehicle_label}
+                          {tripSpan(trip) && (
+                            <div style={{ fontSize: '0.74rem', fontWeight: 600, color: '#1f5a7a' }}>
+                              항공 시간대 {tripSpan(trip)}
+                            </div>
+                          )}
+                        </AssignCardTitle>
+                        <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <CapTag $over={over}>{seats}/{trip.capacity}석</CapTag>
+                          <IconButton onClick={() => removeTrip(trip.id)}>삭제</IconButton>
+                        </span>
+                      </AssignCardHead>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                        <MiniInput
+                          placeholder="날짜 (YYYY-MM-DD)"
+                          defaultValue={trip.trip_date || ''}
+                          onBlur={(e) => save(trip, { trip_date: e.target.value || null })}
+                        />
+                        <MiniInput
+                          placeholder="시간 (예: 14:30)"
+                          defaultValue={trip.trip_time || ''}
+                          onBlur={(e) => save(trip, { trip_time: e.target.value })}
+                        />
+                        <MiniInput
+                          placeholder="차량 라벨"
+                          defaultValue={trip.vehicle_label || ''}
+                          onBlur={(e) => save(trip, { vehicle_label: e.target.value })}
+                        />
+                        <MiniInput
+                          placeholder="운전자"
+                          defaultValue={trip.driver || ''}
+                          onBlur={(e) => save(trip, { driver: e.target.value })}
+                        />
+                      </div>
+
+                      <ChipRow>
+                        {pax.map((pid) => {
+                          const cc = pMap[pid]?.companion_count || (pMap[pid]?.has_companion ? 1 : 0);
+                          return (
+                            <Chip key={pid}>
+                              {displayName(pMap[pid]) || '(알수없음)'}{cc > 0 ? ` +${cc}` : ''}
+                              <button onClick={() => removePassenger(trip, pid)} title="제거">✕</button>
+                            </Chip>
+                          );
+                        })}
+                        {pax.length === 0 && <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>탑승자 없음</span>}
+                      </ChipRow>
+
+                      <Select defaultValue="" onChange={(e) => { addPassenger(trip, e.target.value); e.target.value = ''; }}>
+                        <option value="">+ 탑승자 배정</option>
+                        {unassigned.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {displayName(p)} · {p[dirCfg.dateField] || '날짜미정'}{p[dirCfg.timeField] ? ` ${p[dirCfg.timeField]}` : ''}
+                          </option>
+                        ))}
+                      </Select>
+                    </AssignCard>
+                  );
+                })}
+              </AssignGrid>
+            )}
+          </>
+        )}
+      </CardBody>
+    </Card>
+  );
+};
+
+export default Transport;
