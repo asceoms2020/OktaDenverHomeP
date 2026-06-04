@@ -39,6 +39,14 @@ const Rooms = ({ participants }) => {
 
   useEffect(() => { load(); }, [load]);
 
+  // 자연 정렬: 1인-1, 1인-2, ... 1인-10 (문자열 정렬이 아닌 숫자 인식)
+  const sortedRooms = useMemo(
+    () => rooms.slice().sort((a, b) =>
+      String(a.room_no || '').localeCompare(String(b.room_no || ''), undefined, { numeric: true, sensitivity: 'base' })
+    ),
+    [rooms]
+  );
+
   const assignedIds = useMemo(() => {
     const s = new Set();
     rooms.forEach((r) => (r.occupant_ids || []).forEach((id) => s.add(id)));
@@ -151,7 +159,7 @@ const Rooms = ({ participants }) => {
               <Empty>아직 생성된 방이 없습니다. 위에서 방을 추가하세요.</Empty>
             ) : (
               <AssignGrid>
-                {rooms.map((room) => {
+                {sortedRooms.map((room) => {
                   const occ = room.occupant_ids || [];
                   const over = occ.length > (room.capacity || 2);
                   return (
