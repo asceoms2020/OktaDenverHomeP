@@ -213,6 +213,18 @@ export const deleteScheduleRow = async (id) => {
   if (error) throw error;
 };
 
+// ---------- 운영 인력 명단 (업무 담당자 후보) ----------
+export const STAFF_GROUPS = ['봉사자', '준비위원회', '덴버회원'];
+
+export const fetchStaff = async () => {
+  const { data, error } = await db()
+    .from('mou_staff')
+    .select('*')
+    .order('sort_order', { ascending: true });
+  if (error) throw error;
+  return data || [];
+};
+
 // ---------- 공통 유틸 ----------
 export const PROGRAM_LABELS = {
   golf: '골프',

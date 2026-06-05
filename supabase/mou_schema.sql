@@ -154,6 +154,22 @@ create table if not exists public.mou_schedule (
   updated_at timestamptz default now()
 );
 
+-- -------------------------------------------------------------
+-- 8) 운영 인력 명단 (업무 담당자 후보) — 봉사자 / 준비위원회 / 덴버회원
+-- -------------------------------------------------------------
+create table if not exists public.mou_staff (
+  id uuid primary key default gen_random_uuid(),
+  name text,
+  role_group text,                   -- 봉사자 | 준비위원회 | 덴버회원
+  title text,                        -- 직책/지회
+  phone text,
+  email text,
+  kakao_id text,
+  sort_order int default 0,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
 -- =============================================================
 -- RLS: 모든 mou_* 테이블은 관리자만 읽기/쓰기 가능 (PII 보호)
 -- =============================================================
@@ -162,7 +178,7 @@ declare
   t text;
   tables text[] := array[
     'mou_participants','mou_rooms','mou_transport_trips',
-    'mou_train_groups','mou_golf_teams','mou_tasks','mou_schedule'
+    'mou_train_groups','mou_golf_teams','mou_tasks','mou_schedule','mou_staff'
   ];
 begin
   foreach t in array tables loop

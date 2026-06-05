@@ -2,10 +2,10 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Card, CardHead, CardTitle, CardBody, Toolbar, Select, Input, PrimaryButton,
   GhostButton, Message, Empty, Table, TableWrap, MiniInput, IconButton, Badge,
-  ProgressWrap, ProgressBar, ProgressSeg, GroupHeaderRow,
+  ProgressWrap, ProgressBar, ProgressSeg, GroupHeaderRow, Chip, ChipRow,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchTasks, upsertTask, updateTask, deleteTask, toCsv, downloadCsv,
+  fetchTasks, upsertTask, updateTask, deleteTask, fetchStaff, STAFF_GROUPS, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const newId = () =>
@@ -21,7 +21,6 @@ const STATUS_STYLE = {
   'In Progress': { bg: 'rgba(52,152,219,0.14)', color: '#1f5a7a', bar: '#3498db' },
   'Completed': { bg: 'rgba(46,204,113,0.14)', color: '#1f7a3b', bar: '#2ecc71' },
 };
-const arr = (s) => (s || '').split(/[,，]/).map((x) => x.trim()).filter(Boolean);
 const dayOrder = (d) => { const i = DAY_OPTIONS.indexOf(d); return i === -1 ? 99 : i; };
 
 const Tasks = () => {
@@ -33,6 +32,17 @@ const Tasks = () => {
   const [fStatus, setFStatus] = useState('');
   const [fWho, setFWho] = useState('');
   const [collapsed, setCollapsed] = useState(() => new Set());
+  const [staff, setStaff] = useState([]);
+
+  useEffect(() => { fetchStaff().then(setStaff).catch(() => {}); }, []);
+
+  // 담당자 후보를 그룹별로 정리
+  const staffByGroup = useMemo(() => {
+    const g = {};
+    STAFF_GROUPS.forEach((k) => { g[k] = []; });
+    staff.forEach((s) => { (g[s.role_group] = g[s.role_group] || []).push(s); });
+    return g;
+  }, [staff]);
 
   const load = useCallback(async () => {
     try {
@@ -134,6 +144,16 @@ const Tasks = () => {
   const cycleStatus = (task) => {
     const i = STATUSES.indexOf(task.status);
     save(task, { status: STATUSES[(i + 1) % STATUSES.length] });
+  };
+
+  const addResp = (task, name) => {
+    if (!name) return;
+    const cur = task.responsible || [];
+    if (cur.includes(name)) return;
+    save(task, { responsible: [...cur, name] });
+  };
+  const removeResp = (task, name) => {
+    save(task, { responsible: (task.responsible || []).filter((x) => x !== name) });
   };
 
   const exportCsv = () => {
@@ -247,15 +267,36 @@ const Tasks = () => {
                           </td>
                           <td><MiniInput defaultValue={t.category || ''} onBlur={(e) => save(t, { category: e.target.value })} /></td>
                           <td><MiniInput defaultValue={t.task || ''} onBlur={(e) => save(t, { task: e.target.value })} /></td>
-                          <td style={{ whiteSpace: 'normal' }}>
-                            <MiniInput
-                              as="textarea"
-                              rows={2}
-                              defaultValue={(t.responsible || []).join(', ')}
-                              placeholder="쉼표로 구분 (예: 정민수, 최제민)"
-                              onBlur={(e) => save(t, { responsible: arr(e.target.value) })}
-                              style={{ resize: 'vertical', minHeight: 42, lineHeight: 1.35, fontFamily: 'inherit' }}
-                            />
+                          <td style={{ whiteSpace: 'normal', minWidth: 260 }}>
+                            <ChipRow style={{ marginBottom: 6 }}>
+                              {(t.responsible || []).map((name) => (
+                                <Chip key={name}>
+                                  {name}
+                                  <button onClick={() => removeResp(t, name)} title="제거">✕</button>
+                                </Chip>
+                              ))}
+                              {(t.responsible || []).length === 0 && (
+                                <span style={{ color: '#cbd5e1', fontSize: '0.8rem' }}>담당자 없음</span>
+                              )}
+                            </ChipRow>
+                            <Select
+                              value=""
+                              onChange={(e) => { addResp(t, e.target.value); e.target.value = ''; }}
+                              style={{ padding: '6px 8px', fontSize: '0.85rem', width: '100%' }}
+                            >
+                              <option value="">+ 담당자 추가</option>
+                              {STAFF_GROUPS.map((grp) => (
+                                (staffByGroup[grp] || []).length > 0 && (
+                                  <optgroup key={grp} label={grp}>
+                                    {staffByGroup[grp].map((s) => (
+                                      <option key={s.id} value={s.name}>
+                                        {s.name}{s.title ? ` (${s.title})` : ''}
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                )
+                              ))}
+                            </Select>
                           </td>
                           <td>
                             <MiniInput
