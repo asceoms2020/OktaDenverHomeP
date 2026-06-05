@@ -446,6 +446,44 @@ export const FieldSelect = styled.select`
   outline: none;
 `;
 
+/* ---- 진행률 / 업무 그룹 ---- */
+export const ProgressWrap = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+`;
+
+export const ProgressBar = styled.div`
+  flex: 1;
+  min-width: 160px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.08);
+  overflow: hidden;
+  display: flex;
+`;
+
+export const ProgressSeg = styled.div`
+  height: 100%;
+  width: ${(p) => p.$pct || 0}%;
+  background: ${(p) => p.$color};
+  transition: width 200ms ease;
+`;
+
+export const GroupHeaderRow = styled.tr`
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.08), rgba(52, 152, 219, 0.05));
+  cursor: pointer;
+  td {
+    font-weight: 800;
+    color: #1f2a37;
+    padding: 10px 12px !important;
+    border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+  }
+  &:hover td { background: rgba(46, 204, 113, 0.06); }
+`;
+
 export const ProgramChips = styled.div`
   display: flex;
   flex-wrap: wrap;

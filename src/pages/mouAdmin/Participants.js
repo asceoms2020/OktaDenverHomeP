@@ -66,15 +66,29 @@ const Participants = ({ participants, adminName, reload }) => {
   );
 
   const togglePay = async (p) => {
+    const next = !p.payment_received;
+    const ok = window.confirm(
+      next
+        ? `${displayName(p)} 님을 '납부완료'로 체크할까요?\n(체크한 사람: ${adminName})`
+        : `${displayName(p)} 님의 '납부완료'를 취소할까요?`
+    );
+    if (!ok) return;
     setBusyId(p.id); setMsg(null);
-    try { await setPaymentReceived(p, !p.payment_received, adminName); await reload(); }
+    try { await setPaymentReceived(p, next, adminName); await reload(); }
     catch (e) { setMsg({ error: true, text: `납부 상태 저장 실패: ${e.message}` }); }
     finally { setBusyId(null); }
   };
 
   const toggleCheckin = async (p) => {
+    const next = !p.checked_in;
+    const ok = window.confirm(
+      next
+        ? `${displayName(p)} 님을 '체크인' 처리할까요?\n(체크한 사람: ${adminName})`
+        : `${displayName(p)} 님의 '체크인'을 취소할까요?`
+    );
+    if (!ok) return;
     setBusyId(p.id); setMsg(null);
-    try { await setCheckedIn(p, !p.checked_in, adminName); await reload(); }
+    try { await setCheckedIn(p, next, adminName); await reload(); }
     catch (e) { setMsg({ error: true, text: `체크인 저장 실패: ${e.message}` }); }
     finally { setBusyId(null); }
   };
