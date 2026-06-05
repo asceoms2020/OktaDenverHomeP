@@ -13,7 +13,6 @@ const newId = () =>
     ? crypto.randomUUID()
     : `${Date.now()}_${Math.random().toString(16).slice(2)}`;
 
-const ROLES = ['운전자', '인솔자', '봉사자'];
 const PRESETS = ['VAN1', 'VAN2', 'SUV'];
 
 const Train = ({ participants }) => {
@@ -75,7 +74,8 @@ const Train = ({ participants }) => {
       id: newId(),
       vehicle_label: label || `차량 ${groups.length + 1}`,
       driver: '',
-      role: '운전자',
+      leader: '',
+      volunteer: '',
       capacity: label === 'SUV' ? 6 : 9,
       passenger_ids: [],
     };
@@ -96,7 +96,8 @@ const Train = ({ participants }) => {
     const csv = toCsv(groups, [
       { label: '차량', key: 'vehicle_label' },
       { label: '운전자', key: 'driver' },
-      { label: '역할', key: 'role' },
+      { label: '인솔자', key: 'leader' },
+      { label: '봉사자', key: 'volunteer' },
       { label: '정원', key: 'capacity' },
       { label: '인원', value: (g) => (g.passenger_ids || []).length },
       { label: '탑승자', value: (g) => (g.passenger_ids || []).map((id) => displayName(pMap[id])).join(' | ') },
@@ -161,21 +162,27 @@ const Train = ({ participants }) => {
                         </span>
                       </AssignCardHead>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                        <MiniInput
-                          placeholder="운전자"
-                          defaultValue={grp.driver || ''}
-                          onBlur={(e) => save(grp, { driver: e.target.value })}
-                        />
-                        <Select defaultValue={grp.role || '운전자'} onChange={(e) => save(grp, { role: e.target.value })}>
-                          {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
-                        </Select>
-                        <MiniInput
-                          type="number"
-                          placeholder="정원"
-                          defaultValue={grp.capacity || 9}
-                          onBlur={(e) => save(grp, { capacity: parseInt(e.target.value, 10) || 9 })}
-                        />
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>운전자</div>
+                          <MiniInput defaultValue={grp.driver || ''} onBlur={(e) => save(grp, { driver: e.target.value })} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>인솔자</div>
+                          <MiniInput defaultValue={grp.leader || ''} onBlur={(e) => save(grp, { leader: e.target.value })} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>봉사자</div>
+                          <MiniInput defaultValue={grp.volunteer || ''} onBlur={(e) => save(grp, { volunteer: e.target.value })} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>정원</div>
+                          <MiniInput
+                            type="number"
+                            defaultValue={grp.capacity || 9}
+                            onBlur={(e) => save(grp, { capacity: parseInt(e.target.value, 10) || 9 })}
+                          />
+                        </div>
                       </div>
 
                       <ChipRow>

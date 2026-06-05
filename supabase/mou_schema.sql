@@ -96,8 +96,10 @@ create table if not exists public.mou_transport_trips (
 create table if not exists public.mou_train_groups (
   id uuid primary key default gen_random_uuid(),
   vehicle_label text,                -- VAN1 | VAN2 | SUV ...
-  driver text,
-  role text,                         -- 운전자 | 인솔자 | 봉사자
+  driver text,                       -- 운전자
+  leader text,                       -- 인솔자
+  volunteer text,                    -- 봉사자
+  role text,                         -- (구) 단일 역할 — 미사용
   capacity int default 9,
   passenger_ids uuid[] default '{}',
   notes text,
