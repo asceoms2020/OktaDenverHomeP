@@ -24,6 +24,15 @@ const Golf = ({ participants }) => {
     () => participants.filter((p) => (p.programs || []).includes('golf')),
     [participants]
   );
+  // 배정 가능 풀 = 골프 신청자 + 준비위원회(프로그램 무관 배정 허용)
+  const eligible = useMemo(() => {
+    const seen = new Set();
+    return participants.filter((p) => {
+      const ok = (p.programs || []).includes('golf') || p.member_type === '준비위원회';
+      if (ok && !seen.has(p.id)) { seen.add(p.id); return true; }
+      return false;
+    });
+  }, [participants]);
   const golfCompanions = useMemo(
     () => golfers.reduce((s, p) => s + (p.companion_count || (p.has_companion ? 1 : 0)), 0),
     [golfers]
@@ -53,8 +62,8 @@ const Golf = ({ participants }) => {
   }, [teams]);
 
   const unassigned = useMemo(
-    () => golfers.filter((p) => !assignedIds.has(p.id)),
-    [golfers, assignedIds]
+    () => eligible.filter((p) => !assignedIds.has(p.id)),
+    [eligible, assignedIds]
   );
 
   const save = async (team, patch) => {
@@ -123,11 +132,14 @@ const Golf = ({ participants }) => {
               <Pool>
                 {unassigned.length === 0
                   ? <Empty>모든 골퍼가 조에 배정되었습니다 🎉</Empty>
-                  : unassigned.map((p) => (
-                    <Badge key={p.id} $bg="rgba(46,204,113,0.1)" $color="#1f7a3b">
-                      {displayName(p)}{p.companion_name ? ` (+${p.companion_name})` : ''}
-                    </Badge>
-                  ))}
+                  : unassigned.map((p) => {
+                    const isCom = p.member_type === '준비위원회';
+                    return (
+                      <Badge key={p.id} $bg={isCom ? 'rgba(52,152,219,0.12)' : 'rgba(46,204,113,0.1)'} $color={isCom ? '#1f5a7a' : '#1f7a3b'}>
+                        {displayName(p)}{isCom ? ' · 준비위' : ''}{p.companion_name ? ` (+${p.companion_name})` : ''}
+                      </Badge>
+                    );
+                  })}
               </Pool>
             </div>
 
@@ -170,7 +182,9 @@ const Golf = ({ participants }) => {
                       <Select defaultValue="" onChange={(e) => { addMember(team, e.target.value); e.target.value = ''; }}>
                         <option value="">+ 골퍼 배정</option>
                         {unassigned.map((p) => (
-                          <option key={p.id} value={p.id}>{displayName(p)} · {p.chapter}</option>
+                          <option key={p.id} value={p.id}>
+                            {displayName(p)} · {p.member_type === '준비위원회' ? '준비위원회' : p.chapter}
+                          </option>
                         ))}
                       </Select>
                     </AssignCard>

@@ -197,7 +197,7 @@ function buildParticipants() {
       name_en: en,
       chapter: clean(r[1]),
       position,
-      member_type: memberType(position),
+      member_type: ko === '이혜연' ? '차세대봉사자' : memberType(position),
       has_companion: hasComp,
       companion_name: clean(r[4]),
       companion_count: hasComp ? 1 : 0,
@@ -283,6 +283,66 @@ function buildVolunteers(koMap, enMap) {
   return out;
 }
 
+// ---------- Denver 준비위원회 파싱 (비상연락망 CSV) ----------
+function buildCommittee(koMap, enMap) {
+  const file = path.join(DIR, '비지니스 포럼 준비 상황 - 비상연락망.csv');
+  const out = [];
+  if (!fs.existsSync(file)) return out;
+  const rows = parseCsv(fs.readFileSync(file, 'utf8'));
+
+  // "Denver 준비위원회" 섹션 헤더 위치 탐색
+  let start = -1;
+  for (let i = 0; i < rows.length; i++) {
+    if (/Denver\s*준비위원회/.test(clean(rows[i][0]))) {
+      // 다음 행이 "이름,영문 이름,Position,..." 헤더 → 그 다음부터 데이터
+      start = (clean(rows[i + 1][0]) === '이름') ? i + 2 : i + 1;
+      break;
+    }
+  }
+  if (start === -1) return out;
+
+  for (let i = start; i < rows.length; i++) {
+    const r = rows[i];
+    const ko = clean(r[0]);
+    if (!ko) break;            // 블록 종료(빈 행)
+    if (ko === '덴버지회 회원') break;
+    const en = clean(r[1]);
+    const id = uuid();
+    out.push({
+      id,
+      name_ko: ko,
+      name_en: en,
+      chapter: 'Denver',
+      position: clean(r[2]),
+      member_type: '준비위원회',
+      has_companion: false,
+      companion_name: '',
+      companion_count: 0,
+      phone: clean(r[3]),
+      email: clean(r[4]),
+      kakao_id: '',
+      arrival_date: null,
+      arrival_time: '',
+      departure_date: null,
+      departure_time: '',
+      arrival_flight: '',
+      departure_flight: '',
+      room_type: '',
+      room_no: '',
+      programs: [],
+      waiver_status: '',
+      event_fee: '',
+      fee_amount: '',
+      payment_received: false,
+      payment_method: '',
+      notes: 'Denver 준비위원회',
+    });
+    if (ko) koMap[ko] = id;
+    if (en) enMap[normEn(en)] = id;
+  }
+  return out;
+}
+
 // ---------- Room list 파싱 → 방 + 입실자 연결 ----------
 function buildRooms(koMap, enMap) {
   const file = path.join(DIR, '비지니스 포럼 준비 상황 - Room list.csv');
@@ -345,7 +405,8 @@ function buildRooms(koMap, enMap) {
 function main() {
   const { records, koMap, enMap } = buildParticipants();
   const volunteers = buildVolunteers(koMap, enMap); // koMap/enMap 확장 (방 매칭에 활용)
-  const all = records.concat(volunteers);
+  const committee = buildCommittee(koMap, enMap);    // Denver 준비위원회 → 참가자
+  const all = records.concat(volunteers, committee);
   const rooms = buildRooms(koMap, enMap);
 
   let sql = '-- MOU 시드 (자동 생성) — supabase/mou_seed.sql\n';
@@ -380,7 +441,11 @@ function main() {
   for (const rm of rooms) {
     matchedOcc += rm.occupant_ids.length;
     unmatchedOcc += rm.unmatched.length;
-    const note = rm.unmatched.length ? `미매칭: ${rm.unmatched.join(', ')}` : '';
+    // 2인실에 1명만 매칭됐는데 미매칭 이름이 있으면 그건 동반자. 그 외 미매칭은 표시 안 함.
+    let note = '';
+    if (rm.unmatched.length && rm.room_type === '2인실' && rm.occupant_ids.length === 1) {
+      note = `동반자: ${rm.unmatched.join(', ')}`;
+    }
     sql +=
       'insert into public.mou_rooms (id,room_no,room_type,capacity,occupant_ids,check_in,check_out,notes) values (' +
       [
@@ -394,7 +459,7 @@ function main() {
 
   sql += '\ncommit;\n';
   fs.writeFileSync(OUT, sql, 'utf8');
-  console.log(`완료: 참가자 ${all.length}명 (명단 ${records.length} + 봉사단 ${volunteers.length}), 방 ${rooms.length}개 (입실 매칭 ${matchedOcc}명 / 미매칭 ${unmatchedOcc}명)`);
+  console.log(`완료: 참가자 ${all.length}명 (명단 ${records.length} + 봉사단 ${volunteers.length} + 준비위 ${committee.length}), 방 ${rooms.length}개 (입실 매칭 ${matchedOcc}명 / 미매칭 ${unmatchedOcc}명)`);
   console.log(`→ ${OUT}`);
 }
 

@@ -24,6 +24,15 @@ const Train = ({ participants }) => {
     () => participants.filter((p) => (p.programs || []).includes('train')),
     [participants]
   );
+  // 배정 가능 풀 = 기차 신청자 + 준비위원회(프로그램 무관 배정 허용)
+  const eligible = useMemo(() => {
+    const seen = new Set();
+    return participants.filter((p) => {
+      const ok = (p.programs || []).includes('train') || p.member_type === '준비위원회';
+      if (ok && !seen.has(p.id)) { seen.add(p.id); return true; }
+      return false;
+    });
+  }, [participants]);
   const pMap = useMemo(() => {
     const m = {};
     participants.forEach((p) => { m[p.id] = p; });
@@ -49,8 +58,8 @@ const Train = ({ participants }) => {
   }, [groups]);
 
   const unassigned = useMemo(
-    () => riders.filter((p) => !assignedIds.has(p.id)),
-    [riders, assignedIds]
+    () => eligible.filter((p) => !assignedIds.has(p.id)),
+    [eligible, assignedIds]
   );
 
   // 동반자 포함 인원(좌석) 계산
@@ -130,11 +139,14 @@ const Train = ({ participants }) => {
               <Pool>
                 {unassigned.length === 0
                   ? <Empty>모든 인원이 차량에 배정되었습니다 🎉</Empty>
-                  : unassigned.map((p) => (
-                    <Badge key={p.id} $bg="rgba(155,89,182,0.1)" $color="#7d3c98">
-                      {displayName(p)}{p.companion_name ? ` (+${p.companion_name})` : ''}
-                    </Badge>
-                  ))}
+                  : unassigned.map((p) => {
+                    const isCom = p.member_type === '준비위원회';
+                    return (
+                      <Badge key={p.id} $bg={isCom ? 'rgba(52,152,219,0.12)' : 'rgba(155,89,182,0.1)'} $color={isCom ? '#1f5a7a' : '#7d3c98'}>
+                        {displayName(p)}{isCom ? ' · 준비위' : ''}{p.companion_name ? ` (+${p.companion_name})` : ''}
+                      </Badge>
+                    );
+                  })}
               </Pool>
             </div>
 
@@ -201,7 +213,9 @@ const Train = ({ participants }) => {
                       <Select defaultValue="" onChange={(e) => { addPassenger(grp, e.target.value); e.target.value = ''; }}>
                         <option value="">+ 탑승자 배정</option>
                         {unassigned.map((p) => (
-                          <option key={p.id} value={p.id}>{displayName(p)} · {p.chapter}</option>
+                          <option key={p.id} value={p.id}>
+                            {displayName(p)} · {p.member_type === '준비위원회' ? '준비위원회' : p.chapter}
+                          </option>
                         ))}
                       </Select>
                     </AssignCard>

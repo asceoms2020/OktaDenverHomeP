@@ -9,7 +9,22 @@ import {
 } from '../../services/mouAdmin';
 
 const nightsOf = (p) => (p ? nightsBetween(p.arrival_date, p.departure_date) : null);
-const nightsLabel = (p) => { const n = nightsOf(p); return n == null ? '' : `${n}박`; };
+const shortDate = (d) => {
+  if (!d) return '';
+  const parts = String(d).split('-');
+  if (parts.length < 3) return d;
+  return `${parseInt(parts[1], 10)}/${parseInt(parts[2], 10)}`;
+};
+// "6/25 · 2박" 형태 (체크인 날짜 + 박수)
+const stayLabel = (p) => {
+  if (!p) return '';
+  const ci = shortDate(p.arrival_date);
+  const n = nightsOf(p);
+  if (ci && n != null) return `${ci}·${n}박`;
+  if (ci) return ci;
+  if (n != null) return `${n}박`;
+  return '';
+};
 const stayTitle = (p) => {
   if (!p) return '';
   const a = p.arrival_date || '미정';
@@ -79,10 +94,23 @@ const Rooms = ({ participants }) => {
     }
   };
 
+  // 타입별 다음 번호 자동 생성 (1인-N / 2인-N)
+  const nextRoomNo = (type) => {
+    const prefix = type === '1인실' ? '1인' : '2인';
+    const nums = rooms
+      .map((r) => {
+        const m = String(r.room_no || '').match(new RegExp(`^${prefix}-(\\d+)$`));
+        return m ? parseInt(m[1], 10) : null;
+      })
+      .filter((n) => n != null);
+    const next = (nums.length ? Math.max(...nums) : 0) + 1;
+    return `${prefix}-${next}`;
+  };
+
   const addRoom = async () => {
     const room = {
       id: newId(),
-      room_no: newNo || `R-${rooms.length + 1}`,
+      room_no: newNo || nextRoomNo(newType),
       room_type: newType,
       capacity: newType === '1인실' ? 1 : 2,
       occupant_ids: [],
@@ -121,8 +149,8 @@ const Rooms = ({ participants }) => {
       { label: '정원', key: 'capacity' },
       { label: '입실인원', value: (r) => (r.occupant_ids || []).length },
       { label: '명단', value: (r) => (r.occupant_ids || []).map((id) => {
-        const p = pMap[id]; const nl = nightsLabel(p);
-        return `${displayName(p)}${nl ? ` (${nl})` : ''}`;
+        const p = pMap[id]; const sl = stayLabel(p);
+        return `${displayName(p)}${sl ? ` (${sl})` : ''}`;
       }).join(' | ') },
     ]);
     downloadCsv('mou_rooms.csv', csv);
@@ -163,7 +191,7 @@ const Rooms = ({ participants }) => {
                   ? <Empty>모든 참가자가 배정되었습니다 🎉</Empty>
                   : unassigned.map((p) => (
                     <Badge key={p.id} title={stayTitle(p)} $bg="rgba(230,126,34,0.1)" $color="#b9530a">
-                      {displayName(p)}{nightsLabel(p) ? ` · ${nightsLabel(p)}` : ''}
+                      {displayName(p)}{stayLabel(p) ? ` · ${stayLabel(p)}` : ''}
                     </Badge>
                   ))}
               </Pool>
@@ -191,8 +219,8 @@ const Rooms = ({ participants }) => {
                         {occ.map((pid) => (
                           <Chip key={pid} title={stayTitle(pMap[pid])}>
                             {displayName(pMap[pid]) || '(알수없음)'}
-                            {nightsLabel(pMap[pid]) && (
-                              <span style={{ fontWeight: 800, marginLeft: 2 }}>· {nightsLabel(pMap[pid])}</span>
+                            {stayLabel(pMap[pid]) && (
+                              <span style={{ fontWeight: 800, marginLeft: 2 }}>· {stayLabel(pMap[pid])}</span>
                             )}
                             <button onClick={() => removeOccupant(room, pid)} title="제거">✕</button>
                           </Chip>
@@ -200,13 +228,15 @@ const Rooms = ({ participants }) => {
                         {occ.length === 0 && <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>비어 있음</span>}
                       </ChipRow>
                       {room.notes && (
-                        <div style={{ fontSize: '0.78rem', color: '#b9530a' }}>⚠ {room.notes}</div>
+                        <div style={{ fontSize: '0.78rem', color: room.notes.startsWith('동반자') ? '#1f5a7a' : '#b9530a' }}>
+                          {room.notes.startsWith('동반자') ? '👤 ' : '⚠ '}{room.notes}
+                        </div>
                       )}
                       <Select defaultValue="" onChange={(e) => { addOccupant(room, e.target.value); e.target.value = ''; }}>
                         <option value="">+ 배정 (미배정에서 선택)</option>
                         {unassigned.map((p) => (
                           <option key={p.id} value={p.id}>
-                            {displayName(p)}{nightsLabel(p) ? ` · ${nightsLabel(p)}` : ''} · {p.chapter}
+                            {displayName(p)}{stayLabel(p) ? ` · ${stayLabel(p)}` : ''} · {p.chapter}
                           </option>
                         ))}
                       </Select>
