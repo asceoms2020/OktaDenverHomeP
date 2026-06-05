@@ -5,8 +5,17 @@ import {
   AssignCardTitle, CapTag, Chip, ChipRow, Pool, PoolChip, IconButton, Badge,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchRooms, upsertRoom, updateRoom, deleteRoom, displayName, toCsv, downloadCsv,
+  fetchRooms, upsertRoom, updateRoom, deleteRoom, displayName, nightsBetween, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
+
+const nightsOf = (p) => (p ? nightsBetween(p.arrival_date, p.departure_date) : null);
+const nightsLabel = (p) => { const n = nightsOf(p); return n == null ? '' : `${n}박`; };
+const stayTitle = (p) => {
+  if (!p) return '';
+  const a = p.arrival_date || '미정';
+  const b = p.departure_date || '미정';
+  return `입국 ${a} · 출국 ${b}`;
+};
 
 const newId = () =>
   (typeof crypto !== 'undefined' && crypto.randomUUID)
@@ -111,7 +120,10 @@ const Rooms = ({ participants }) => {
       { label: '타입', key: 'room_type' },
       { label: '정원', key: 'capacity' },
       { label: '입실인원', value: (r) => (r.occupant_ids || []).length },
-      { label: '명단', value: (r) => (r.occupant_ids || []).map((id) => displayName(pMap[id])).join(' | ') },
+      { label: '명단', value: (r) => (r.occupant_ids || []).map((id) => {
+        const p = pMap[id]; const nl = nightsLabel(p);
+        return `${displayName(p)}${nl ? ` (${nl})` : ''}`;
+      }).join(' | ') },
     ]);
     downloadCsv('mou_rooms.csv', csv);
   };
@@ -150,7 +162,9 @@ const Rooms = ({ participants }) => {
                 {unassigned.length === 0
                   ? <Empty>모든 참가자가 배정되었습니다 🎉</Empty>
                   : unassigned.map((p) => (
-                    <Badge key={p.id} $bg="rgba(230,126,34,0.1)" $color="#b9530a">{displayName(p)}</Badge>
+                    <Badge key={p.id} title={stayTitle(p)} $bg="rgba(230,126,34,0.1)" $color="#b9530a">
+                      {displayName(p)}{nightsLabel(p) ? ` · ${nightsLabel(p)}` : ''}
+                    </Badge>
                   ))}
               </Pool>
             </div>
@@ -175,8 +189,11 @@ const Rooms = ({ participants }) => {
                       </AssignCardHead>
                       <ChipRow>
                         {occ.map((pid) => (
-                          <Chip key={pid}>
+                          <Chip key={pid} title={stayTitle(pMap[pid])}>
                             {displayName(pMap[pid]) || '(알수없음)'}
+                            {nightsLabel(pMap[pid]) && (
+                              <span style={{ fontWeight: 800, marginLeft: 2 }}>· {nightsLabel(pMap[pid])}</span>
+                            )}
                             <button onClick={() => removeOccupant(room, pid)} title="제거">✕</button>
                           </Chip>
                         ))}
@@ -188,7 +205,9 @@ const Rooms = ({ participants }) => {
                       <Select defaultValue="" onChange={(e) => { addOccupant(room, e.target.value); e.target.value = ''; }}>
                         <option value="">+ 배정 (미배정에서 선택)</option>
                         {unassigned.map((p) => (
-                          <option key={p.id} value={p.id}>{displayName(p)} · {p.chapter}</option>
+                          <option key={p.id} value={p.id}>
+                            {displayName(p)}{nightsLabel(p) ? ` · ${nightsLabel(p)}` : ''} · {p.chapter}
+                          </option>
                         ))}
                       </Select>
                     </AssignCard>

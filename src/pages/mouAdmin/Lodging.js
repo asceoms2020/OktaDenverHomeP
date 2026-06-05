@@ -6,7 +6,7 @@ import {
 } from '../../styles/MouEventAdmin.styles';
 import {
   setLodgingPaid, nightsBetween, payableNights, displayName,
-  fetchRooms, buildRoomTypeMap, toCsv, downloadCsv,
+  fetchRooms, buildRoomTypeMap, buildRoomMap, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const fmtChecked = (who, at) => {
@@ -28,6 +28,7 @@ const Lodging = ({ participants, adminName, reload }) => {
   // 방 배정(occupant_ids) → 객실타입 매핑 (단일 기준)
   useEffect(() => { fetchRooms().then(setRooms).catch(() => {}); }, []);
   const roomTypeMap = useMemo(() => buildRoomTypeMap(rooms), [rooms]);
+  const roomNoMap = useMemo(() => buildRoomMap(rooms), [rooms]);
 
   // 박수 계산. 차세대봉사자(봉사단)는 리스트엔 나오되 숙박비 면제 → 받을 박수 0, 객실은 2인실 고정
   const rows = useMemo(() => {
@@ -35,9 +36,9 @@ const Lodging = ({ participants, adminName, reload }) => {
       const total = nightsBetween(p.arrival_date, p.departure_date);
       const exempt = p.member_type === '차세대봉사자';
       const roomType = exempt ? '2인실' : (roomTypeMap[p.id] || null);
-      return { ...p, _total: total, _exempt: exempt, _roomType: roomType, _payable: exempt ? 0 : payableNights(total) };
+      return { ...p, _total: total, _exempt: exempt, _roomType: roomType, _roomNo: roomNoMap[p.id] || null, _payable: exempt ? 0 : payableNights(total) };
     });
-  }, [participants, roomTypeMap]);
+  }, [participants, roomTypeMap, roomNoMap]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -93,6 +94,7 @@ const Lodging = ({ participants, adminName, reload }) => {
       { label: '영어이름', key: 'name_en' },
       { label: '체크인', key: 'arrival_date' },
       { label: '체크아웃', key: 'departure_date' },
+      { label: '방번호', value: (r) => r._roomNo || '' },
       { label: '객실', value: (r) => r._roomType || '' },
       { label: '총 박수', value: (r) => (r._total == null ? '' : r._total) },
       { label: '받을 박수', value: (r) => (r._exempt ? '면제' : r._payable == null ? '' : r._payable) },
@@ -149,6 +151,7 @@ const Lodging = ({ participants, adminName, reload }) => {
                 <th>영어이름</th>
                 <th>체크인</th>
                 <th>체크아웃</th>
+                <th>방번호</th>
                 <th>객실</th>
                 <th>총 박수</th>
                 <th>받을 박수</th>
@@ -162,6 +165,11 @@ const Lodging = ({ participants, adminName, reload }) => {
                   <td>{p.name_en || '-'}</td>
                   <td>{p.arrival_date || <span style={{ color: '#cbd5e1' }}>미정</span>}</td>
                   <td>{p.departure_date || <span style={{ color: '#cbd5e1' }}>미정</span>}</td>
+                  <td>
+                    {p._roomNo
+                      ? <Badge $bg="rgba(52,152,219,0.12)" $color="#1f5a7a">{p._roomNo}</Badge>
+                      : <span style={{ color: '#cbd5e1' }}>미배정</span>}
+                  </td>
                   <td>
                     {p._roomType
                       ? <Badge $bg={p._roomType === '1인실' ? 'rgba(155,89,182,0.12)' : 'rgba(46,204,113,0.12)'} $color={p._roomType === '1인실' ? '#7d3c98' : '#1f7a3b'}>{p._roomType}</Badge>
@@ -198,7 +206,7 @@ const Lodging = ({ participants, adminName, reload }) => {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={8}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
+                <tr><td colSpan={9}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
               )}
             </tbody>
           </Table>
