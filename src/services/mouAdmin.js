@@ -266,6 +266,13 @@ export const buildRoomMap = (rooms) => {
   return m;
 };
 
+/** 방 배정 → { 참가자id: room_type(1인실|2인실) } 매핑 */
+export const buildRoomTypeMap = (rooms) => {
+  const m = {};
+  (rooms || []).forEach((r) => (r.occupant_ids || []).forEach((id) => { m[id] = r.room_type; }));
+  return m;
+};
+
 export const displayName = (p) => {
   if (!p) return '';
   return [p.name_ko, p.name_en].filter(Boolean).join(' / ') || '(이름없음)';

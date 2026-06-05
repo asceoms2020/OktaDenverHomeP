@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Card, CardHead, CardTitle, CardBody, Toolbar, Input, Select,
   Table, TableWrap, Badge, CheckButton, GhostButton, Empty, Message,
   StatGrid, Stat, StatLabel, StatValue, StatSub,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  setLodgingPaid, nightsBetween, payableNights, displayName, toCsv, downloadCsv,
+  setLodgingPaid, nightsBetween, payableNights, displayName,
+  fetchRooms, buildRoomTypeMap, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const fmtChecked = (who, at) => {
@@ -22,29 +23,41 @@ const Lodging = ({ participants, adminName, reload }) => {
   const [pay, setPay] = useState('');
   const [busyId, setBusyId] = useState(null);
   const [msg, setMsg] = useState(null);
+  const [rooms, setRooms] = useState([]);
 
-  // 차세대봉사자(봉사단)는 숙박비 대상 아님 → 제외. 박수 계산 부착
+  // 방 배정(occupant_ids) → 객실타입 매핑 (단일 기준)
+  useEffect(() => { fetchRooms().then(setRooms).catch(() => {}); }, []);
+  const roomTypeMap = useMemo(() => buildRoomTypeMap(rooms), [rooms]);
+
+  // 박수 계산. 차세대봉사자(봉사단)는 리스트엔 나오되 숙박비 면제 → 받을 박수 0, 객실은 2인실 고정
   const rows = useMemo(() => {
-    return participants
-      .filter((p) => p.member_type !== '차세대봉사자')
-      .map((p) => {
-        const total = nightsBetween(p.arrival_date, p.departure_date);
-        return { ...p, _total: total, _payable: payableNights(total) };
-      });
-  }, [participants]);
+    return participants.map((p) => {
+      const total = nightsBetween(p.arrival_date, p.departure_date);
+      const exempt = p.member_type === '차세대봉사자';
+      const roomType = exempt ? '2인실' : (roomTypeMap[p.id] || null);
+      return { ...p, _total: total, _exempt: exempt, _roomType: roomType, _payable: exempt ? 0 : payableNights(total) };
+    });
+  }, [participants, roomTypeMap]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return rows.filter((p) => {
-      if (view === 'payable' && !(p._payable > 0)) return false;
+      // 추가요금 대상 보기: 받을 박수>0 + 봉사단(면제)은 항상 노출
+      if (view === 'payable' && !(p._payable > 0) && !p._exempt) return false;
       if (needle) {
         const hay = `${p.name_ko} ${p.name_en} ${p.chapter}`.toLowerCase();
         if (!hay.includes(needle)) return false;
       }
-      if (pay === 'paid' && !p.lodging_paid) return false;
-      if (pay === 'unpaid' && p.lodging_paid) return false;
+      // 납부 필터는 추가요금 대상(payable>0)에만 적용 → 면제자는 paid/unpaid에서 제외
+      if (pay === 'paid' && !(p.lodging_paid && p._payable > 0)) return false;
+      if (pay === 'unpaid' && !(!p.lodging_paid && p._payable > 0)) return false;
       return true;
-    }).sort((a, b) => (b._payable || 0) - (a._payable || 0));
+    }).sort((a, b) => {
+      const da = a.arrival_date || '9999-99-99';
+      const db = b.arrival_date || '9999-99-99';
+      if (da !== db) return da < db ? -1 : 1;
+      return String(a.name_ko || '').localeCompare(String(b.name_ko || ''), 'ko');
+    });
   }, [rows, q, view, pay]);
 
   const summary = useMemo(() => {
@@ -80,9 +93,10 @@ const Lodging = ({ participants, adminName, reload }) => {
       { label: '영어이름', key: 'name_en' },
       { label: '체크인', key: 'arrival_date' },
       { label: '체크아웃', key: 'departure_date' },
+      { label: '객실', value: (r) => r._roomType || '' },
       { label: '총 박수', value: (r) => (r._total == null ? '' : r._total) },
-      { label: '받을 박수', value: (r) => (r._payable == null ? '' : r._payable) },
-      { label: '납부', value: (r) => (r.lodging_paid ? '완료' : '미납') },
+      { label: '받을 박수', value: (r) => (r._exempt ? '면제' : r._payable == null ? '' : r._payable) },
+      { label: '납부', value: (r) => (r._exempt ? '면제' : !(r._payable > 0) ? '해당없음' : r.lodging_paid ? '완료' : '미납') },
       { label: '체크한사람', key: 'lodging_paid_by' },
     ]);
     downloadCsv('mou_lodging.csv', csv);
@@ -135,6 +149,7 @@ const Lodging = ({ participants, adminName, reload }) => {
                 <th>영어이름</th>
                 <th>체크인</th>
                 <th>체크아웃</th>
+                <th>객실</th>
                 <th>총 박수</th>
                 <th>받을 박수</th>
                 <th>납부 여부</th>
@@ -147,16 +162,25 @@ const Lodging = ({ participants, adminName, reload }) => {
                   <td>{p.name_en || '-'}</td>
                   <td>{p.arrival_date || <span style={{ color: '#cbd5e1' }}>미정</span>}</td>
                   <td>{p.departure_date || <span style={{ color: '#cbd5e1' }}>미정</span>}</td>
+                  <td>
+                    {p._roomType
+                      ? <Badge $bg={p._roomType === '1인실' ? 'rgba(155,89,182,0.12)' : 'rgba(46,204,113,0.12)'} $color={p._roomType === '1인실' ? '#7d3c98' : '#1f7a3b'}>{p._roomType}</Badge>
+                      : <span style={{ color: '#cbd5e1' }}>미배정</span>}
+                  </td>
                   <td>{p._total == null ? <span style={{ color: '#cbd5e1' }}>-</span> : `${p._total}박`}</td>
                   <td>
-                    {p._payable == null
-                      ? <span style={{ color: '#cbd5e1' }}>-</span>
-                      : p._payable > 0
-                        ? <Badge $bg="rgba(231,76,60,0.12)" $color="#c0392b">{p._payable}박</Badge>
-                        : <Badge $bg="rgba(149,165,166,0.15)" $color="#5d6d7e">0박</Badge>}
+                    {p._exempt
+                      ? <Badge $bg="rgba(52,152,219,0.12)" $color="#1f5a7a">면제(봉사단)</Badge>
+                      : p._payable == null
+                        ? <span style={{ color: '#cbd5e1' }}>-</span>
+                        : p._payable > 0
+                          ? <Badge $bg="rgba(231,76,60,0.12)" $color="#c0392b">{p._payable}박</Badge>
+                          : <Badge $bg="rgba(149,165,166,0.15)" $color="#5d6d7e">0박</Badge>}
                   </td>
                   <td>
-                    {p._payable > 0 ? (
+                    {p._exempt ? (
+                      <span style={{ color: '#1f5a7a', fontSize: '0.82rem' }}>면제</span>
+                    ) : p._payable > 0 ? (
                       <>
                         <CheckButton $on={p.lodging_paid} disabled={busyId === p.id} onClick={() => togglePaid(p)}>
                           {p.lodging_paid ? '✓ 납부완료' : '미납'}
@@ -174,7 +198,7 @@ const Lodging = ({ participants, adminName, reload }) => {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={7}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
+                <tr><td colSpan={8}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
               )}
             </tbody>
           </Table>
