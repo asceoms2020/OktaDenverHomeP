@@ -52,6 +52,9 @@ create table if not exists public.mou_participants (
   checked_in boolean default false,
   checked_in_by text,
   checked_in_at timestamptz,
+  lodging_paid boolean default false,
+  lodging_paid_by text,
+  lodging_paid_at timestamptz,
   notes text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()

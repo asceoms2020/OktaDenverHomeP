@@ -81,6 +81,31 @@ export const setCheckedIn = async (p, value, adminName) => {
 /** 1명 + 동반자 인원 = 실제 헤드카운트 */
 export const headcount = (p) => 1 + (p?.companion_count || (p?.has_companion ? 1 : 0));
 
+/** 숙박비 추가요금 납부 토글 — 누가/언제 체크했는지 기록 */
+export const setLodgingPaid = async (p, value, adminName) => {
+  const patch = value
+    ? { lodging_paid: true, lodging_paid_by: adminName || '관리자', lodging_paid_at: new Date().toISOString() }
+    : { lodging_paid: false, lodging_paid_by: null, lodging_paid_at: null };
+  await updateParticipant(p.id, patch);
+  return patch;
+};
+
+/** 두 날짜(YYYY-MM-DD) 사이 박수. 없으면 null */
+export const nightsBetween = (arrival, departure) => {
+  if (!arrival || !departure) return null;
+  const [ay, am, ad] = String(arrival).split('-').map(Number);
+  const [by, bm, bd] = String(departure).split('-').map(Number);
+  if (!ay || !by) return null;
+  const A = Date.UTC(ay, am - 1, ad);
+  const B = Date.UTC(by, bm - 1, bd);
+  const d = Math.round((B - A) / 86400000);
+  return d >= 0 ? d : null;
+};
+
+/** 받아야 할 박수 = 3박부터 추가요금 (총박수 - 2, 최소 0) */
+export const payableNights = (totalNights) =>
+  totalNights == null ? null : Math.max(0, totalNights - 2);
+
 // ---------- 방 배정 ----------
 export const fetchRooms = async () => {
   const { data, error } = await db()

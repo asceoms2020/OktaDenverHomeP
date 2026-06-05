@@ -12,6 +12,7 @@ import Golf from './mouAdmin/Golf';
 import Train from './mouAdmin/Train';
 import Tasks from './mouAdmin/Tasks';
 import Schedule from './mouAdmin/Schedule';
+import Lodging from './mouAdmin/Lodging';
 
 const TABS = [
   { key: 'dashboard', label: '현황' },
@@ -22,6 +23,7 @@ const TABS = [
   { key: 'train', label: '기차팀' },
   { key: 'tasks', label: '업무 지시' },
   { key: 'schedule', label: '일정표' },
+  { key: 'lodging', label: '숙박 정산' },
 ];
 
 const MouEventAdmin = () => {
@@ -101,6 +103,9 @@ const MouEventAdmin = () => {
       {!loading && tab === 'train' && <Train participants={participants} />}
       {!loading && tab === 'tasks' && <Tasks />}
       {!loading && tab === 'schedule' && <Schedule />}
+      {!loading && tab === 'lodging' && (
+        <Lodging participants={participants} adminName={adminName} reload={load} />
+      )}
     </Page>
   );
 };
