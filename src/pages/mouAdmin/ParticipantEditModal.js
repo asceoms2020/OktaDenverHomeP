@@ -146,7 +146,10 @@ const ParticipantEditModal = ({ initial, onClose, onSaved }) => {
             <FullRow>{F('출국 항공편', 'departure_flight')}</FullRow>
 
             {F('룸 타입', 'room_type')}
-            {F('Room #', 'room_no')}
+            <div>
+              <FieldLabel>Room # (방 배정 탭에서 관리)</FieldLabel>
+              <FieldInput value={initial?.id ? '방 배정 탭에서 변경' : '저장 후 방 배정 탭에서 배정'} disabled style={{ background: '#f3f4f6', color: '#9ca3af' }} />
+            </div>
 
             <FullRow>
               <FieldLabel>참가 프로그램</FieldLabel>

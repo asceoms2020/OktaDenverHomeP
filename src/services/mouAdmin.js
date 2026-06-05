@@ -222,6 +222,13 @@ export const PROGRAM_LABELS = {
   springs: 'Colorado Springs',
 };
 
+/** 방 배정(occupant_ids) → { 참가자id: room_no } 매핑. 참가자 Room# 표시의 단일 기준. */
+export const buildRoomMap = (rooms) => {
+  const m = {};
+  (rooms || []).forEach((r) => (r.occupant_ids || []).forEach((id) => { m[id] = r.room_no; }));
+  return m;
+};
+
 export const displayName = (p) => {
   if (!p) return '';
   return [p.name_ko, p.name_en].filter(Boolean).join(' / ') || '(이름없음)';

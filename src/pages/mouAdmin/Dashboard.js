@@ -1,11 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   StatGrid, Stat, StatLabel, StatValue, StatSub,
   Card, CardHead, CardTitle, CardBody, Badge, Table, TableWrap, Empty,
 } from '../../styles/MouEventAdmin.styles';
-import { parseAmount, displayName, headcount } from '../../services/mouAdmin';
+import { parseAmount, displayName, headcount, fetchRooms, buildRoomMap } from '../../services/mouAdmin';
 
 const Dashboard = ({ participants }) => {
+  const [rooms, setRooms] = useState([]);
+  useEffect(() => { fetchRooms().then(setRooms).catch(() => {}); }, []);
+  const roomMap = useMemo(() => buildRoomMap(rooms), [rooms]);
+
   const s = useMemo(() => {
     const rows = participants.length;
     let total = 0;            // 동반자 포함 실제 인원
@@ -34,7 +38,7 @@ const Dashboard = ({ participants }) => {
       if ((p.programs || []).includes('golf')) golf.push(p);
       if ((p.programs || []).includes('train')) train.push(p);
       if (!p.waiver_status || !/완료|done|y/i.test(p.waiver_status)) waiverMissing += 1;
-      if (!p.room_no) roomMissing.push(p);
+      if (!roomMap[p.id]) roomMissing.push(p);
       if (p.arrival_date) arrivalByDate[p.arrival_date] = (arrivalByDate[p.arrival_date] || 0) + head;
       if (p.departure_date) departureByDate[p.departure_date] = (departureByDate[p.departure_date] || 0) + head;
     });
@@ -44,7 +48,7 @@ const Dashboard = ({ participants }) => {
       unpaidCount: rows - paidCount, checkedIn, golf, train, waiverMissing, roomMissing,
       arrivalByDate, departureByDate,
     };
-  }, [participants]);
+  }, [participants, roomMap]);
 
   const fmt = (n) => `$${n.toLocaleString()}`;
   const dateRows = (obj) =>

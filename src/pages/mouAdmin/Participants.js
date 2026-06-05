@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Card, CardHead, CardTitle, CardBody, Toolbar, Input, Select,
   Table, TableWrap, Badge, CheckButton, GhostButton, PrimaryButton,
@@ -6,7 +6,7 @@ import {
 } from '../../styles/MouEventAdmin.styles';
 import {
   setPaymentReceived, setCheckedIn, deleteParticipant, PROGRAM_LABELS,
-  displayName, headcount, toCsv, downloadCsv,
+  displayName, headcount, fetchRooms, buildRoomMap, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 import ParticipantEditModal from './ParticipantEditModal';
 
@@ -27,6 +27,13 @@ const Participants = ({ participants, adminName, reload }) => {
   const [busyId, setBusyId] = useState(null);
   const [msg, setMsg] = useState(null);
   const [editing, setEditing] = useState(null); // participant | 'new' | null
+  const [rooms, setRooms] = useState([]);
+
+  // 방 배정(occupant_ids)을 단일 기준으로 Room# 파생
+  useEffect(() => {
+    fetchRooms().then(setRooms).catch(() => {});
+  }, []);
+  const roomMap = useMemo(() => buildRoomMap(rooms), [rooms]);
 
   const chapters = useMemo(
     () => Array.from(new Set(participants.map((p) => p.chapter).filter(Boolean))).sort(),
@@ -90,7 +97,7 @@ const Participants = ({ participants, adminName, reload }) => {
       { label: '입국', key: 'arrival_date' },
       { label: '출국', key: 'departure_date' },
       { label: '룸타입', key: 'room_type' },
-      { label: 'Room#', key: 'room_no' },
+      { label: 'Room#', value: (r) => roomMap[r.id] || '' },
       { label: '프로그램', value: (r) => (r.programs || []).map((x) => PROGRAM_LABELS[x] || x).join(' | ') },
       { label: '행사비', key: 'event_fee' },
       { label: '납부', value: (r) => (r.payment_received ? '완료' : '미납') },
@@ -169,7 +176,11 @@ const Participants = ({ participants, adminName, reload }) => {
                     <td><Badge>{p.member_type || '-'}</Badge></td>
                     <td>{p.arrival_date || '-'}{p.arrival_time ? ` ${p.arrival_time}` : ''}</td>
                     <td>{p.departure_date || '-'}{p.departure_time ? ` ${p.departure_time}` : ''}</td>
-                    <td>{p.room_no || <span style={{ color: '#cbd5e1' }}>-</span>}</td>
+                    <td title="방 배정 탭에서 변경됩니다">
+                      {roomMap[p.id]
+                        ? <Badge $bg="rgba(52,152,219,0.12)" $color="#1f5a7a">{roomMap[p.id]}</Badge>
+                        : <span style={{ color: '#cbd5e1' }}>미배정</span>}
+                    </td>
                     <td style={{ whiteSpace: 'normal', minWidth: 140 }}>
                       {(p.programs || []).map((x) => (
                         <Badge key={x} $bg="rgba(155,89,182,0.12)" $color="#7d3c98" style={{ marginRight: 4 }}>
