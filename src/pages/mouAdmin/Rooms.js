@@ -139,13 +139,34 @@ const Rooms = ({ participants }) => {
     }
   };
 
+  // 타입별로 1인-N / 2인-N 을 빈 번호 없이 연속 번호로 재정렬
+  const renumberRooms = async (list) => {
+    const updates = [];
+    ['1인', '2인'].forEach((prefix) => {
+      const re = new RegExp(`^${prefix}-(\\d+)$`);
+      const group = list
+        .filter((r) => re.test(r.room_no || ''))
+        .sort((a, b) => parseInt(a.room_no.match(re)[1], 10) - parseInt(b.room_no.match(re)[1], 10));
+      group.forEach((r, i) => {
+        const want = `${prefix}-${i + 1}`;
+        if (r.room_no !== want) updates.push({ id: r.id, room_no: want });
+      });
+    });
+    for (const u of updates) {
+      // eslint-disable-next-line no-await-in-loop
+      await updateRoom(u.id, { room_no: u.room_no });
+    }
+  };
+
   const removeRoom = async (id) => {
     if (!window.confirm('이 방을 삭제할까요? (배정 인원은 미배정으로 돌아갑니다)')) return;
     try {
       await deleteRoom(id);
+      await renumberRooms(rooms.filter((r) => r.id !== id)); // 남은 방 번호 당기기
       load();
     } catch (e) {
       setMsg({ error: true, text: `삭제 실패: ${e.message}` });
+      load();
     }
   };
 

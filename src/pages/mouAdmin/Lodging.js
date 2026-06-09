@@ -37,7 +37,7 @@ const Lodging = ({ participants, adminName, reload }) => {
       const exempt = p.member_type === '차세대봉사자';
       const roomType = exempt ? '2인실' : (roomTypeMap[p.id] || null);
       return { ...p, _total: total, _exempt: exempt, _roomType: roomType, _roomNo: roomNoMap[p.id] || null, _payable: exempt ? 0 : payableNights(total) };
-    });
+    }).filter((p) => p._roomNo); // 방 배정 안 된 사람은 숙박 정산에서 제외
   }, [participants, roomTypeMap, roomNoMap]);
 
   const filtered = useMemo(() => {
