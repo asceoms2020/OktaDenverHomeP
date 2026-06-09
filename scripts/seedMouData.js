@@ -343,6 +343,52 @@ function buildCommittee(koMap, enMap) {
   return out;
 }
 
+// ---------- 덴버지회 회원 파싱 (비상연락망 CSV) ----------
+function buildDenver(koMap, enMap) {
+  const file = path.join(DIR, '비지니스 포럼 준비 상황 - 비상연락망.csv');
+  const out = [];
+  if (!fs.existsSync(file)) return out;
+  const rows = parseCsv(fs.readFileSync(file, 'utf8'));
+
+  let start = -1;
+  for (let i = 0; i < rows.length; i++) {
+    if (clean(rows[i][0]) === '덴버지회 회원') { start = i + 1; break; }
+  }
+  if (start === -1) return out;
+
+  for (let i = start; i < rows.length; i++) {
+    const c0 = clean(rows[i][0]);
+    if (!c0) break;
+    const m = c0.match(/\+\s*(\d+)\s*$/);
+    const cc = m ? parseInt(m[1], 10) : 0;
+    const name = c0.replace(/\s*\+\s*\d+\s*$/, '').trim();
+    if (!name) continue;
+    const id = uuid();
+    out.push({
+      id,
+      name_ko: name,
+      name_en: '',
+      chapter: 'Denver',
+      position: '덴버지회 회원',
+      member_type: '덴버지회',
+      has_companion: cc > 0,
+      companion_name: '',
+      companion_count: cc,
+      phone: '', email: '', kakao_id: '',
+      arrival_date: null, arrival_time: '',
+      departure_date: null, departure_time: '',
+      arrival_flight: '', departure_flight: '',
+      room_type: '', room_no: '',
+      programs: [], waiver_status: '',
+      event_fee: '', fee_amount: '',
+      payment_received: false, payment_method: '',
+      notes: '덴버지회 회원',
+    });
+    if (name) koMap[name] = id;
+  }
+  return out;
+}
+
 // ---------- Room list 파싱 → 방 + 입실자 연결 ----------
 function buildRooms(koMap, enMap) {
   const file = path.join(DIR, '비지니스 포럼 준비 상황 - Room list.csv');
@@ -356,12 +402,16 @@ function buildRooms(koMap, enMap) {
     if (en && enMap[normEn(en)]) return enMap[normEn(en)];
     return null;
   };
+  const assigned = new Set(); // 한 사람이 여러 방에 들어가는 중복 방지
   const pushOcc = (room, raw) => {
     const id = matchId(raw);
     const nm = clean(raw);
     if (!nm) return;
-    if (id) room.occupant_ids.push(id);
-    else room.unmatched.push(splitName(raw).ko || nm);
+    if (id) {
+      if (assigned.has(id)) return; // 이미 다른 방에 배정됨 → 중복 스킵
+      assigned.add(id);
+      room.occupant_ids.push(id);
+    } else room.unmatched.push(splitName(raw).ko || nm);
   };
 
   let cur2 = null; // 현재 2인실 (두번째 입실자 이어붙이기용)
@@ -406,7 +456,8 @@ function main() {
   const { records, koMap, enMap } = buildParticipants();
   const volunteers = buildVolunteers(koMap, enMap); // koMap/enMap 확장 (방 매칭에 활용)
   const committee = buildCommittee(koMap, enMap);    // Denver 준비위원회 → 참가자
-  const all = records.concat(volunteers, committee);
+  const denver = buildDenver(koMap, enMap);          // 덴버지회 회원 → 참가자
+  const all = records.concat(volunteers, committee, denver);
   const rooms = buildRooms(koMap, enMap);
 
   let sql = '-- MOU 시드 (자동 생성) — supabase/mou_seed.sql\n';
@@ -459,7 +510,7 @@ function main() {
 
   sql += '\ncommit;\n';
   fs.writeFileSync(OUT, sql, 'utf8');
-  console.log(`완료: 참가자 ${all.length}명 (명단 ${records.length} + 봉사단 ${volunteers.length} + 준비위 ${committee.length}), 방 ${rooms.length}개 (입실 매칭 ${matchedOcc}명 / 미매칭 ${unmatchedOcc}명)`);
+  console.log(`완료: 참가자 ${all.length}명 (명단 ${records.length} + 봉사단 ${volunteers.length} + 준비위 ${committee.length} + 덴버지회 ${denver.length}), 방 ${rooms.length}개 (입실 매칭 ${matchedOcc}명 / 미매칭 ${unmatchedOcc}명)`);
   console.log(`→ ${OUT}`);
 }
 

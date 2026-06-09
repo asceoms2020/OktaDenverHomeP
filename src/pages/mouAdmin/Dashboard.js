@@ -19,8 +19,13 @@ const Dashboard = ({ participants }) => {
     let paidAmount = 0;
     let unpaidAmount = 0;
     let checkedIn = 0;
-    const golf = [];
-    const train = [];
+    // 프로그램별 신청 인원 (rows=신청건수, head=동반자 포함 인원)
+    const prog = {
+      golf: { rows: 0, head: 0 },
+      train: { rows: 0, head: 0 },
+      garden: { rows: 0, head: 0 },
+      coors: { rows: 0, head: 0 },
+    };
     let waiverMissing = 0;
     const roomMissing = [];
     const arrivalByDate = {};
@@ -35,8 +40,9 @@ const Dashboard = ({ participants }) => {
       if (p.payment_received) { paidCount += 1; paidAmount += amt; }
       else unpaidAmount += amt;
       if (p.checked_in) checkedIn += 1;
-      if ((p.programs || []).includes('golf')) golf.push(p);
-      if ((p.programs || []).includes('train')) train.push(p);
+      ['golf', 'train', 'garden', 'coors'].forEach((k) => {
+        if ((p.programs || []).includes(k)) { prog[k].rows += 1; prog[k].head += head; }
+      });
       if (!p.waiver_status || !/완료|done|y/i.test(p.waiver_status)) waiverMissing += 1;
       if (!roomMap[p.id]) roomMissing.push(p);
       if (p.arrival_date) arrivalByDate[p.arrival_date] = (arrivalByDate[p.arrival_date] || 0) + head;
@@ -45,7 +51,7 @@ const Dashboard = ({ participants }) => {
 
     return {
       rows, total, byType, companions, paidCount, paidAmount, unpaidAmount,
-      unpaidCount: rows - paidCount, checkedIn, golf, train, waiverMissing, roomMissing,
+      unpaidCount: rows - paidCount, checkedIn, prog, waiverMissing, roomMissing,
       arrivalByDate, departureByDate,
     };
   }, [participants, roomMap]);
@@ -79,13 +85,23 @@ const Dashboard = ({ participants }) => {
         </Stat>
         <Stat $accent="#3498db">
           <StatLabel>골프 신청</StatLabel>
-          <StatValue>{s.golf.length}명</StatValue>
-          <StatSub>팀 편성 필요</StatSub>
+          <StatValue>{s.prog.golf.head}명</StatValue>
+          <StatSub>신청 {s.prog.golf.rows}명 + 동반자 {s.prog.golf.head - s.prog.golf.rows}</StatSub>
         </Stat>
         <Stat $accent="#9b59b6">
           <StatLabel>기차(Pikes Peak)</StatLabel>
-          <StatValue>{s.train.length}명</StatValue>
-          <StatSub>차량 배정 필요</StatSub>
+          <StatValue>{s.prog.train.head}명</StatValue>
+          <StatSub>신청 {s.prog.train.rows}명 + 동반자 {s.prog.train.head - s.prog.train.rows}</StatSub>
+        </Stat>
+        <Stat $accent="#16a085">
+          <StatLabel>Garden of Gods</StatLabel>
+          <StatValue>{s.prog.garden.head}명</StatValue>
+          <StatSub>신청 {s.prog.garden.rows}명 + 동반자 {s.prog.garden.head - s.prog.garden.rows}</StatSub>
+        </Stat>
+        <Stat $accent="#c0392b">
+          <StatLabel>Coors</StatLabel>
+          <StatValue>{s.prog.coors.head}명</StatValue>
+          <StatSub>신청 {s.prog.coors.rows}명 + 동반자 {s.prog.coors.head - s.prog.coors.rows}</StatSub>
         </Stat>
         <Stat $accent="#f39c12">
           <StatLabel>Waiver 미완료</StatLabel>
@@ -111,6 +127,14 @@ const Dashboard = ({ participants }) => {
                   {k} {v}명
                 </Badge>
               ))}
+              {s.companions > 0 && (
+                <Badge $bg="rgba(155,89,182,0.14)" $color="#7d3c98">
+                  동반자 {s.companions}명
+                </Badge>
+              )}
+              <Badge $bg="rgba(52,152,219,0.14)" $color="#1f5a7a">
+                합계 {s.total}명
+              </Badge>
             </div>
           )}
         </CardBody>

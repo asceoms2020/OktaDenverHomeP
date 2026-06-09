@@ -82,6 +82,21 @@ const Rooms = ({ participants }) => {
     [participants, assignedIds]
   );
 
+  // 참가자 → 현재 배정된 방 (중복이면 첫 방)
+  const roomOfMap = useMemo(() => {
+    const m = {};
+    rooms.forEach((r) => (r.occupant_ids || []).forEach((id) => { if (!m[id]) m[id] = r; }));
+    return m;
+  }, [rooms]);
+
+  // 다른 방에 배정된 사람(이동 후보)
+  const movable = useMemo(
+    () => participants
+      .filter((p) => roomOfMap[p.id])
+      .sort((a, b) => displayName(a).localeCompare(displayName(b), 'ko')),
+    [participants, roomOfMap]
+  );
+
   const save = async (room, patch) => {
     try {
       const next = { ...room, ...patch };
@@ -136,7 +151,15 @@ const Rooms = ({ participants }) => {
 
   const addOccupant = (room, pid) => {
     if (!pid) return;
-    save(room, { occupant_ids: [...(room.occupant_ids || []), pid] });
+    // 1인 1방 보장: 다른 방(들)에 있으면 거기서 빼고 이동
+    rooms.forEach((r) => {
+      if (r.id !== room.id && (r.occupant_ids || []).includes(pid)) {
+        save(r, { occupant_ids: (r.occupant_ids || []).filter((x) => x !== pid) });
+      }
+    });
+    if (!(room.occupant_ids || []).includes(pid)) {
+      save(room, { occupant_ids: [...(room.occupant_ids || []), pid] });
+    }
   };
   const removeOccupant = (room, pid) => {
     save(room, { occupant_ids: (room.occupant_ids || []).filter((x) => x !== pid) });
@@ -233,12 +256,21 @@ const Rooms = ({ participants }) => {
                         </div>
                       )}
                       <Select defaultValue="" onChange={(e) => { addOccupant(room, e.target.value); e.target.value = ''; }}>
-                        <option value="">+ 배정 (미배정에서 선택)</option>
-                        {unassigned.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {displayName(p)}{stayLabel(p) ? ` · ${stayLabel(p)}` : ''} · {p.chapter}
-                          </option>
-                        ))}
+                        <option value="">+ 배정 / 이동</option>
+                        <optgroup label="미배정">
+                          {unassigned.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {displayName(p)}{stayLabel(p) ? ` · ${stayLabel(p)}` : ''} · {p.chapter}
+                            </option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="다른 방에서 이동">
+                          {movable.filter((p) => roomOfMap[p.id] && roomOfMap[p.id].id !== room.id).map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {displayName(p)} · 현재 {roomOfMap[p.id].room_no}
+                            </option>
+                          ))}
+                        </optgroup>
                       </Select>
                     </AssignCard>
                   );

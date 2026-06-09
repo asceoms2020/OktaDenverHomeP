@@ -6,7 +6,7 @@ import {
 } from '../../styles/MouEventAdmin.styles';
 import { insertParticipant, updateParticipant, PROGRAM_LABELS } from '../../services/mouAdmin';
 
-const MEMBER_TYPES = ['정회원', '동반자', '차세대', '차세대봉사자', '덴버'];
+const MEMBER_TYPES = ['정회원', '동반자', '차세대', '차세대봉사자', '준비위원회', '덴버지회'];
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
 const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));

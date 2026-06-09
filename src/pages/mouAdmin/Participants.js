@@ -6,8 +6,13 @@ import {
 } from '../../styles/MouEventAdmin.styles';
 import {
   setPaymentReceived, setCheckedIn, deleteParticipant, PROGRAM_LABELS,
-  displayName, headcount, fetchRooms, buildRoomMap, toCsv, downloadCsv,
+  displayName, headcount, parseAmount, fetchRooms, buildRoomMap, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
+
+// 등록비 + 행사비 = 총 내야할 돈
+const regFee = (p) => parseAmount(p.fee_amount);
+const evtFee = (p) => parseAmount(p.event_fee);
+const totalDue = (p) => regFee(p) + evtFee(p);
 import ParticipantEditModal from './ParticipantEditModal';
 
 const fmtChecked = (who, at) => {
@@ -113,7 +118,9 @@ const Participants = ({ participants, adminName, reload }) => {
       { label: '룸타입', key: 'room_type' },
       { label: 'Room#', value: (r) => roomMap[r.id] || '' },
       { label: '프로그램', value: (r) => (r.programs || []).map((x) => PROGRAM_LABELS[x] || x).join(' | ') },
-      { label: '행사비', key: 'event_fee' },
+      { label: '등록비', value: (r) => (regFee(r) ? `$${regFee(r)}` : '') },
+      { label: '행사비', value: (r) => (evtFee(r) ? `$${evtFee(r)}` : '') },
+      { label: '총내야할돈', value: (r) => (totalDue(r) ? `$${totalDue(r)}` : '') },
       { label: '납부', value: (r) => (r.payment_received ? '완료' : '미납') },
       { label: '납부체크', key: 'payment_checked_by' },
       { label: '체크인', value: (r) => (r.checked_in ? '완료' : '미체크') },
@@ -169,7 +176,9 @@ const Participants = ({ participants, adminName, reload }) => {
                   <th>출국</th>
                   <th>Room#</th>
                   <th>프로그램</th>
+                  <th>등록비</th>
                   <th>행사비</th>
+                  <th>총 내야할 돈</th>
                   <th>납부 체크</th>
                   <th>체크인</th>
                   <th>관리</th>
@@ -202,7 +211,9 @@ const Participants = ({ participants, adminName, reload }) => {
                         </Badge>
                       ))}
                     </td>
-                    <td>{p.event_fee || '-'}</td>
+                    <td>{regFee(p) ? `$${regFee(p)}` : '-'}</td>
+                    <td>{evtFee(p) ? `$${evtFee(p)}` : '-'}</td>
+                    <td><strong>{totalDue(p) ? `$${totalDue(p)}` : '-'}</strong></td>
                     <td>
                       <CheckButton $on={p.payment_received} disabled={busyId === p.id} onClick={() => togglePay(p)}>
                         {p.payment_received ? '✓ 납부완료' : '미납'}
@@ -230,7 +241,7 @@ const Participants = ({ participants, adminName, reload }) => {
                   </tr>
                 ))}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={11}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
+                  <tr><td colSpan={13}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
                 )}
               </tbody>
             </Table>
