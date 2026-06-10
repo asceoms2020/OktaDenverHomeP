@@ -181,6 +181,93 @@ const Transport = ({ participants }) => {
     downloadCsv(`mou_transport_${dir}.csv`, csv);
   };
 
+  // 날짜 = 미배정 인원 날짜 ∪ 밴(trip) 날짜 (미정은 맨 뒤)
+  const allDates = useMemo(() => {
+    const set = new Set();
+    dateGroups.forEach((g) => set.add(g.date));
+    dirTrips.forEach((t) => set.add(t.trip_date || '미정'));
+    return Array.from(set).sort((a, b) => {
+      if (a === b) return 0;
+      if (a === '미정') return 1;
+      if (b === '미정') return -1;
+      return a < b ? -1 : 1;
+    });
+  }, [dateGroups, dirTrips]);
+
+  const renderTrip = (trip) => {
+    const pax = trip.passenger_ids || [];
+    const seats = seatsOf(pax);
+    const over = seats > (trip.capacity || 9);
+    // 이 밴 날짜에 운행해야 할 미배정자만 (날짜 없는 밴은 전체)
+    const dayPool = trip.trip_date
+      ? unassignedSorted.filter((p) => p[dirCfg.dateField] === trip.trip_date)
+      : unassignedSorted;
+    return (
+      <AssignCard key={trip.id} $over={over}>
+        <AssignCardHead>
+          <AssignCardTitle>
+            {trip.vehicle_label}
+            {tripSpan(trip) && (
+              <div style={{ fontSize: '0.74rem', fontWeight: 600, color: '#1f5a7a' }}>
+                항공 시간대 {tripSpan(trip)}
+              </div>
+            )}
+          </AssignCardTitle>
+          <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <CapTag $over={over}>{seats}/{trip.capacity}석</CapTag>
+            <IconButton onClick={() => removeTrip(trip.id)}>삭제</IconButton>
+          </span>
+        </AssignCardHead>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+          <MiniInput placeholder="날짜 (YYYY-MM-DD)" defaultValue={trip.trip_date || ''} onBlur={(e) => save(trip, { trip_date: e.target.value || null })} />
+          <MiniInput placeholder="시간 (예: 14:30)" defaultValue={trip.trip_time || ''} onBlur={(e) => save(trip, { trip_time: e.target.value })} />
+          <MiniInput placeholder="차량 라벨" defaultValue={trip.vehicle_label || ''} onBlur={(e) => save(trip, { vehicle_label: e.target.value })} />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>운전자</div>
+            <CrewSelect value={trip.driver} groups={staffByGroup} onChange={(v) => save(trip, { driver: v })} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>인솔자</div>
+            <CrewSelect value={trip.leader} groups={staffByGroup} onChange={(v) => save(trip, { leader: v })} />
+          </div>
+          <div>
+            <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>봉사자</div>
+            <CrewSelect value={trip.volunteer} groups={staffByGroup} onChange={(v) => save(trip, { volunteer: v })} />
+          </div>
+        </div>
+
+        <ChipRow>
+          {pax.map((pid) => {
+            const cc = pMap[pid]?.companion_count || (pMap[pid]?.has_companion ? 1 : 0);
+            return (
+              <Chip key={pid}>
+                {displayName(pMap[pid]) || '(알수없음)'}{cc > 0 ? ` +${cc}` : ''}
+                <button onClick={() => removePassenger(trip, pid)} title="제거">✕</button>
+              </Chip>
+            );
+          })}
+          {pax.length === 0 && <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>탑승자 없음</span>}
+        </ChipRow>
+
+        <Select defaultValue="" onChange={(e) => { addPassenger(trip, e.target.value); e.target.value = ''; }}>
+          <option value="">+ 탑승자 배정{trip.trip_date ? ` (${trip.trip_date})` : ''}</option>
+          {dayPool.map((p) => {
+            const cc = p.companion_count || (p.has_companion ? 1 : 0);
+            return (
+              <option key={p.id} value={p.id}>
+                {p[dirCfg.dateField] || '날짜미정'}{p[dirCfg.timeField] ? ` ${p[dirCfg.timeField]}` : ''} · {displayName(p)}{cc > 0 ? ` +${cc}` : ''}
+              </option>
+            );
+          })}
+        </Select>
+      </AssignCard>
+    );
+  };
+
   return (
     <Card>
       <CardHead>
@@ -206,120 +293,46 @@ const Transport = ({ participants }) => {
 
         {!loading && (
           <>
-            {/* 항공 시간 기준 그룹 제안 */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontWeight: 700, marginBottom: 8, fontSize: '0.9rem', color: '#374151' }}>
-                {dirCfg.label} 미배정 — 날짜별 ({unassigned.length}명)
-              </div>
-              {dateGroups.length === 0 ? (
-                <Empty>모든 인원이 차량에 배정되었습니다 🎉</Empty>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {dateGroups.map((g) => (
-                    <div key={g.date} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                      <Badge $bg="rgba(52,152,219,0.12)" $color="#1f5a7a" style={{ minWidth: 92 }}>
-                        {g.date} · {g.people.length}명 · {g.span}
+            <div style={{ fontWeight: 700, marginBottom: 12, fontSize: '0.9rem', color: '#374151' }}>
+              {dirCfg.label} · 날짜별 미배정 {unassignedHead}명 · 운행 {dirTrips.length}대
+            </div>
+
+            {allDates.length === 0 && dirTrips.length === 0 ? (
+              <Empty>미배정 인원이 없습니다. “+ 9인승 밴 추가”로 운행을 만들 수 있습니다.</Empty>
+            ) : (
+              allDates.map((date) => {
+                const grp = dateGroups.find((g) => g.date === date);
+                const dayTrips = dirTrips.filter((t) => (t.trip_date || '미정') === date);
+                const label = date === '미정' ? '날짜 미지정' : date;
+                return (
+                  <div key={date} style={{ marginBottom: 22, paddingBottom: 14, borderBottom: '1px solid rgba(17,24,39,0.06)' }}>
+                    <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 10 }}>
+                      <Badge $bg="rgba(52,152,219,0.14)" $color="#1f5a7a" style={{ fontSize: '0.9rem', fontWeight: 800 }}>
+                        {label}{grp ? ` · 미배정 ${grp.people.reduce((s, p) => s + headcount(p), 0)}명(동반자 포함) · ${grp.span}` : ''}
                       </Badge>
-                      <Pool>
-                        {g.people.map((p) => {
+                      <GhostButton onClick={() => addTrip(date === '미정' ? undefined : date)}>+ 이 날짜로 밴 생성</GhostButton>
+                    </div>
+
+                    {grp && grp.people.length > 0 && (
+                      <Pool style={{ marginBottom: 12 }}>
+                        {grp.people.map((p) => {
                           const st = memberBadgeStyle(p.member_type);
+                          const cc = p.companion_count || (p.has_companion ? 1 : 0);
                           return (
                             <Badge key={p.id} $bg={st.bg} $color={st.color}>
-                              {displayName(p)}{st.tag ? ` · ${st.tag}` : ''}{p[dirCfg.timeField] ? ` ${p[dirCfg.timeField]}` : ''}
+                              {displayName(p)}{st.tag ? ` · ${st.tag}` : ''}{cc > 0 ? ` +${cc}` : ''}{p[dirCfg.timeField] ? ` ${p[dirCfg.timeField]}` : ''}
                             </Badge>
                           );
                         })}
                       </Pool>
-                      <GhostButton onClick={() => addTrip(g.date)}>이 날짜로 밴 생성</GhostButton>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    )}
 
-            {dirTrips.length === 0 ? (
-              <Empty>운행이 없습니다. 위에서 9인승 밴을 추가하세요.</Empty>
-            ) : (
-              <AssignGrid>
-                {dirTrips.map((trip) => {
-                  const pax = trip.passenger_ids || [];
-                  const seats = seatsOf(pax);
-                  const over = seats > (trip.capacity || 9);
-                  return (
-                    <AssignCard key={trip.id} $over={over}>
-                      <AssignCardHead>
-                        <AssignCardTitle>
-                          {trip.vehicle_label}
-                          {tripSpan(trip) && (
-                            <div style={{ fontSize: '0.74rem', fontWeight: 600, color: '#1f5a7a' }}>
-                              항공 시간대 {tripSpan(trip)}
-                            </div>
-                          )}
-                        </AssignCardTitle>
-                        <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                          <CapTag $over={over}>{seats}/{trip.capacity}석</CapTag>
-                          <IconButton onClick={() => removeTrip(trip.id)}>삭제</IconButton>
-                        </span>
-                      </AssignCardHead>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                        <MiniInput
-                          placeholder="날짜 (YYYY-MM-DD)"
-                          defaultValue={trip.trip_date || ''}
-                          onBlur={(e) => save(trip, { trip_date: e.target.value || null })}
-                        />
-                        <MiniInput
-                          placeholder="시간 (예: 14:30)"
-                          defaultValue={trip.trip_time || ''}
-                          onBlur={(e) => save(trip, { trip_time: e.target.value })}
-                        />
-                        <MiniInput
-                          placeholder="차량 라벨"
-                          defaultValue={trip.vehicle_label || ''}
-                          onBlur={(e) => save(trip, { vehicle_label: e.target.value })}
-                        />
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
-                        <div>
-                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>운전자</div>
-                          <CrewSelect value={trip.driver} groups={staffByGroup} onChange={(v) => save(trip, { driver: v })} />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>인솔자</div>
-                          <CrewSelect value={trip.leader} groups={staffByGroup} onChange={(v) => save(trip, { leader: v })} />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>봉사자</div>
-                          <CrewSelect value={trip.volunteer} groups={staffByGroup} onChange={(v) => save(trip, { volunteer: v })} />
-                        </div>
-                      </div>
-
-                      <ChipRow>
-                        {pax.map((pid) => {
-                          const cc = pMap[pid]?.companion_count || (pMap[pid]?.has_companion ? 1 : 0);
-                          return (
-                            <Chip key={pid}>
-                              {displayName(pMap[pid]) || '(알수없음)'}{cc > 0 ? ` +${cc}` : ''}
-                              <button onClick={() => removePassenger(trip, pid)} title="제거">✕</button>
-                            </Chip>
-                          );
-                        })}
-                        {pax.length === 0 && <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>탑승자 없음</span>}
-                      </ChipRow>
-
-                      <Select defaultValue="" onChange={(e) => { addPassenger(trip, e.target.value); e.target.value = ''; }}>
-                        <option value="">+ 탑승자 배정</option>
-                        {unassignedSorted.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p[dirCfg.dateField] || '날짜미정'}{p[dirCfg.timeField] ? ` ${p[dirCfg.timeField]}` : ''} · {displayName(p)}
-                          </option>
-                        ))}
-                      </Select>
-                    </AssignCard>
-                  );
-                })}
-              </AssignGrid>
+                    {dayTrips.length > 0 && (
+                      <AssignGrid>{dayTrips.map(renderTrip)}</AssignGrid>
+                    )}
+                  </div>
+                );
+              })
             )}
           </>
         )}
