@@ -5,14 +5,17 @@ import {
   Empty, Message, IconButton,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  setPaymentReceived, setCheckedIn, deleteParticipant, PROGRAM_LABELS,
+  setPaymentReceived, setCheckedIn, deleteParticipant, updateParticipant, PROGRAM_LABELS,
   displayName, headcount, parseAmount, fetchRooms, buildRoomMap, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
-// 등록비 + 행사비 = 총 내야할 돈
+const GOLF_RENTAL_FEE = 65;
+const isGolfer = (p) => (p.programs || []).includes('golf');
+// 등록비 + 행사비 + 골프렌탈($65) = 총 내야할 돈
 const regFee = (p) => parseAmount(p.fee_amount);
 const evtFee = (p) => parseAmount(p.event_fee);
-const totalDue = (p) => regFee(p) + evtFee(p);
+const rentalFee = (p) => (p.golf_rental ? GOLF_RENTAL_FEE : 0);
+const totalDue = (p) => regFee(p) + evtFee(p) + rentalFee(p);
 import ParticipantEditModal from './ParticipantEditModal';
 
 const fmtChecked = (who, at) => {
@@ -98,6 +101,13 @@ const Participants = ({ participants, adminName, reload }) => {
     finally { setBusyId(null); }
   };
 
+  const toggleRental = async (p) => {
+    setBusyId(p.id); setMsg(null);
+    try { await updateParticipant(p.id, { golf_rental: !p.golf_rental }); await reload(); }
+    catch (e) { setMsg({ error: true, text: `골프렌탈 저장 실패: ${e.message}` }); }
+    finally { setBusyId(null); }
+  };
+
   const remove = async (p) => {
     if (!window.confirm(`${displayName(p)} 님을 명단에서 삭제할까요?`)) return;
     setBusyId(p.id); setMsg(null);
@@ -121,6 +131,7 @@ const Participants = ({ participants, adminName, reload }) => {
       { label: '프로그램', value: (r) => (r.programs || []).map((x) => PROGRAM_LABELS[x] || x).join(' | ') },
       { label: '등록비', value: (r) => (regFee(r) ? `$${regFee(r)}` : '') },
       { label: '행사비', value: (r) => (evtFee(r) ? `$${evtFee(r)}` : '') },
+      { label: '골프렌탈', value: (r) => (isGolfer(r) ? (r.golf_rental ? `$${GOLF_RENTAL_FEE}` : '미렌탈') : '') },
       { label: '총내야할돈', value: (r) => (totalDue(r) ? `$${totalDue(r)}` : '') },
       { label: '납부', value: (r) => (r.payment_received ? '완료' : '미납') },
       { label: '납부체크', key: 'payment_checked_by' },
@@ -180,6 +191,7 @@ const Participants = ({ participants, adminName, reload }) => {
                   <th>프로그램</th>
                   <th>등록비</th>
                   <th>행사비</th>
+                  <th>골프렌탈</th>
                   <th>총 내야할 돈</th>
                   <th>납부 체크</th>
                   <th>체크인</th>
@@ -216,6 +228,15 @@ const Participants = ({ participants, adminName, reload }) => {
                     </td>
                     <td>{regFee(p) ? `$${regFee(p)}` : '-'}</td>
                     <td>{evtFee(p) ? `$${evtFee(p)}` : '-'}</td>
+                    <td>
+                      {isGolfer(p) ? (
+                        <CheckButton $on={p.golf_rental} disabled={busyId === p.id} onClick={() => toggleRental(p)}>
+                          {p.golf_rental ? `✓ 렌탈 $${GOLF_RENTAL_FEE}` : '렌탈'}
+                        </CheckButton>
+                      ) : (
+                        <span style={{ color: '#cbd5e1' }}>-</span>
+                      )}
+                    </td>
                     <td><strong>{totalDue(p) ? `$${totalDue(p)}` : '-'}</strong></td>
                     <td>
                       <CheckButton $on={p.payment_received} disabled={busyId === p.id} onClick={() => togglePay(p)}>
@@ -244,7 +265,7 @@ const Participants = ({ participants, adminName, reload }) => {
                   </tr>
                 ))}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={14}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
+                  <tr><td colSpan={15}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
                 )}
               </tbody>
             </Table>

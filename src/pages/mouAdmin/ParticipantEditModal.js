@@ -39,7 +39,7 @@ const empty = {
   arrival_date: '', arrival_time: '', arrival_flight: '',
   departure_date: '', departure_time: '', departure_flight: '',
   room_type: '', room_no: '', programs: [], waiver_status: '',
-  event_fee: '', fee_amount: '', payment_method: '', notes: '',
+  event_fee: '', fee_amount: '', payment_method: '', notes: '', golf_rental: false,
 };
 
 const ParticipantEditModal = ({ initial, onClose, onSaved }) => {
@@ -82,6 +82,7 @@ const ParticipantEditModal = ({ initial, onClose, onSaved }) => {
         room_type: form.room_type || null,
         room_no: form.room_no || null,
         programs: form.programs || [],
+        golf_rental: !!form.golf_rental,
         waiver_status: form.waiver_status || null,
         event_fee: form.event_fee || null,
         fee_amount: form.fee_amount || null,
@@ -165,6 +166,15 @@ const ParticipantEditModal = ({ initial, onClose, onSaved }) => {
                 })}
               </ProgramChips>
             </FullRow>
+
+            {(form.programs || []).includes('golf') && (
+              <FullRow>
+                <ProgramChip $on={!!form.golf_rental} style={{ display: 'inline-flex' }}>
+                  <input type="checkbox" checked={!!form.golf_rental} onChange={() => set('golf_rental', !form.golf_rental)} />
+                  골프 클럽 렌탈 (+$65)
+                </ProgramChip>
+              </FullRow>
+            )}
 
             {F('Waiver 상태', 'waiver_status')}
             {F('행사 참여비', 'event_fee')}

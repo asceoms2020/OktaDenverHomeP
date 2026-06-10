@@ -216,6 +216,7 @@ function buildParticipants() {
       waiver_status: clean(r[11]),
       event_fee: clean(r[13]),
       fee_amount: clean(r[8]),
+      golf_rental: (() => { const gr = clean(r[12]); return gr !== '' && !/no|x|없/i.test(gr); })(),
       payment_received: /납부완료|완료/.test(clean(r[14])) || !!flight.payment_paid,
       payment_method: clean(r[15]),
       notes: clean(r[18]),
@@ -472,7 +473,7 @@ function main() {
       'insert into public.mou_participants ' +
       '(id,name_ko,name_en,chapter,position,member_type,has_companion,companion_name,companion_count,' +
       'phone,email,kakao_id,arrival_date,arrival_time,arrival_flight,departure_date,departure_time,departure_flight,' +
-      'room_type,room_no,programs,waiver_status,event_fee,fee_amount,payment_received,payment_method,notes) values (' +
+      'room_type,room_no,programs,waiver_status,event_fee,fee_amount,golf_rental,payment_received,payment_method,notes) values (' +
       [
         sqlStr(r.id), sqlStr(r.name_ko), sqlStr(r.name_en), sqlStr(r.chapter), sqlStr(r.position),
         sqlStr(r.member_type), sqlBool(r.has_companion), sqlStr(r.companion_name), (r.companion_count || 0),
@@ -480,7 +481,7 @@ function main() {
         r.arrival_date ? sqlStr(r.arrival_date) : 'NULL', sqlStr(r.arrival_time), sqlStr(r.arrival_flight),
         r.departure_date ? sqlStr(r.departure_date) : 'NULL', sqlStr(r.departure_time), sqlStr(r.departure_flight),
         sqlStr(r.room_type), sqlStr(r.room_no), sqlTextArr(r.programs),
-        sqlStr(r.waiver_status), sqlStr(r.event_fee), sqlStr(r.fee_amount),
+        sqlStr(r.waiver_status), sqlStr(r.event_fee), sqlStr(r.fee_amount), sqlBool(r.golf_rental),
         sqlBool(r.payment_received), sqlStr(r.payment_method), sqlStr(r.notes),
       ].join(',') + ');\n';
   }

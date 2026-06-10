@@ -45,6 +45,7 @@ create table if not exists public.mou_participants (
   waiver_status text,
   fee_amount text,
   event_fee text,
+  golf_rental boolean default false,
   payment_received boolean default false,
   payment_checked_by text,
   payment_checked_at timestamptz,
