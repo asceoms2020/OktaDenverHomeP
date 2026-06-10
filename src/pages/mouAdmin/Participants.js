@@ -112,6 +112,7 @@ const Participants = ({ participants, adminName, reload }) => {
       { label: '이름(영)', key: 'name_en' },
       { label: '지회', key: 'chapter' },
       { label: '구분', key: 'member_type' },
+      { label: '직책', key: 'position' },
       { label: '동반자수', key: 'companion_count' },
       { label: '입국', key: 'arrival_date' },
       { label: '출국', key: 'departure_date' },
@@ -172,6 +173,7 @@ const Participants = ({ participants, adminName, reload }) => {
                   <th>이름</th>
                   <th>지회</th>
                   <th>구분</th>
+                  <th>직책</th>
                   <th>입국</th>
                   <th>출국</th>
                   <th>Room#</th>
@@ -197,6 +199,7 @@ const Participants = ({ participants, adminName, reload }) => {
                     </td>
                     <td>{p.chapter || '-'}</td>
                     <td><Badge>{p.member_type || '-'}</Badge></td>
+                    <td style={{ whiteSpace: 'normal', minWidth: 100 }}>{p.position || '-'}</td>
                     <td>{p.arrival_date || '-'}{p.arrival_time ? ` ${p.arrival_time}` : ''}</td>
                     <td>{p.departure_date || '-'}{p.departure_time ? ` ${p.departure_time}` : ''}</td>
                     <td title="방 배정 탭에서 변경됩니다">
@@ -241,7 +244,7 @@ const Participants = ({ participants, adminName, reload }) => {
                   </tr>
                 ))}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={13}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
+                  <tr><td colSpan={14}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
                 )}
               </tbody>
             </Table>
