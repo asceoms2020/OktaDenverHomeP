@@ -5,7 +5,7 @@ import {
   CapTag, Chip, ChipRow, Pool, Select, IconButton, Badge, MiniInput,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchGolfTeams, upsertGolfTeam, updateGolfTeam, deleteGolfTeam, displayName, toCsv, downloadCsv,
+  fetchGolfTeams, upsertGolfTeam, updateGolfTeam, deleteGolfTeam, displayName, headcount, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const newId = () =>
@@ -66,6 +66,11 @@ const Golf = ({ participants }) => {
     [eligible, assignedIds]
   );
 
+  // 동반자 포함 인원(좌석) 계산
+  const seatsOf = (ids) => (ids || []).reduce((s, id) => s + headcount(pMap[id]), 0);
+  const unassignedHead = useMemo(() => unassigned.reduce((s, p) => s + headcount(p), 0), [unassigned]);
+  const compOf = (p) => (p?.companion_count || (p?.has_companion ? 1 : 0));
+
   const save = async (team, patch) => {
     try {
       const next = { ...team, ...patch };
@@ -112,7 +117,7 @@ const Golf = ({ participants }) => {
     <Card>
       <CardHead>
         <CardTitle>
-          골프 팀 편성 · 골퍼 {golfers.length}명{golfCompanions > 0 ? ` + 동반자 ${golfCompanions}명` : ''} (총 {golfers.length + golfCompanions}명) · {teams.length}개 조 · 미배정 {unassigned.length}명
+          골프 팀 편성 · 골퍼 {golfers.length}명{golfCompanions > 0 ? ` + 동반자 ${golfCompanions}명` : ''} (총 {golfers.length + golfCompanions}명) · {teams.length}개 조 · 미배정 {unassignedHead}명
         </CardTitle>
         <span style={{ display: 'flex', gap: 8 }}>
           <GhostButton onClick={exportCsv}>CSV 내보내기</GhostButton>
@@ -127,16 +132,17 @@ const Golf = ({ participants }) => {
           <>
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontWeight: 700, marginBottom: 8, fontSize: '0.9rem', color: '#374151' }}>
-                미배정 골퍼 ({unassigned.length}명)
+                미배정 골퍼 ({unassignedHead}명, 동반자 포함)
               </div>
               <Pool>
                 {unassigned.length === 0
                   ? <Empty>모든 골퍼가 조에 배정되었습니다 🎉</Empty>
                   : unassigned.map((p) => {
                     const isCom = p.member_type === '준비위원회';
+                    const cc = compOf(p);
                     return (
                       <Badge key={p.id} $bg={isCom ? 'rgba(52,152,219,0.12)' : 'rgba(46,204,113,0.1)'} $color={isCom ? '#1f5a7a' : '#1f7a3b'}>
-                        {displayName(p)}{isCom ? ' · 준비위' : ''}{p.companion_name ? ` (+${p.companion_name})` : ''}
+                        {displayName(p)}{isCom ? ' · 준비위' : ''}{cc > 0 ? ` +${cc}` : ''}
                       </Badge>
                     );
                   })}
@@ -149,7 +155,8 @@ const Golf = ({ participants }) => {
               <AssignGrid>
                 {teams.map((team) => {
                   const mem = team.member_ids || [];
-                  const over = mem.length > TEAM_CAP;
+                  const seats = seatsOf(mem);
+                  const over = seats > TEAM_CAP;
                   return (
                     <AssignCard key={team.id} $over={over}>
                       <AssignCardHead>
@@ -161,7 +168,7 @@ const Golf = ({ participants }) => {
                           />
                         </AssignCardTitle>
                         <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                          <CapTag $over={over}>{mem.length}/{TEAM_CAP}</CapTag>
+                          <CapTag $over={over}>{seats}/{TEAM_CAP}명</CapTag>
                           <IconButton onClick={() => removeTeam(team.id)}>삭제</IconButton>
                         </span>
                       </AssignCardHead>
@@ -171,19 +178,22 @@ const Golf = ({ participants }) => {
                         onBlur={(e) => save(team, { tee_info: e.target.value })}
                       />
                       <ChipRow>
-                        {mem.map((pid) => (
-                          <Chip key={pid}>
-                            {displayName(pMap[pid]) || '(알수없음)'}
-                            <button onClick={() => removeMember(team, pid)} title="제거">✕</button>
-                          </Chip>
-                        ))}
+                        {mem.map((pid) => {
+                          const cc = compOf(pMap[pid]);
+                          return (
+                            <Chip key={pid}>
+                              {displayName(pMap[pid]) || '(알수없음)'}{cc > 0 ? ` +${cc}` : ''}
+                              <button onClick={() => removeMember(team, pid)} title="제거">✕</button>
+                            </Chip>
+                          );
+                        })}
                         {mem.length === 0 && <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>비어 있음</span>}
                       </ChipRow>
                       <Select defaultValue="" onChange={(e) => { addMember(team, e.target.value); e.target.value = ''; }}>
                         <option value="">+ 골퍼 배정</option>
                         {unassigned.map((p) => (
                           <option key={p.id} value={p.id}>
-                            {displayName(p)} · {p.member_type === '준비위원회' ? '준비위원회' : p.chapter}
+                            {displayName(p)}{compOf(p) > 0 ? ` +${compOf(p)}` : ''} · {p.member_type === '준비위원회' ? '준비위원회' : p.chapter}
                           </option>
                         ))}
                       </Select>
