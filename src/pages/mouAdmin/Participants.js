@@ -11,10 +11,11 @@ import {
 
 const GOLF_RENTAL_FEE = 65;
 const isGolfer = (p) => (p.programs || []).includes('golf');
-// 등록비 + 행사비 + 골프렌탈($65) = 총 내야할 돈
+const hasComp = (p) => (p.companion_count || 0) > 0 || p.has_companion;
+// 등록비 + 행사비 + 골프렌탈(본인/동반자 각 $65) = 총 내야할 돈
 const regFee = (p) => parseAmount(p.fee_amount);
 const evtFee = (p) => parseAmount(p.event_fee);
-const rentalFee = (p) => (p.golf_rental ? GOLF_RENTAL_FEE : 0);
+const rentalFee = (p) => (p.golf_rental ? GOLF_RENTAL_FEE : 0) + (p.companion_golf_rental ? GOLF_RENTAL_FEE : 0);
 const totalDue = (p) => regFee(p) + evtFee(p) + rentalFee(p);
 import ParticipantEditModal from './ParticipantEditModal';
 
@@ -101,9 +102,9 @@ const Participants = ({ participants, adminName, reload }) => {
     finally { setBusyId(null); }
   };
 
-  const toggleRental = async (p) => {
+  const toggleRental = async (p, field) => {
     setBusyId(p.id); setMsg(null);
-    try { await updateParticipant(p.id, { golf_rental: !p.golf_rental }); await reload(); }
+    try { await updateParticipant(p.id, { [field]: !p[field] }); await reload(); }
     catch (e) { setMsg({ error: true, text: `골프렌탈 저장 실패: ${e.message}` }); }
     finally { setBusyId(null); }
   };
@@ -131,7 +132,8 @@ const Participants = ({ participants, adminName, reload }) => {
       { label: '프로그램', value: (r) => (r.programs || []).map((x) => PROGRAM_LABELS[x] || x).join(' | ') },
       { label: '등록비', value: (r) => (regFee(r) ? `$${regFee(r)}` : '') },
       { label: '행사비', value: (r) => (evtFee(r) ? `$${evtFee(r)}` : '') },
-      { label: '골프렌탈', value: (r) => (isGolfer(r) ? (r.golf_rental ? `$${GOLF_RENTAL_FEE}` : '미렌탈') : '') },
+      { label: '골프렌탈(본인)', value: (r) => (isGolfer(r) ? (r.golf_rental ? `$${GOLF_RENTAL_FEE}` : '미렌탈') : '') },
+      { label: '골프렌탈(동반)', value: (r) => (isGolfer(r) && hasComp(r) ? (r.companion_golf_rental ? `$${GOLF_RENTAL_FEE}` : '미렌탈') : '') },
       { label: '총내야할돈', value: (r) => (totalDue(r) ? `$${totalDue(r)}` : '') },
       { label: '납부', value: (r) => (r.payment_received ? '완료' : '미납') },
       { label: '납부체크', key: 'payment_checked_by' },
@@ -231,9 +233,16 @@ const Participants = ({ participants, adminName, reload }) => {
                     <td>{evtFee(p) ? `$${evtFee(p)}` : '-'}</td>
                     <td>
                       {isGolfer(p) ? (
-                        <CheckButton $on={p.golf_rental} disabled={busyId === p.id} onClick={() => toggleRental(p)}>
-                          {p.golf_rental ? `✓ 렌탈 $${GOLF_RENTAL_FEE}` : '렌탈'}
-                        </CheckButton>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                          <CheckButton $on={p.golf_rental} disabled={busyId === p.id} onClick={() => toggleRental(p, 'golf_rental')}>
+                            {p.golf_rental ? `✓ 본인 $${GOLF_RENTAL_FEE}` : '본인 렌탈'}
+                          </CheckButton>
+                          {hasComp(p) && (
+                            <CheckButton $on={p.companion_golf_rental} disabled={busyId === p.id} onClick={() => toggleRental(p, 'companion_golf_rental')}>
+                              {p.companion_golf_rental ? `✓ 동반 $${GOLF_RENTAL_FEE}` : '동반 렌탈'}
+                            </CheckButton>
+                          )}
+                        </div>
                       ) : (
                         <span style={{ color: '#cbd5e1' }}>-</span>
                       )}

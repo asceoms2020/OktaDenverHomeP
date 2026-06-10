@@ -39,7 +39,7 @@ const empty = {
   arrival_date: '', arrival_time: '', arrival_flight: '',
   departure_date: '', departure_time: '', departure_flight: '',
   room_type: '', room_no: '', programs: [], waiver_status: '',
-  event_fee: '', fee_amount: '', payment_method: '', notes: '', golf_rental: false,
+  event_fee: '', fee_amount: '', payment_method: '', notes: '', golf_rental: false, companion_golf_rental: false,
 };
 
 const ParticipantEditModal = ({ initial, onClose, onSaved }) => {
@@ -83,6 +83,7 @@ const ParticipantEditModal = ({ initial, onClose, onSaved }) => {
         room_no: form.room_no || null,
         programs: form.programs || [],
         golf_rental: !!form.golf_rental,
+        companion_golf_rental: !!form.companion_golf_rental,
         waiver_status: form.waiver_status || null,
         event_fee: form.event_fee || null,
         fee_amount: form.fee_amount || null,
@@ -169,10 +170,18 @@ const ParticipantEditModal = ({ initial, onClose, onSaved }) => {
 
             {(form.programs || []).includes('golf') && (
               <FullRow>
-                <ProgramChip $on={!!form.golf_rental} style={{ display: 'inline-flex' }}>
-                  <input type="checkbox" checked={!!form.golf_rental} onChange={() => set('golf_rental', !form.golf_rental)} />
-                  골프 클럽 렌탈 (+$65)
-                </ProgramChip>
+                <ProgramChips>
+                  <ProgramChip $on={!!form.golf_rental}>
+                    <input type="checkbox" checked={!!form.golf_rental} onChange={() => set('golf_rental', !form.golf_rental)} />
+                    본인 골프 클럽 렌탈 (+$65)
+                  </ProgramChip>
+                  {(parseInt(form.companion_count, 10) || 0) > 0 && (
+                    <ProgramChip $on={!!form.companion_golf_rental}>
+                      <input type="checkbox" checked={!!form.companion_golf_rental} onChange={() => set('companion_golf_rental', !form.companion_golf_rental)} />
+                      동반자 골프 클럽 렌탈 (+$65)
+                    </ProgramChip>
+                  )}
+                </ProgramChips>
               </FullRow>
             )}
 
