@@ -87,6 +87,8 @@ create table if not exists public.mou_transport_trips (
   vehicle_label text,
   capacity int default 9,
   driver text,
+  leader text,                       -- 인솔자
+  volunteer text,                    -- 봉사자
   passenger_ids uuid[] default '{}',
   notes text,
   created_at timestamptz default now(),
@@ -98,6 +100,7 @@ create table if not exists public.mou_transport_trips (
 -- -------------------------------------------------------------
 create table if not exists public.mou_train_groups (
   id uuid primary key default gen_random_uuid(),
+  activity text default 'train',     -- train(Pikes Peak) | garden | coors
   vehicle_label text,                -- VAN1 | VAN2 | SUV ...
   driver text,                       -- 운전자
   leader text,                       -- 인솔자

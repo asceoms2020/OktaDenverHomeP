@@ -157,6 +157,15 @@ export const fetchTrainGroups = async () => {
   if (error) throw error;
   return data || [];
 };
+// 활동별 차량 그룹 (train | garden | coors)
+export const fetchVehicleGroups = async (activity = 'train') => {
+  const { data, error } = await db()
+    .from('mou_train_groups')
+    .select('*')
+    .eq('activity', activity);
+  if (error) throw error;
+  return data || [];
+};
 export const upsertTrainGroup = async (row) => {
   const { error } = await db().from('mou_train_groups').upsert(row).select('id');
   if (error) throw error;
@@ -240,6 +249,13 @@ export const deleteScheduleRow = async (id) => {
 
 // ---------- 운영 인력 명단 (업무 담당자 후보) ----------
 export const STAFF_GROUPS = ['봉사자', '준비위원회', '덴버회원'];
+
+/** 구분별 풀 배지 색상 — 준비위(파랑) / 차세대봉사자(주황) / 일반(초록) */
+export const memberBadgeStyle = (memberType) => {
+  if (memberType === '준비위원회') return { bg: 'rgba(52,152,219,0.14)', color: '#1f5a7a', tag: '준비위' };
+  if (memberType === '차세대봉사자') return { bg: 'rgba(243,156,18,0.18)', color: '#b9770a', tag: '봉사단' };
+  return { bg: 'rgba(46,204,113,0.12)', color: '#1f7a3b', tag: '' };
+};
 
 export const fetchStaff = async () => {
   const { data, error } = await db()

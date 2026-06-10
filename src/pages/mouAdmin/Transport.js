@@ -6,8 +6,9 @@ import {
 } from '../../styles/MouEventAdmin.styles';
 import {
   fetchTrips, upsertTrip, updateTrip, deleteTrip, updateParticipant,
-  displayName, headcount, toCsv, downloadCsv,
+  fetchStaff, STAFF_GROUPS, memberBadgeStyle, displayName, headcount, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
+import CrewSelect from './CrewSelect';
 
 const newId = () =>
   (typeof crypto !== 'undefined' && crypto.randomUUID)
@@ -24,6 +25,15 @@ const Transport = ({ participants }) => {
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState(null);
   const [dir, setDir] = useState('pickup_in');
+  const [staff, setStaff] = useState([]);
+
+  useEffect(() => { fetchStaff().then(setStaff).catch(() => {}); }, []);
+  const staffByGroup = useMemo(() => {
+    const g = {};
+    STAFF_GROUPS.forEach((k) => { g[k] = []; });
+    staff.forEach((s) => { (g[s.role_group] = g[s.role_group] || []).push(s); });
+    return g;
+  }, [staff]);
 
   const pMap = useMemo(() => {
     const m = {};
@@ -162,6 +172,8 @@ const Transport = ({ participants }) => {
       { label: '시간', key: 'trip_time' },
       { label: '차량', key: 'vehicle_label' },
       { label: '운전자', key: 'driver' },
+      { label: '인솔자', key: 'leader' },
+      { label: '봉사자', key: 'volunteer' },
       { label: '정원', key: 'capacity' },
       { label: '탑승인원', value: (t) => (t.passenger_ids || []).length },
       { label: '탑승자', value: (t) => (t.passenger_ids || []).map((id) => displayName(pMap[id])).join(' | ') },
@@ -209,11 +221,14 @@ const Transport = ({ participants }) => {
                         {g.date} · {g.people.length}명 · {g.span}
                       </Badge>
                       <Pool>
-                        {g.people.map((p) => (
-                          <Badge key={p.id} $bg="rgba(230,126,34,0.1)" $color="#b9530a">
-                            {displayName(p)}{p[dirCfg.timeField] ? ` ${p[dirCfg.timeField]}` : ''}
-                          </Badge>
-                        ))}
+                        {g.people.map((p) => {
+                          const st = memberBadgeStyle(p.member_type);
+                          return (
+                            <Badge key={p.id} $bg={st.bg} $color={st.color}>
+                              {displayName(p)}{st.tag ? ` · ${st.tag}` : ''}{p[dirCfg.timeField] ? ` ${p[dirCfg.timeField]}` : ''}
+                            </Badge>
+                          );
+                        })}
                       </Pool>
                       <GhostButton onClick={() => addTrip(g.date)}>이 날짜로 밴 생성</GhostButton>
                     </div>
@@ -263,11 +278,21 @@ const Transport = ({ participants }) => {
                           defaultValue={trip.vehicle_label || ''}
                           onBlur={(e) => save(trip, { vehicle_label: e.target.value })}
                         />
-                        <MiniInput
-                          placeholder="운전자"
-                          defaultValue={trip.driver || ''}
-                          onBlur={(e) => save(trip, { driver: e.target.value })}
-                        />
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>운전자</div>
+                          <CrewSelect value={trip.driver} groups={staffByGroup} onChange={(v) => save(trip, { driver: v })} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>인솔자</div>
+                          <CrewSelect value={trip.leader} groups={staffByGroup} onChange={(v) => save(trip, { leader: v })} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginBottom: 2 }}>봉사자</div>
+                          <CrewSelect value={trip.volunteer} groups={staffByGroup} onChange={(v) => save(trip, { volunteer: v })} />
+                        </div>
                       </div>
 
                       <ChipRow>

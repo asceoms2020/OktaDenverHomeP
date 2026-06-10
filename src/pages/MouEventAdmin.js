@@ -9,7 +9,7 @@ import Participants from './mouAdmin/Participants';
 import Rooms from './mouAdmin/Rooms';
 import Transport from './mouAdmin/Transport';
 import Golf from './mouAdmin/Golf';
-import Train from './mouAdmin/Train';
+import DayVehicles from './mouAdmin/DayVehicles';
 import Tasks from './mouAdmin/Tasks';
 import Schedule from './mouAdmin/Schedule';
 import Lodging from './mouAdmin/Lodging';
@@ -21,6 +21,8 @@ const TABS = [
   { key: 'transport', label: '공항 교통' },
   { key: 'golf', label: '골프 팀' },
   { key: 'train', label: '기차팀' },
+  { key: 'garden', label: 'Garden of Gods' },
+  { key: 'coors', label: 'Coors' },
   { key: 'tasks', label: '업무 지시' },
   { key: 'schedule', label: '일정표' },
   { key: 'lodging', label: '숙박 정산' },
@@ -100,7 +102,18 @@ const MouEventAdmin = () => {
       {!loading && tab === 'rooms' && <Rooms participants={participants} />}
       {!loading && tab === 'transport' && <Transport participants={participants} />}
       {!loading && tab === 'golf' && <Golf participants={participants} />}
-      {!loading && tab === 'train' && <Train participants={participants} />}
+      {!loading && tab === 'train' && (
+        <DayVehicles participants={participants} activity="train" label="기차(Pikes Peak)"
+          presets={['VAN1', 'VAN2', 'SUV']} badgeBg="rgba(155,89,182,0.1)" badgeColor="#7d3c98" />
+      )}
+      {!loading && tab === 'garden' && (
+        <DayVehicles participants={participants} activity="garden" label="Garden of Gods"
+          presets={['밴1', '밴2', 'SUV']} badgeBg="rgba(22,160,133,0.12)" badgeColor="#0e6b57" />
+      )}
+      {!loading && tab === 'coors' && (
+        <DayVehicles participants={participants} activity="coors" label="Coors"
+          presets={['밴1', '밴2', 'SUV']} badgeBg="rgba(192,57,43,0.1)" badgeColor="#a93226" />
+      )}
       {!loading && tab === 'tasks' && <Tasks />}
       {!loading && tab === 'schedule' && <Schedule />}
       {!loading && tab === 'lodging' && (

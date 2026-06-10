@@ -5,7 +5,7 @@ import {
   CapTag, Chip, ChipRow, Pool, Select, IconButton, Badge, MiniInput,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchGolfTeams, upsertGolfTeam, updateGolfTeam, deleteGolfTeam, displayName, headcount, toCsv, downloadCsv,
+  fetchGolfTeams, upsertGolfTeam, updateGolfTeam, deleteGolfTeam, displayName, headcount, memberBadgeStyle, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const newId = () =>
@@ -138,11 +138,11 @@ const Golf = ({ participants }) => {
                 {unassigned.length === 0
                   ? <Empty>모든 골퍼가 조에 배정되었습니다 🎉</Empty>
                   : unassigned.map((p) => {
-                    const isCom = p.member_type === '준비위원회';
                     const cc = compOf(p);
+                    const st = memberBadgeStyle(p.member_type);
                     return (
-                      <Badge key={p.id} $bg={isCom ? 'rgba(52,152,219,0.12)' : 'rgba(46,204,113,0.1)'} $color={isCom ? '#1f5a7a' : '#1f7a3b'}>
-                        {displayName(p)}{isCom ? ' · 준비위' : ''}{cc > 0 ? ` +${cc}` : ''}
+                      <Badge key={p.id} $bg={st.bg} $color={st.color}>
+                        {displayName(p)}{st.tag ? ` · ${st.tag}` : ''}{cc > 0 ? ` +${cc}` : ''}
                       </Badge>
                     );
                   })}
