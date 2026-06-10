@@ -194,6 +194,7 @@ const Participants = ({ participants, adminName, reload }) => {
                   <th>골프렌탈</th>
                   <th>총 내야할 돈</th>
                   <th>납부 체크</th>
+                  <th>확인자</th>
                   <th>체크인</th>
                   <th>관리</th>
                 </tr>
@@ -242,11 +243,13 @@ const Participants = ({ participants, adminName, reload }) => {
                       <CheckButton $on={p.payment_received} disabled={busyId === p.id} onClick={() => togglePay(p)}>
                         {p.payment_received ? '✓ 납부완료' : '미납'}
                       </CheckButton>
-                      {p.payment_received && (
-                        <div style={{ fontSize: '0.72rem', color: '#1f7a3b', marginTop: 3 }}>
-                          {fmtChecked(p.payment_checked_by, p.payment_checked_at)}
-                        </div>
-                      )}
+                    </td>
+                    <td style={{ whiteSpace: 'normal', minWidth: 110 }}>
+                      {!p.payment_received
+                        ? <span style={{ color: '#cbd5e1' }}>-</span>
+                        : p.payment_checked_by
+                          ? <span style={{ color: '#1f7a3b', fontSize: '0.82rem' }}>{fmtChecked(p.payment_checked_by, p.payment_checked_at)}</span>
+                          : <span style={{ color: '#9ca3af', fontSize: '0.78rem' }}>시트 반영(확인자 없음)</span>}
                     </td>
                     <td>
                       <CheckButton $on={p.checked_in} disabled={busyId === p.id} onClick={() => toggleCheckin(p)}>
@@ -265,7 +268,7 @@ const Participants = ({ participants, adminName, reload }) => {
                   </tr>
                 ))}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={15}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
+                  <tr><td colSpan={16}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
                 )}
               </tbody>
             </Table>
