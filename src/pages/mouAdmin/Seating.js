@@ -268,7 +268,7 @@ const Seating = ({ participants }) => {
 
             {/* 선택 테이블 편집 */}
             {selected && (
-              <Card style={{ marginTop: 18 }}>
+              <Card key={selected.id} style={{ marginTop: 18 }}>
                 <CardHead>
                   <CardTitle>
                     테이블 편집 — {selected.label} ({seatsOf(selected.occupant_ids)}/{selected.capacity || 8}명)
