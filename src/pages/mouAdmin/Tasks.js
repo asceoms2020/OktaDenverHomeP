@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import {
   Card, CardHead, CardTitle, CardBody, Toolbar, Select, Input, PrimaryButton,
   GhostButton, Message, Empty, Table, TableWrap, MiniInput, IconButton, Badge,
@@ -91,6 +91,15 @@ const Tasks = () => {
     }
     return Array.from(map.values());
   }, [filtered]);
+
+  // 처음 로드 시 모든 그룹을 접힌 상태로 시작
+  const collapseInit = useRef(false);
+  useEffect(() => {
+    if (!collapseInit.current && tasks.length > 0 && groups.length > 0) {
+      collapseInit.current = true;
+      setCollapsed(new Set(groups.map((g) => g.key)));
+    }
+  }, [tasks, groups]);
 
   const summary = useMemo(() => {
     const c = { 'Not Started': 0, 'In Progress': 0, 'Completed': 0 };
