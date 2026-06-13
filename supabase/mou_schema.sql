@@ -180,6 +180,20 @@ create table if not exists public.mou_staff (
   updated_at timestamptz default now()
 );
 
+-- -------------------------------------------------------------
+-- 9) 개회식 자리배치 (8인 원형 테이블)
+-- -------------------------------------------------------------
+create table if not exists public.mou_seating_tables (
+  id uuid primary key default gen_random_uuid(),
+  label text,
+  kind text default 'normal',        -- normal | staff | vip
+  capacity int default 8,
+  occupant_ids uuid[] default '{}',
+  sort_order int default 0,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
 -- =============================================================
 -- RLS: 모든 mou_* 테이블은 관리자만 읽기/쓰기 가능 (PII 보호)
 -- =============================================================
@@ -188,7 +202,7 @@ declare
   t text;
   tables text[] := array[
     'mou_participants','mou_rooms','mou_transport_trips',
-    'mou_train_groups','mou_golf_teams','mou_tasks','mou_schedule','mou_staff'
+    'mou_train_groups','mou_golf_teams','mou_tasks','mou_schedule','mou_staff','mou_seating_tables'
   ];
 begin
   foreach t in array tables loop

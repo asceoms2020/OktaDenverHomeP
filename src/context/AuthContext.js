@@ -72,19 +72,11 @@ export const AuthProvider = ({ children }) => {
       };
     };
 
-    // localStorage에서 저장된 세션 로드
+    // localStorage에서 저장된 세션 로드 (만료돼도 일단 반환 → 리프레시 토큰으로 갱신 시도)
     const loadStoredSession = () => {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const session = JSON.parse(stored);
-          // 만료 여부 확인
-          if (session.expiresAt && Date.now() / 1000 < session.expiresAt) {
-            return session;
-          } else {
-            localStorage.removeItem(STORAGE_KEY);
-          }
-        }
+        if (stored) return JSON.parse(stored);
       } catch (e) {
         console.error('Failed to load stored session:', e);
       }
@@ -209,26 +201,40 @@ export const AuthProvider = ({ children }) => {
         } else {
           // 저장된 세션 로드
           const storedSession = loadStoredSession();
-          if (storedSession && storedSession.user) {
-            console.log('Restored session for:', storedSession.user.email);
-            if (mounted) {
-              if (storedSession.accessToken && storedSession.refreshToken) {
+          if (storedSession && storedSession.user && storedSession.refreshToken) {
+            const now = Date.now() / 1000;
+            const expired = !storedSession.expiresAt || storedSession.expiresAt <= now + 60; // 만료 60초 전이면 갱신
+
+            if (expired) {
+              // 액세스 토큰 만료 → 리프레시 토큰으로 갱신 (재로그인 불필요)
+              console.log('Access token expired, refreshing with refresh token...');
+              const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession({
+                refresh_token: storedSession.refreshToken,
+              });
+              const s = refreshed?.session;
+              if (refreshError || !s) {
+                console.warn('Session refresh failed:', refreshError?.message);
+                localStorage.removeItem(STORAGE_KEY);
+                if (mounted) { setUser(null); setUserProfile(null); }
+              } else {
+                saveSession(s.access_token, s.refresh_token, s.expires_at, s.user);
+                if (mounted) {
+                  setUser(s.user);
+                  await fetchUserProfile(s.user.id);
+                }
+              }
+            } else {
+              console.log('Restored session for:', storedSession.user.email);
+              if (mounted) {
                 supabase.auth
                   .setSession({
                     access_token: storedSession.accessToken,
                     refresh_token: storedSession.refreshToken,
                   })
-                  .then(({ error }) => {
-                    if (error) {
-                      console.warn('Failed to restore Supabase in-memory session:', error.message);
-                    }
-                  })
-                  .catch((e) => {
-                    console.warn('Failed to restore Supabase in-memory session:', e);
-                  });
+                  .catch((e) => console.warn('Failed to restore Supabase in-memory session:', e));
+                setUser(storedSession.user);
+                await fetchUserProfile(storedSession.user.id);
               }
-              setUser(storedSession.user);
-              await fetchUserProfile(storedSession.user.id);
             }
           } else {
             console.log('No valid session found');
@@ -259,6 +265,27 @@ export const AuthProvider = ({ children }) => {
       clearTimeout(timeoutId);
     };
   }, []);
+
+  // 로그인 중에는 45분마다 토큰을 자동 갱신 (탭을 오래 열어둬도 세션 유지)
+  useEffect(() => {
+    if (!user) return undefined;
+    const KEY = 'okta_auth_session';
+    const refresh = async () => {
+      try {
+        const stored = JSON.parse(localStorage.getItem(KEY) || 'null');
+        if (!stored?.refreshToken) return;
+        const { data, error } = await supabase.auth.refreshSession({ refresh_token: stored.refreshToken });
+        const s = data?.session;
+        if (!error && s) {
+          localStorage.setItem(KEY, JSON.stringify({
+            accessToken: s.access_token, refreshToken: s.refresh_token, expiresAt: s.expires_at, user: s.user,
+          }));
+        }
+      } catch (e) { /* 무시: 다음 진입 시 재시도 */ }
+    };
+    const id = setInterval(refresh, 45 * 60 * 1000);
+    return () => clearInterval(id);
+  }, [user]);
 
   // 이메일 로그인 함수
   const signInWithEmail = async (email, password) => {

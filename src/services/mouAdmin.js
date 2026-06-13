@@ -247,6 +247,28 @@ export const deleteScheduleRow = async (id) => {
   if (error) throw error;
 };
 
+// ---------- 개회식 자리배치 ----------
+export const fetchSeatingTables = async () => {
+  const { data, error } = await db()
+    .from('mou_seating_tables')
+    .select('*')
+    .order('sort_order', { ascending: true });
+  if (error) throw error;
+  return data || [];
+};
+export const upsertSeatingTable = async (row) => {
+  const { error } = await db().from('mou_seating_tables').upsert(row).select('id');
+  if (error) throw error;
+};
+export const updateSeatingTable = async (id, patch) => {
+  const { error } = await db().from('mou_seating_tables').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw error;
+};
+export const deleteSeatingTable = async (id) => {
+  const { error } = await db().from('mou_seating_tables').delete().eq('id', id);
+  if (error) throw error;
+};
+
 // ---------- 운영 인력 명단 (업무 담당자 후보) ----------
 export const STAFF_GROUPS = ['봉사자', '준비위원회', '덴버회원'];
 

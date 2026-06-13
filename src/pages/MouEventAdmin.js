@@ -13,6 +13,7 @@ import DayVehicles from './mouAdmin/DayVehicles';
 import Tasks from './mouAdmin/Tasks';
 import Schedule from './mouAdmin/Schedule';
 import Lodging from './mouAdmin/Lodging';
+import Seating from './mouAdmin/Seating';
 
 const TABS = [
   { key: 'dashboard', label: '현황' },
@@ -23,6 +24,7 @@ const TABS = [
   { key: 'train', label: '기차팀' },
   { key: 'garden', label: 'Garden of Gods' },
   { key: 'coors', label: 'Coors' },
+  { key: 'seating', label: '개회식' },
   { key: 'tasks', label: '업무 지시' },
   { key: 'schedule', label: '일정표' },
   { key: 'lodging', label: '숙박 정산' },
@@ -114,6 +116,7 @@ const MouEventAdmin = () => {
         <DayVehicles participants={participants} activity="coors" label="Coors"
           presets={['밴1', '밴2', 'SUV']} badgeBg="rgba(192,57,43,0.1)" badgeColor="#a93226" />
       )}
+      {!loading && tab === 'seating' && <Seating participants={participants} />}
       {!loading && tab === 'tasks' && <Tasks />}
       {!loading && tab === 'schedule' && <Schedule />}
       {!loading && tab === 'lodging' && (

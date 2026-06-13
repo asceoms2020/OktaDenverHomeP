@@ -484,6 +484,97 @@ export const GroupHeaderRow = styled.tr`
   &:hover td { background: rgba(46, 204, 113, 0.06); }
 `;
 
+/* ---- 개회식 자리배치(볼룸) ---- */
+export const Ballroom = styled.div`
+  position: relative;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: 16px;
+  background:
+    linear-gradient(0deg, rgba(46,204,113,0.03), rgba(52,152,219,0.03));
+  padding: 16px 16px 24px 64px;
+  overflow-x: auto;
+`;
+
+export const StageBar = styled.div`
+  height: 40px;
+  margin: 4px 8px 18px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1f2a37, #374151);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.25em;
+  font-weight: 800;
+  font-size: 0.9rem;
+`;
+
+export const BeverageBar = styled.div`
+  position: absolute;
+  left: 14px;
+  top: 70px;
+  bottom: 28px;
+  width: 34px;
+  border: 1px dashed rgba(17, 24, 39, 0.25);
+  border-radius: 8px;
+  background: rgba(17, 24, 39, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+  font-size: 0.72rem;
+  color: #6b7280;
+  letter-spacing: 0.1em;
+`;
+
+export const TablesArea = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 26px 30px;
+  justify-content: center;
+  padding: 8px 0;
+`;
+
+export const TableBox = styled.div`
+  position: relative;
+  width: 118px;
+  height: 118px;
+  flex: 0 0 auto;
+`;
+
+export const TableCircle = styled.button`
+  position: absolute;
+  inset: 16px;
+  border-radius: 50%;
+  border: 2px solid ${(p) => (p.$selected ? '#1f2a37' : p.$ring)};
+  background: ${(p) => p.$bg};
+  color: ${(p) => p.$color};
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: ${(p) => (p.$selected ? '0 0 0 3px rgba(31,42,55,0.18)' : '0 4px 10px rgba(17,24,39,0.08)')};
+  transition: transform 100ms ease, box-shadow 100ms ease;
+  &:hover { transform: scale(1.04); }
+  .t-label { font-weight: 800; font-size: 0.82rem; line-height: 1.1; text-align: center; }
+  .t-count { font-size: 0.72rem; font-weight: 700; opacity: 0.85; }
+`;
+
+export const SeatDot = styled.span`
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid rgba(17, 24, 39, 0.25);
+  background: ${(p) => (p.$on ? '#2ecc71' : '#ffffff')};
+  left: 50%;
+  top: 50%;
+  margin: -6.5px 0 0 -6.5px;
+  transform: ${(p) => `rotate(${p.$angle}deg) translate(0, -52px) rotate(${-p.$angle}deg)`};
+`;
+
 export const ProgramChips = styled.div`
   display: flex;
   flex-wrap: wrap;
