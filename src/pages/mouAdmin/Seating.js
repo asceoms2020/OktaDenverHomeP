@@ -202,6 +202,52 @@ const Seating = ({ participants }) => {
               )}
             </Ballroom>
 
+            {/* 테이블별 명단 (한눈에 보기) */}
+            {tables.length > 0 && (
+              <>
+                <div style={{ margin: '18px 0 8px', fontWeight: 700, fontSize: '0.9rem', color: '#374151' }}>
+                  테이블별 명단
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: 12 }}>
+                  {tables.map((t) => {
+                    const ks = kindStyle(t.kind);
+                    const occ = t.occupant_ids || [];
+                    const used = seatsOf(occ);
+                    return (
+                      <div
+                        key={t.id}
+                        onClick={() => setSelId(t.id)}
+                        style={{
+                          border: `1px solid ${selId === t.id ? '#1f2a37' : 'rgba(17,24,39,0.1)'}`,
+                          borderRadius: 12, overflow: 'hidden', cursor: 'pointer',
+                        }}
+                      >
+                        <div style={{
+                          padding: '8px 12px', background: ks.bg, color: ks.color,
+                          fontWeight: 800, display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        }}>
+                          <span>{t.label}{t.kind !== 'normal' ? ` · ${KINDS[t.kind]}` : ''}</span>
+                          <span style={{ fontSize: '0.82rem' }}>{used}/{t.capacity || 8}</span>
+                        </div>
+                        <div style={{ padding: '8px 12px' }}>
+                          {occ.length === 0
+                            ? <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>비어 있음</span>
+                            : (
+                              <ol style={{ margin: 0, paddingLeft: 18, fontSize: '0.85rem', lineHeight: 1.7 }}>
+                                {occ.map((pid) => {
+                                  const cc = pMap[pid]?.companion_count || (pMap[pid]?.has_companion ? 1 : 0);
+                                  return <li key={pid}>{displayName(pMap[pid]) || '(알수없음)'}{cc > 0 ? ` +${cc}` : ''}</li>;
+                                })}
+                              </ol>
+                            )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
             {/* 미배정 풀 */}
             <div style={{ margin: '18px 0 8px', fontWeight: 700, fontSize: '0.9rem', color: '#374151' }}>
               미배정 ({unassignedHead}명, 동반자 포함)
