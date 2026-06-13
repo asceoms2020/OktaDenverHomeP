@@ -117,7 +117,7 @@ const MouEventAdmin = () => {
           presets={['밴1', '밴2', 'SUV']} badgeBg="rgba(192,57,43,0.1)" badgeColor="#a93226" />
       )}
       {!loading && tab === 'seating' && <Seating participants={participants} />}
-      {!loading && tab === 'tasks' && <Tasks />}
+      {!loading && tab === 'tasks' && <Tasks participants={participants} />}
       {!loading && tab === 'schedule' && <Schedule />}
       {!loading && tab === 'lodging' && (
         <Lodging participants={participants} adminName={adminName} reload={load} />

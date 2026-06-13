@@ -5,7 +5,7 @@ import {
   ProgressWrap, ProgressBar, ProgressSeg, GroupHeaderRow, Chip, ChipRow,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchTasks, upsertTask, updateTask, deleteTask, fetchStaff, STAFF_GROUPS, toCsv, downloadCsv,
+  fetchTasks, upsertTask, updateTask, deleteTask, fetchStaff, STAFF_GROUPS, buildStaffGroups, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const newId = () =>
@@ -23,7 +23,7 @@ const STATUS_STYLE = {
 };
 const dayOrder = (d) => { const i = DAY_OPTIONS.indexOf(d); return i === -1 ? 99 : i; };
 
-const Tasks = () => {
+const Tasks = ({ participants = [] }) => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState(null);
@@ -36,13 +36,8 @@ const Tasks = () => {
 
   useEffect(() => { fetchStaff().then(setStaff).catch(() => {}); }, []);
 
-  // 담당자 후보를 그룹별로 정리
-  const staffByGroup = useMemo(() => {
-    const g = {};
-    STAFF_GROUPS.forEach((k) => { g[k] = []; });
-    staff.forEach((s) => { (g[s.role_group] = g[s.role_group] || []).push(s); });
-    return g;
-  }, [staff]);
+  // 담당자 후보 = mou_staff + 참가자(차세대봉사자/준비위원회/덴버지회)
+  const staffByGroup = useMemo(() => buildStaffGroups(staff, participants), [staff, participants]);
 
   const load = useCallback(async () => {
     try {

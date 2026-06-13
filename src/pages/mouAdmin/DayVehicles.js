@@ -6,7 +6,7 @@ import {
 } from '../../styles/MouEventAdmin.styles';
 import {
   fetchVehicleGroups, upsertTrainGroup, updateTrainGroup, deleteTrainGroup,
-  fetchStaff, STAFF_GROUPS, memberBadgeStyle, displayName, headcount, toCsv, downloadCsv,
+  fetchStaff, buildStaffGroups, memberBadgeStyle, displayName, headcount, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 import CrewSelect from './CrewSelect';
 
@@ -33,12 +33,7 @@ const DayVehicles = ({
   const [staff, setStaff] = useState([]);
 
   useEffect(() => { fetchStaff().then(setStaff).catch(() => {}); }, []);
-  const staffByGroup = useMemo(() => {
-    const g = {};
-    STAFF_GROUPS.forEach((k) => { g[k] = []; });
-    staff.forEach((s) => { (g[s.role_group] = g[s.role_group] || []).push(s); });
-    return g;
-  }, [staff]);
+  const staffByGroup = useMemo(() => buildStaffGroups(staff, participants), [staff, participants]);
 
   const riders = useMemo(
     () => participants.filter((p) => (p.programs || []).includes(activity)),

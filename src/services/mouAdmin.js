@@ -279,6 +279,32 @@ export const memberBadgeStyle = (memberType) => {
   return { bg: 'rgba(46,204,113,0.12)', color: '#1f7a3b', tag: '' };
 };
 
+/**
+ * 담당자 후보 그룹 = mou_staff + 참가자(차세대봉사자/준비위원회/덴버지회) 병합.
+ * 참가자 탭에서 구분을 바꾼 사람도 드롭다운에 자동 반영. 이름 중복은 제거.
+ */
+const MEMBER_TO_GROUP = { 차세대봉사자: '봉사자', 준비위원회: '준비위원회', 덴버지회: '덴버회원' };
+export const buildStaffGroups = (staff, participants = []) => {
+  const g = {};
+  STAFF_GROUPS.forEach((k) => { g[k] = []; });
+  const seen = new Set();
+  (staff || []).forEach((s) => {
+    (g[s.role_group] = g[s.role_group] || []).push(s);
+    seen.add(`${s.role_group}|${s.name}`);
+  });
+  (participants || []).forEach((p) => {
+    const rg = MEMBER_TO_GROUP[p.member_type];
+    if (!rg) return;
+    const name = p.name_ko || p.name_en;
+    if (!name) return;
+    const key = `${rg}|${name}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    (g[rg] = g[rg] || []).push({ id: p.id, name, role_group: rg, title: p.position || p.chapter || '' });
+  });
+  return g;
+};
+
 export const fetchStaff = async () => {
   const { data, error } = await db()
     .from('mou_staff')
