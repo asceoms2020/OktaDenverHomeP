@@ -19,11 +19,15 @@ export const fetchParticipants = async () => {
 };
 
 export const updateParticipant = async (id, patch) => {
-  const { error } = await db()
+  const { data, error } = await db()
     .from('mou_participants')
     .update({ ...patch, updated_at: new Date().toISOString() })
-    .eq('id', id);
+    .eq('id', id)
+    .select('id');
   if (error) throw error;
+  if (!data || data.length === 0) {
+    throw new Error('대상 참가자를 찾을 수 없습니다. 페이지를 새로고침한 뒤 다시 시도하세요.');
+  }
 };
 
 export const insertParticipant = async (row) => {
