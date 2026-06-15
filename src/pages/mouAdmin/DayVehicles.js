@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Card, CardHead, CardTitle, CardBody, PrimaryButton, GhostButton,
   Message, Empty, AssignGrid, AssignCard, AssignCardHead, AssignCardTitle,
-  CapTag, Chip, ChipRow, Pool, Select, IconButton, Badge, MiniInput,
+  CapTag, Chip, ChipRow, Pool, PoolChip, IconButton, Badge, MiniInput,
 } from '../../styles/MouEventAdmin.styles';
 import {
   fetchVehicleGroups, upsertTrainGroup, updateTrainGroup, deleteTrainGroup,
@@ -31,6 +31,8 @@ const DayVehicles = ({
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState(null);
   const [staff, setStaff] = useState([]);
+  const [addOpen, setAddOpen] = useState(null);     // 다중 추가 패널이 열린 차량 id
+  const [picked, setPicked] = useState(() => new Set());
 
   useEffect(() => { fetchStaff().then(setStaff).catch(() => {}); }, []);
   const staffByGroup = useMemo(() => buildStaffGroups(staff, participants), [staff, participants]);
@@ -111,8 +113,19 @@ const DayVehicles = ({
     catch (e) { setMsg({ error: true, text: `삭제 실패: ${e.message}` }); }
   };
 
-  const addPassenger = (grp, pid) => { if (pid) save(grp, { passenger_ids: [...(grp.passenger_ids || []), pid] }); };
   const removePassenger = (grp, pid) => save(grp, { passenger_ids: (grp.passenger_ids || []).filter((x) => x !== pid) });
+
+  // 다중 선택으로 한 번에 추가
+  const openAdd = (grpId) => { setAddOpen(grpId); setPicked(new Set()); };
+  const closeAdd = () => { setAddOpen(null); setPicked(new Set()); };
+  const togglePick = (pid) => {
+    setPicked((prev) => { const n = new Set(prev); if (n.has(pid)) n.delete(pid); else n.add(pid); return n; });
+  };
+  const commitAdd = (grp) => {
+    const ids = [...picked].filter((id) => !(grp.passenger_ids || []).includes(id));
+    if (ids.length) save(grp, { passenger_ids: [...(grp.passenger_ids || []), ...ids] });
+    closeAdd();
+  };
 
   const exportCsv = () => {
     const csv = toCsv(groups, [
@@ -224,14 +237,38 @@ const DayVehicles = ({
                         {pax.length === 0 && <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>탑승자 없음</span>}
                       </ChipRow>
 
-                      <Select defaultValue="" onChange={(e) => { addPassenger(grp, e.target.value); e.target.value = ''; }}>
-                        <option value="">+ 탑승자 배정</option>
-                        {unassigned.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {displayName(p)} · {p.member_type === '준비위원회' ? '준비위원회' : p.chapter}
-                          </option>
-                        ))}
-                      </Select>
+                      {addOpen === grp.id ? (
+                        <div style={{ border: '1px solid rgba(46,204,113,0.4)', borderRadius: 10, padding: 8, background: 'rgba(46,204,113,0.04)' }}>
+                          <div style={{ fontSize: '0.78rem', color: '#6b7280', marginBottom: 6 }}>
+                            추가할 사람을 클릭하세요 (여러 명 선택 가능)
+                          </div>
+                          <Pool style={{ maxHeight: 220, overflowY: 'auto' }}>
+                            {unassigned.length === 0
+                              ? <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>미배정 인원 없음</span>
+                              : unassigned.map((p) => {
+                                const on = picked.has(p.id);
+                                const cc = p.companion_count || (p.has_companion ? 1 : 0);
+                                return (
+                                  <PoolChip
+                                    key={p.id}
+                                    onClick={() => togglePick(p.id)}
+                                    style={on ? { background: '#2ecc71', color: '#fff', borderColor: '#2ecc71', borderStyle: 'solid' } : undefined}
+                                  >
+                                    {on ? '✓ ' : ''}{displayName(p)}{cc > 0 ? ` +${cc}` : ''}
+                                  </PoolChip>
+                                );
+                              })}
+                          </Pool>
+                          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                            <PrimaryButton onClick={() => commitAdd(grp)} disabled={picked.size === 0}>
+                              {picked.size}명 추가
+                            </PrimaryButton>
+                            <GhostButton onClick={closeAdd}>취소</GhostButton>
+                          </div>
+                        </div>
+                      ) : (
+                        <GhostButton onClick={() => openAdd(grp.id)} style={{ width: '100%' }}>+ 탑승자 추가</GhostButton>
+                      )}
                     </AssignCard>
                   );
                 })}
