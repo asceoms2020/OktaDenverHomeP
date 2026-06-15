@@ -103,7 +103,13 @@ const MouEventAdmin = () => {
       )}
       {!loading && tab === 'rooms' && <Rooms participants={participants} />}
       {!loading && tab === 'transport' && <Transport participants={participants} />}
-      {!loading && tab === 'golf' && <Golf participants={participants} />}
+      {!loading && tab === 'golf' && (
+        <>
+          <Golf participants={participants} />
+          <DayVehicles participants={participants} activity="golf" label="골프장 이동"
+            presets={['밴1', '밴2', 'SUV']} badgeBg="rgba(46,204,113,0.12)" badgeColor="#1f7a3b" />
+        </>
+      )}
       {!loading && tab === 'train' && (
         <DayVehicles participants={participants} activity="train" label="기차(Pikes Peak)"
           presets={['VAN1', 'VAN2', 'SUV']} badgeBg="rgba(155,89,182,0.1)" badgeColor="#7d3c98" />
