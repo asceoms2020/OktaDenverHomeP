@@ -22,7 +22,7 @@ const TABS = [
   { key: 'transport', label: '공항 교통' },
   { key: 'golf', label: '골프 팀' },
   { key: 'train', label: '기차팀' },
-  { key: 'garden', label: 'Garden of Gods' },
+  { key: 'garden', label: 'Broadmoor / Garden of Gods' },
   { key: 'coors', label: 'Coors' },
   { key: 'seating', label: '개회식' },
   { key: 'tasks', label: '업무 지시' },
