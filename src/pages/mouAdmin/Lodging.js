@@ -17,9 +17,33 @@ const fmtChecked = (who, at) => {
   return `${who || '관리자'}${when ? ` · ${when}` : ''}`;
 };
 
+// 참가자의 동반자를 이름(한/영)으로 분해. companion_count 만큼 행 생성
+const parseCompanions = (p) => {
+  const cc = p.companion_count || (p.has_companion ? 1 : 0);
+  if (cc <= 0) return [];
+  const raw = (p.companion_name || '').trim();
+  const names = raw ? raw.split(/[,&·]|(?:\s+and\s+)/i).map((s) => s.trim()).filter(Boolean) : [];
+  const out = [];
+  for (let i = 0; i < cc; i += 1) {
+    const nm = names[i] || '';
+    let ko = '';
+    let en = '';
+    if (nm) {
+      const parts = nm.split('/').map((s) => s.trim());
+      if (parts.length >= 2) {
+        ko = parts.find((x) => /[가-힣]/.test(x)) || parts[0];
+        en = parts.find((x) => x !== ko && /[A-Za-z]/.test(x)) || '';
+      } else if (/[가-힣]/.test(nm)) ko = nm;
+      else en = nm;
+    }
+    out.push({ ko: ko || nm || `동반자 ${i + 1}`, en });
+  }
+  return out;
+};
+
 const Lodging = ({ participants, adminName, reload }) => {
   const [q, setQ] = useState('');
-  const [view, setView] = useState('payable'); // payable | all
+  const [view, setView] = useState('all'); // all | payable
   const [pay, setPay] = useState('');
   const [busyId, setBusyId] = useState(null);
   const [msg, setMsg] = useState(null);
@@ -61,6 +85,31 @@ const Lodging = ({ participants, adminName, reload }) => {
     });
   }, [rows, q, view, pay]);
 
+  // 멤버 + 동반자를 각각의 행으로 펼침 (동반자도 다 보이게)
+  const displayRows = useMemo(() => {
+    const out = [];
+    filtered.forEach((p) => {
+      out.push({ ...p, _kind: 'member', _key: p.id });
+      parseCompanions(p).forEach((c, i) => {
+        out.push({
+          _kind: 'companion',
+          _key: `${p.id}-c${i}`,
+          name_ko: c.ko,
+          name_en: c.en,
+          arrival_date: p.arrival_date,
+          departure_date: p.departure_date,
+          _roomNo: p._roomNo,
+          _roomType: p._roomType,
+          _total: p._total,
+          _ofName: displayName(p),
+        });
+      });
+    });
+    return out;
+  }, [filtered]);
+
+  const stayingCount = displayRows.length;
+
   const summary = useMemo(() => {
     const targets = rows.filter((p) => p._payable > 0);
     const payableSum = targets.reduce((s, p) => s + p._payable, 0);
@@ -89,7 +138,8 @@ const Lodging = ({ participants, adminName, reload }) => {
   };
 
   const exportCsv = () => {
-    const csv = toCsv(filtered, [
+    const csv = toCsv(displayRows, [
+      { label: '구분', value: (r) => (r._kind === 'companion' ? '동반자' : '본인') },
       { label: '이름', key: 'name_ko' },
       { label: '영어이름', key: 'name_en' },
       { label: '체크인', key: 'arrival_date' },
@@ -97,8 +147,8 @@ const Lodging = ({ participants, adminName, reload }) => {
       { label: '방번호', value: (r) => r._roomNo || '' },
       { label: '객실', value: (r) => r._roomType || '' },
       { label: '총 박수', value: (r) => (r._total == null ? '' : r._total) },
-      { label: '받을 박수', value: (r) => (r._exempt ? '면제' : r._payable == null ? '' : r._payable) },
-      { label: '납부', value: (r) => (r._exempt ? '면제' : !(r._payable > 0) ? '해당없음' : r.lodging_paid ? '완료' : '미납') },
+      { label: '받을 박수', value: (r) => (r._kind === 'companion' ? '본인합산' : r._exempt ? '면제' : r._payable == null ? '' : r._payable) },
+      { label: '납부', value: (r) => (r._kind === 'companion' ? '' : r._exempt ? '면제' : !(r._payable > 0) ? '해당없음' : r.lodging_paid ? '완료' : '미납') },
       { label: '체크한사람', key: 'lodging_paid_by' },
     ]);
     downloadCsv('mou_lodging.csv', csv);
@@ -107,7 +157,7 @@ const Lodging = ({ participants, adminName, reload }) => {
   return (
     <Card>
       <CardHead>
-        <CardTitle>숙박 정산 · 추가요금 대상 {summary.targetCount}명 (3박부터 추가)</CardTitle>
+        <CardTitle>숙박 정산 · 숙박 인원 {stayingCount}명(동반자 포함) · 추가요금 대상 {summary.targetCount}명(3박부터)</CardTitle>
         <GhostButton onClick={exportCsv}>CSV 내보내기</GhostButton>
       </CardHead>
       <CardBody>
@@ -159,8 +209,22 @@ const Lodging = ({ participants, adminName, reload }) => {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((p) => (
-                <tr key={p.id}>
+              {displayRows.map((p) => p._kind === 'companion' ? (
+                <tr key={p._key} style={{ background: 'rgba(155,89,182,0.04)' }}>
+                  <td style={{ paddingLeft: 22 }}>
+                    ↳ <strong>{p.name_ko || '-'}</strong>
+                    <Badge $bg="rgba(155,89,182,0.12)" $color="#7d3c98" style={{ marginLeft: 6 }}>동반자</Badge>
+                  </td>
+                  <td>{p.name_en || '-'}</td>
+                  <td>{p.arrival_date || <span style={{ color: '#cbd5e1' }}>미정</span>}</td>
+                  <td>{p.departure_date || <span style={{ color: '#cbd5e1' }}>미정</span>}</td>
+                  <td>{p._roomNo ? <Badge $bg="rgba(52,152,219,0.12)" $color="#1f5a7a">{p._roomNo}</Badge> : <span style={{ color: '#cbd5e1' }}>미배정</span>}</td>
+                  <td>{p._roomType ? <Badge $bg={p._roomType === '1인실' ? 'rgba(155,89,182,0.12)' : 'rgba(46,204,113,0.12)'} $color={p._roomType === '1인실' ? '#7d3c98' : '#1f7a3b'}>{p._roomType}</Badge> : <span style={{ color: '#cbd5e1' }}>미배정</span>}</td>
+                  <td>{p._total == null ? <span style={{ color: '#cbd5e1' }}>-</span> : `${p._total}박`}</td>
+                  <td colSpan={2} style={{ color: '#9ca3af', fontSize: '0.82rem' }}>{p._ofName} 동반자 (요금은 본인에 합산)</td>
+                </tr>
+              ) : (
+                <tr key={p._key}>
                   <td><strong>{p.name_ko || '-'}</strong></td>
                   <td>{p.name_en || '-'}</td>
                   <td>{p.arrival_date || <span style={{ color: '#cbd5e1' }}>미정</span>}</td>
@@ -205,7 +269,7 @@ const Lodging = ({ participants, adminName, reload }) => {
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && (
+              {displayRows.length === 0 && (
                 <tr><td colSpan={9}><Empty>조건에 맞는 참가자가 없습니다.</Empty></td></tr>
               )}
             </tbody>

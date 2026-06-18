@@ -55,6 +55,11 @@ const DayVehicles = ({
     participants.forEach((p) => { m[p.id] = p; });
     return m;
   }, [participants]);
+  // 선택한 인원의 총 탑승 인원(동반자 포함)
+  const pickedHead = useMemo(
+    () => [...picked].reduce((s, id) => s + headcount(pMap[id]), 0),
+    [picked, pMap]
+  );
 
   const load = useCallback(async () => {
     try {
@@ -261,7 +266,7 @@ const DayVehicles = ({
                           </Pool>
                           <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                             <PrimaryButton onClick={() => commitAdd(grp)} disabled={picked.size === 0}>
-                              {picked.size}명 추가
+                              {pickedHead}명 추가
                             </PrimaryButton>
                             <GhostButton onClick={closeAdd}>취소</GhostButton>
                           </div>
