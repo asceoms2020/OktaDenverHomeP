@@ -269,8 +269,16 @@ const Tasks = ({ participants = [] }) => {
                               {DAY_OPTIONS.map((d) => <option key={d} value={d}>{d}</option>)}
                             </Select>
                           </td>
-                          <td><MiniInput defaultValue={t.category || ''} onBlur={(e) => save(t, { category: e.target.value })} /></td>
-                          <td><MiniInput defaultValue={t.task || ''} onBlur={(e) => save(t, { task: e.target.value })} /></td>
+                          <td style={{ whiteSpace: 'normal' }}>
+                            <MiniInput as="textarea" rows={2} defaultValue={t.category || ''}
+                              onBlur={(e) => save(t, { category: e.target.value })}
+                              style={{ resize: 'vertical', minHeight: 40, lineHeight: 1.4, fontFamily: 'inherit' }} />
+                          </td>
+                          <td style={{ whiteSpace: 'normal' }}>
+                            <MiniInput as="textarea" rows={2} defaultValue={t.task || ''}
+                              onBlur={(e) => save(t, { task: e.target.value })}
+                              style={{ resize: 'vertical', minHeight: 40, lineHeight: 1.4, fontFamily: 'inherit' }} />
+                          </td>
                           <td style={{ whiteSpace: 'normal', minWidth: 260 }}>
                             <ChipRow style={{ marginBottom: 6 }}>
                               {(t.responsible || []).map((name) => (
@@ -321,8 +329,16 @@ const Tasks = ({ participants = [] }) => {
                               {STATUS_KO[t.status] || t.status}
                             </Badge>
                           </td>
-                          <td><MiniInput defaultValue={t.supplies || ''} onBlur={(e) => save(t, { supplies: e.target.value })} /></td>
-                          <td><MiniInput defaultValue={t.notes || ''} onBlur={(e) => save(t, { notes: e.target.value })} /></td>
+                          <td style={{ whiteSpace: 'normal' }}>
+                            <MiniInput as="textarea" rows={2} defaultValue={t.supplies || ''}
+                              onBlur={(e) => save(t, { supplies: e.target.value })}
+                              style={{ resize: 'vertical', minHeight: 40, lineHeight: 1.4, fontFamily: 'inherit' }} />
+                          </td>
+                          <td style={{ whiteSpace: 'normal' }}>
+                            <MiniInput as="textarea" rows={2} defaultValue={t.notes || ''}
+                              onBlur={(e) => save(t, { notes: e.target.value })}
+                              style={{ resize: 'vertical', minHeight: 40, lineHeight: 1.4, fontFamily: 'inherit' }} />
+                          </td>
                           <td><IconButton onClick={() => removeTask(t.id)}>삭제</IconButton></td>
                         </tr>
                       ))}

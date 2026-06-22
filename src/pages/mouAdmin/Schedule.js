@@ -118,8 +118,8 @@ const Schedule = () => {
                 <tr>
                   <th style={{ minWidth: 80 }}>시작</th>
                   <th style={{ minWidth: 80 }}>종료</th>
-                  <th style={{ minWidth: 160 }}>진행 내용</th>
-                  <th style={{ minWidth: 200 }}>세부 사항</th>
+                  <th style={{ minWidth: 220 }}>진행 내용</th>
+                  <th style={{ minWidth: 300 }}>세부 사항</th>
                   <th style={{ minWidth: 120 }}>담당</th>
                   <th style={{ minWidth: 120 }}>비고</th>
                   <th></th>
@@ -130,8 +130,16 @@ const Schedule = () => {
                   <tr key={r.id}>
                     <td><MiniInput defaultValue={r.time_start || ''} placeholder="10:00" onBlur={(e) => save(r, { time_start: e.target.value })} /></td>
                     <td><MiniInput defaultValue={r.time_end || ''} placeholder="12:30" onBlur={(e) => save(r, { time_end: e.target.value })} /></td>
-                    <td><MiniInput defaultValue={r.title || ''} onBlur={(e) => save(r, { title: e.target.value })} /></td>
-                    <td><MiniInput defaultValue={r.detail || ''} onBlur={(e) => save(r, { detail: e.target.value })} /></td>
+                    <td style={{ whiteSpace: 'normal' }}>
+                      <MiniInput as="textarea" rows={2} defaultValue={r.title || ''}
+                        onBlur={(e) => save(r, { title: e.target.value })}
+                        style={{ resize: 'vertical', minHeight: 40, lineHeight: 1.4, fontFamily: 'inherit' }} />
+                    </td>
+                    <td style={{ whiteSpace: 'normal' }}>
+                      <MiniInput as="textarea" rows={3} defaultValue={r.detail || ''}
+                        onBlur={(e) => save(r, { detail: e.target.value })}
+                        style={{ resize: 'vertical', minHeight: 56, lineHeight: 1.4, fontFamily: 'inherit' }} />
+                    </td>
                     <td><MiniInput defaultValue={r.responsible || ''} onBlur={(e) => save(r, { responsible: e.target.value })} /></td>
                     <td><MiniInput defaultValue={r.note || ''} onBlur={(e) => save(r, { note: e.target.value })} /></td>
                     <td><IconButton onClick={() => removeRow(r.id)}>삭제</IconButton></td>
