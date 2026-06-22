@@ -5,7 +5,8 @@ import {
   CapTag, Chip, ChipRow, Pool, Select, IconButton, Badge, MiniInput,
 } from '../../styles/MouEventAdmin.styles';
 import {
-  fetchGolfTeams, upsertGolfTeam, updateGolfTeam, deleteGolfTeam, displayName, headcount, memberBadgeStyle, toCsv, downloadCsv,
+  fetchGolfTeams, upsertGolfTeam, updateGolfTeam, deleteGolfTeam, displayName, headcount, memberBadgeStyle,
+  companionNames, companionLabel, toCsv, downloadCsv,
 } from '../../services/mouAdmin';
 
 const newId = () =>
@@ -103,12 +104,29 @@ const Golf = ({ participants }) => {
   const addMember = (team, pid) => { if (pid) save(team, { member_ids: [...(team.member_ids || []), pid] }); };
   const removeMember = (team, pid) => save(team, { member_ids: (team.member_ids || []).filter((x) => x !== pid) });
 
+  // 기타(외부) 골퍼 직접 입력
+  const addExtra = (team, name) => {
+    const nm = (name || '').trim();
+    if (!nm) return;
+    if ((team.extra_members || []).includes(nm)) return;
+    save(team, { extra_members: [...(team.extra_members || []), nm] });
+  };
+  const removeExtra = (team, nm) => save(team, { extra_members: (team.extra_members || []).filter((x) => x !== nm) });
+
   const exportCsv = () => {
     const csv = toCsv(teams, [
       { label: '조', key: 'team_name' },
       { label: '티타임/홀', key: 'tee_info' },
-      { label: '인원', value: (t) => (t.member_ids || []).length },
-      { label: '명단', value: (t) => (t.member_ids || []).map((id) => displayName(pMap[id])).join(' | ') },
+      { label: '인원', value: (t) => seatsOf(t.member_ids) + (t.extra_members || []).length },
+      { label: '명단', value: (t) => {
+        const names = [];
+        (t.member_ids || []).forEach((id) => {
+          names.push(displayName(pMap[id]));
+          companionNames(pMap[id]).forEach((c) => names.push(`${companionLabel(c)}(동반)`));
+        });
+        (t.extra_members || []).forEach((nm) => names.push(`${nm}(기타)`));
+        return names.join(' | ');
+      } },
     ]);
     downloadCsv('mou_golf_teams.csv', csv);
   };
@@ -155,7 +173,8 @@ const Golf = ({ participants }) => {
               <AssignGrid>
                 {teams.map((team) => {
                   const mem = team.member_ids || [];
-                  const seats = seatsOf(mem);
+                  const extra = team.extra_members || [];
+                  const seats = seatsOf(mem) + extra.length;
                   const over = seats > TEAM_CAP;
                   return (
                     <AssignCard key={team.id} $over={over}>
@@ -178,25 +197,50 @@ const Golf = ({ participants }) => {
                         onBlur={(e) => save(team, { tee_info: e.target.value })}
                       />
                       <ChipRow>
-                        {mem.map((pid) => {
-                          const cc = compOf(pMap[pid]);
-                          return (
-                            <Chip key={pid}>
-                              {displayName(pMap[pid]) || '(알수없음)'}{cc > 0 ? ` +${cc}` : ''}
+                        {mem.map((pid) => (
+                          <React.Fragment key={pid}>
+                            <Chip>
+                              {displayName(pMap[pid]) || '(알수없음)'}
                               <button onClick={() => removeMember(team, pid)} title="제거">✕</button>
                             </Chip>
-                          );
-                        })}
-                        {mem.length === 0 && <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>비어 있음</span>}
+                            {companionNames(pMap[pid]).map((c, ci) => (
+                              <Chip key={`${pid}-c${ci}`} style={{ background: 'rgba(155,89,182,0.12)', color: '#7d3c98' }}>
+                                {companionLabel(c)} <span style={{ fontSize: '0.7rem' }}>(동반)</span>
+                              </Chip>
+                            ))}
+                          </React.Fragment>
+                        ))}
+                        {extra.map((nm) => (
+                          <Chip key={`x-${nm}`} style={{ background: 'rgba(52,152,219,0.12)', color: '#1f5a7a' }}>
+                            {nm} <span style={{ fontSize: '0.7rem' }}>(기타)</span>
+                            <button onClick={() => removeExtra(team, nm)} title="제거">✕</button>
+                          </Chip>
+                        ))}
+                        {mem.length === 0 && extra.length === 0 && <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>비어 있음</span>}
                       </ChipRow>
                       <Select defaultValue="" onChange={(e) => { addMember(team, e.target.value); e.target.value = ''; }}>
-                        <option value="">+ 골퍼 배정</option>
+                        <option value="">+ 골퍼 배정 (명단에서)</option>
                         {unassigned.map((p) => (
                           <option key={p.id} value={p.id}>
                             {displayName(p)}{compOf(p) > 0 ? ` +${compOf(p)}` : ''} · {p.member_type === '준비위원회' ? '준비위원회' : p.chapter}
                           </option>
                         ))}
                       </Select>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <MiniInput
+                          placeholder="기타 골퍼 직접 입력 (명단에 없는 외부 골퍼)"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') { addExtra(team, e.target.value); e.target.value = ''; }
+                          }}
+                          id={`extra-${team.id}`}
+                        />
+                        <GhostButton
+                          onClick={() => {
+                            const el = document.getElementById(`extra-${team.id}`);
+                            if (el) { addExtra(team, el.value); el.value = ''; }
+                          }}
+                        >추가</GhostButton>
+                      </div>
                     </AssignCard>
                   );
                 })}

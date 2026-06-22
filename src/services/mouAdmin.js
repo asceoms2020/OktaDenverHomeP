@@ -341,6 +341,30 @@ export const buildRoomTypeMap = (rooms) => {
   return m;
 };
 
+/** 참가자의 동반자 이름을 [{ko,en}] 로 분해 (companion_count 만큼) */
+export const companionNames = (p) => {
+  const cc = p?.companion_count || (p?.has_companion ? 1 : 0);
+  if (cc <= 0) return [];
+  const raw = (p.companion_name || '').trim();
+  const names = raw ? raw.split(/[,&·]|(?:\s+and\s+)/i).map((s) => s.trim()).filter(Boolean) : [];
+  const out = [];
+  for (let i = 0; i < cc; i += 1) {
+    const nm = names[i] || '';
+    let ko = ''; let en = '';
+    if (nm) {
+      const parts = nm.split('/').map((s) => s.trim());
+      if (parts.length >= 2) {
+        ko = parts.find((x) => /[가-힣]/.test(x)) || parts[0];
+        en = parts.find((x) => x !== ko && /[A-Za-z]/.test(x)) || '';
+      } else if (/[가-힣]/.test(nm)) ko = nm;
+      else en = nm;
+    }
+    out.push({ ko: ko || nm || `동반자 ${i + 1}`, en });
+  }
+  return out;
+};
+export const companionLabel = (c) => [c.ko, c.en].filter(Boolean).join(' / ');
+
 export const displayName = (p) => {
   if (!p) return '';
   return [p.name_ko, p.name_en].filter(Boolean).join(' / ') || '(이름없음)';

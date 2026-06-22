@@ -124,6 +124,7 @@ create table if not exists public.mou_golf_teams (
   team_name text,
   tee_info text,
   member_ids uuid[] default '{}',
+  extra_members text[] default '{}',   -- 명단에 없는 골프-온리 외부 골퍼(직접 입력)
   notes text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
