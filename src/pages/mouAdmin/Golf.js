@@ -70,6 +70,7 @@ const Golf = ({ participants }) => {
   // 동반자 포함 인원(좌석) 계산
   const seatsOf = (ids) => (ids || []).reduce((s, id) => s + headcount(pMap[id]), 0);
   const unassignedHead = useMemo(() => unassigned.reduce((s, p) => s + headcount(p), 0), [unassigned]);
+  const extraTotal = useMemo(() => teams.reduce((s, t) => s + (t.extra_members || []).length, 0), [teams]);
   const compOf = (p) => (p?.companion_count || (p?.has_companion ? 1 : 0));
 
   const save = async (team, patch) => {
@@ -135,7 +136,7 @@ const Golf = ({ participants }) => {
     <Card>
       <CardHead>
         <CardTitle>
-          골프 팀 편성 · 골퍼 {golfers.length}명{golfCompanions > 0 ? ` + 동반자 ${golfCompanions}명` : ''} (총 {golfers.length + golfCompanions}명) · {teams.length}개 조 · 미배정 {unassignedHead}명
+          골프 팀 편성 · 골퍼 {golfers.length}명{golfCompanions > 0 ? ` + 동반자 ${golfCompanions}` : ''}{extraTotal > 0 ? ` + 기타 ${extraTotal}` : ''} (총 {golfers.length + golfCompanions + extraTotal}명) · {teams.length}개 조 · 미배정 {unassignedHead}명
         </CardTitle>
         <span style={{ display: 'flex', gap: 8 }}>
           <GhostButton onClick={exportCsv}>CSV 내보내기</GhostButton>
