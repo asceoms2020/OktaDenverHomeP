@@ -95,6 +95,7 @@ const Header = () => {
             <Link to="/resources" className="nav-link" onClick={closeMenu}>{t.resources}</Link>
             <Link to="/newsletter" className="nav-link" onClick={closeMenu}>{t.newsletter}</Link>
             <Link to="/sponsors" className="nav-link" onClick={closeMenu}>{t.sponsors}</Link>
+            <Link to="/places" className="nav-link" onClick={closeMenu}>{language === 'ko' ? '교류회 장소' : 'Venues'}</Link>
 
             {/* Conditional Menu: Trading (Only for Logged in users) */}
             {/* {user && (

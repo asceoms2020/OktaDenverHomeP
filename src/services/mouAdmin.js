@@ -1,4 +1,4 @@
-import { getAuthenticatedClient } from '../lib/supabaseClient';
+import { supabase, getAuthenticatedClient } from '../lib/supabaseClient';
 
 /**
  * MOU 이벤트 관리 — Supabase CRUD 서비스
@@ -317,6 +317,37 @@ export const fetchStaff = async () => {
   if (error) throw error;
   return data || [];
 };
+
+// ---------- 교류회 추천 장소 (공개 읽기 / 관리자 쓰기) ----------
+export const fetchPlaces = async () => {
+  // 비로그인도 볼 수 있어야 하므로 anon 클라이언트(supabase) 사용
+  const { data, error } = await supabase
+    .from('event_places')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data || [];
+};
+export const insertPlace = async (row) => {
+  const { error } = await getAuthenticatedClient().from('event_places').insert([row]);
+  if (error) throw error;
+};
+export const updatePlace = async (id, patch) => {
+  const { error } = await getAuthenticatedClient()
+    .from('event_places').update({ ...patch, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw error;
+};
+export const deletePlace = async (id) => {
+  const { error } = await getAuthenticatedClient().from('event_places').delete().eq('id', id);
+  if (error) throw error;
+};
+/** 구글맵 링크: 직접 url 있으면 우선, 없으면 이름+주소로 검색 */
+export const placeMapUrl = (p) =>
+  p.url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([p.name, p.address].filter(Boolean).join(' '))}`;
+/** 페이지 내 임베드용 지도 URL (API 키 불필요) */
+export const placeMapEmbed = (p) =>
+  `https://maps.google.com/maps?q=${encodeURIComponent([p.name, p.address].filter(Boolean).join(' '))}&z=15&output=embed`;
 
 // ---------- 공통 유틸 ----------
 export const PROGRAM_LABELS = {
