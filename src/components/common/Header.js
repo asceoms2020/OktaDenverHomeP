@@ -104,13 +104,6 @@ const Header = () => {
               </Link>
             )} */}
 
-            {/* Conditional Menu: MOU Event Management (Admins only) */}
-            {user && isAdmin && (
-              <Link to="/admin/mouevent" className="nav-link" onClick={closeMenu}>
-                {language === 'ko' ? 'MOU 이벤트 관리' : 'MOU Event Mgmt'}
-              </Link>
-            )}
-
             {user ? (
               <div className="auth-buttons-container">
                 <button

@@ -106,7 +106,6 @@ const Home = () => {
             </p>
           </div>
           <div className="hero-buttons">
-            <Link to="/events/mouevent2026info" className="cta-button mou-event-cta-button">덴버에서 만나는 세계 참가신청!</Link>
             <Link to="/about" className="cta-button">{t.ctaButton}</Link>
           </div>
         </div>
